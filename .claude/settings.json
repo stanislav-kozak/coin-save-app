@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm install)",
+      "Bash(npm install *)",
+      "Bash(npx shadcn *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout -b *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh pr create *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_response.filePath // .tool_input.file_path'); p=\"$CLAUDE_PROJECT_DIR/node_modules/.bin/prettier\"; case \"$f\" in \"$CLAUDE_PROJECT_DIR\"/*) [ -x \"$p\" ] && \"$p\" --write --ignore-unknown \"$f\" >/dev/null 2>&1 ;; esac; true",
+            "statusMessage": "Prettier"
+          }
+        ]
+      }
+    ]
+  }
+}
