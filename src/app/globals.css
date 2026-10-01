@@ -1,26 +1,110 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design-system tokens — docs/specs/2026-09-14-coin-save-design-system.md §2.
+ * Named after shadcn/ui semantics so its components pick them up:
+ *   accent → primary, surface → card, bg → background,
+ *   text-primary → foreground, text-secondary → muted-foreground, danger → destructive.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #f97350;
+  --primary-hover: #e55e3c;
+  --primary-foreground: #ffffff;
+  --success: #16a34a;
+  --warning: #eab308;
+  --destructive: #dc2626;
+  --background: #fdfbf9;
+  --card: #ffffff;
+  --border: #e7e1db;
+  --foreground: #1c1917;
+  --muted-foreground: #78716c;
+}
+
+.dark {
+  --primary: #fb8a65;
+  --primary-hover: #f97350;
+  --primary-foreground: #1c1917;
+  --success: #4ade80;
+  --warning: #facc15;
+  --destructive: #f87171;
+  --background: #1c1917;
+  --card: #292524;
+  --border: #3f3a35;
+  --foreground: #f5f1ed;
+  --muted-foreground: #a8a29e;
 }
 
 @theme inline {
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-destructive: var(--destructive);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  /* shadcn needs subtle fills; the design system has none, so they reuse the page background */
+  --color-secondary: var(--background);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--background);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--background);
+  --color-accent-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--primary);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Design radii (§4.3). shadcn components use rounded-sm…2xl — collapse them onto the two design radii */
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --radius-sm: 10px;
+  --radius-md: 10px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+  --radius-2xl: 16px;
+
+  --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04), 0 2px 8px rgb(28 25 23 / 0.06);
+  --shadow-card-raised: 0 4px 16px rgb(28 25 23 / 0.12);
+  --shadow-modal: 0 8px 32px rgb(28 25 23 / 0.16);
+
+  --text-display: 32px;
+  --text-display--line-height: 40px;
+  --text-display--font-weight: 700;
+  --text-h1: 24px;
+  --text-h1--line-height: 32px;
+  --text-h1--font-weight: 700;
+  --text-h2: 18px;
+  --text-h2--line-height: 26px;
+  --text-h2--font-weight: 600;
+  --text-body: 15px;
+  --text-body--line-height: 22px;
+  --text-caption: 13px;
+  --text-caption--line-height: 18px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@utility text-money {
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground text-body font-sans antialiased;
+  }
 }

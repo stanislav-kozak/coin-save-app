@@ -92,11 +92,28 @@ src/
 - **Схематично** — розкладка, ієрархія і склад елементів мають відповідати макету, але pixel-perfect не потрібен
   (відступи — найближчі значення зі шкали 4/8/12/16/24/32/48/64).
 - **Точно** — кольори, форми (радіуси, тіні), шрифти й типографічні стилі беруться з дизайн-системи без відхилень.
-- Кольори та типографіка — лише через токени Tailwind-теми (`bg-surface`, `text-text-secondary`, `rounded-card` …).
+- Кольори та типографіка — лише через токени Tailwind-теми (визначені в `src/app/globals.css`, див. таблицю нижче).
   Жодних довільних hex/px-значень у компонентах (`bg-[#F97350]`, `text-[15px]`). Якщо потрібного токена немає — додай його в тему.
 - Кожен компонент одразу підтримує світлу і темну тему.
 - Перед версткою екрана/компонента — подивись відповідний фрейм у Figma. Якщо макета немає — спитай, а не вигадуй.
 - Після верстки — перевір результат у браузері (обидві теми, desktop 1440 і mobile 390) і звір із макетом.
+
+### Токени → класи Tailwind
+
+Токени названі за семантикою shadcn/ui, щоб його компоненти підхоплювали їх без змін:
+
+| Токен дизайн-системи       | Клас                                                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| accent / accent-hover      | `bg-primary`, `text-primary`, `hover:bg-primary-hover`; текст на ньому — `text-primary-foreground`                |
+| success / warning / danger | `text-success`, `text-warning`, `text-destructive` (`bg-*` аналогічно)                                            |
+| bg                         | `bg-background`                                                                                                   |
+| surface                    | `bg-card`                                                                                                         |
+| border                     | `border-border`                                                                                                   |
+| text-primary               | `text-foreground`                                                                                                 |
+| text-secondary             | `text-muted-foreground`                                                                                           |
+| Радіуси                    | `rounded-card` (16px), `rounded-control` (10px), `rounded-full`                                                   |
+| Тіні                       | `shadow-card`, `shadow-card-raised` (drag/hover), `shadow-modal`                                                  |
+| Типографіка                | `text-display`, `text-h1`, `text-h2`, `text-body` (+ `font-medium` для Body Medium), `text-caption`, `text-money` |
 
 ## Робочий процес
 
