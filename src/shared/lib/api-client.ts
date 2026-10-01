@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch';
 import type { paths } from '@/generated/api';
-import { routing } from '@/shared/i18n/routing';
 import { createRefreshingFetch } from './refreshing-fetch';
+import { getLoginRedirect } from './route-access';
 
 type Options = {
   baseUrl?: string;
@@ -20,15 +20,15 @@ export function createApiClient({ baseUrl = '', onAuthFailure, fetchImpl }: Opti
   });
 }
 
-function redirectToLogin() {
-  const first = window.location.pathname.split('/')[1];
-  const locale = (routing.locales as readonly string[]).includes(first)
-    ? first
-    : routing.defaultLocale;
+type LocationLike = Pick<Location, 'pathname' | 'assign'>;
+
+/** Session is gone: go to the login of the current locale — unless we're already on a public page. */
+export function redirectToLogin(location: LocationLike) {
+  const target = getLoginRedirect(location.pathname, false);
+  if (!target) return;
   // Deliberate full reload: the session is gone, so drop all client state (query cache, sockets).
-  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-  window.location.assign(`/${locale}/login`);
+  location.assign(target);
 }
 
 /** Browser client: same-origin `/api/*`, proxied to the backend by next.config rewrites. */
-export const api = createApiClient({ onAuthFailure: redirectToLogin });
+export const api = createApiClient({ onAuthFailure: () => redirectToLogin(window.location) });

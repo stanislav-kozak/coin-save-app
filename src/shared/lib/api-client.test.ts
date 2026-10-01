@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createApiClient } from './api-client';
+import { createApiClient, redirectToLogin } from './api-client';
+
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 describe('createApiClient', () => {
   it('calls the typed path on the given base URL and parses JSON', async () => {
     const fetchImpl = vi.fn(async (r: Request) => {
       expect(r.url).toBe('http://localhost/api/health');
-      return new Response(JSON.stringify({ status: 'ok' }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return json({ status: 'ok' });
     });
     const client = createApiClient({
       baseUrl: 'http://localhost',
@@ -23,13 +23,14 @@ describe('createApiClient', () => {
   });
 
   it('goes through refresh-and-retry', async () => {
-    const fetchImpl = vi
-      .fn<(r: Request) => Promise<Response>>()
-      .mockResolvedValueOnce(new Response('{}', { status: 401 }))
-      .mockResolvedValueOnce(new Response('{}', { status: 200 }))
-      .mockResolvedValueOnce(
-        new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } }),
-      );
+    let refreshed = false;
+    const fetchImpl = vi.fn(async (r: Request) => {
+      if (r.url === 'http://localhost/api/auth/refresh') {
+        refreshed = true;
+        return json({});
+      }
+      return refreshed ? json([]) : json({ code: 'HTTP_ERROR' }, 401);
+    });
     const client = createApiClient({
       baseUrl: 'http://localhost',
       onAuthFailure: vi.fn(),
@@ -39,6 +40,21 @@ describe('createApiClient', () => {
     const { data } = await client.GET('/api/spaces');
 
     expect(data).toEqual([]);
-    expect(fetchImpl.mock.calls[1][0].url).toBe('http://localhost/api/auth/refresh');
+    expect(refreshed).toBe(true);
+  });
+});
+
+describe('redirectToLogin', () => {
+  it('sends a protected page to the login of its locale', () => {
+    const assign = vi.fn();
+    redirectToLogin({ pathname: '/en/analytics', assign });
+    expect(assign).toHaveBeenCalledWith('/en/login');
+  });
+
+  it('does nothing on a public page, so a failed session check there cannot reload-loop', () => {
+    const assign = vi.fn();
+    redirectToLogin({ pathname: '/uk/login', assign });
+    redirectToLogin({ pathname: '/en/verify-email/token', assign });
+    expect(assign).not.toHaveBeenCalled();
   });
 });
