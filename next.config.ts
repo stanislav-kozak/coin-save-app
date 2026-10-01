@@ -3,6 +3,13 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/shared/i18n/request.ts');
 
-const nextConfig: NextConfig = {};
+const apiTarget = process.env.API_PROXY_TARGET ?? 'http://176.117.78.135';
+
+const nextConfig: NextConfig = {
+  async rewrites() {
+    // Browser talks to /api on its own origin, so the backend's Secure httpOnly cookies stay first-party.
+    return [{ source: '/api/:path*', destination: `${apiTarget}/api/:path*` }];
+  },
+};
 
 export default withNextIntl(nextConfig);
