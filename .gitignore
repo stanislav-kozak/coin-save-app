@@ -1,0 +1,38 @@
+# Локальні специфікації та плани — не в git
+docs/
+
+# Node
+node_modules/
+
+# Next.js
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# OpenAPI codegen (генерується в predev/prebuild)
+src/generated/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Tests
+coverage/
+playwright-report/
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Claude Code — особисті налаштування
+.claude/settings.local.json
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
