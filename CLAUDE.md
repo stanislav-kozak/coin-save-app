@@ -10,7 +10,13 @@
 
 API: Swagger UI — http://176.117.78.135/api/docs, контракт — http://176.117.78.135/api/docs.json.
 
+Документація Next.js 16 лежить локально в `node_modules/next/dist/docs/` — для питань по Next читай її
+(правила нижче з `AGENTS.md` керуються самим Next, не редагуй їх вручну):
+
+@AGENTS.md
+
 ## Стек
+
 - Next.js 16 (App Router), React 19, TypeScript, Node.js 24
 - Стилі: Tailwind CSS v4 + shadcn/ui (Radix)
 - Серверний стан: TanStack Query v5; локальний — `useState`/`useReducer` (Zustand — тільки якщо з'явиться реальний cross-tree client-only стан)
@@ -25,6 +31,7 @@ API: Swagger UI — http://176.117.78.135/api/docs, контракт — http://
   звіряйся з документацією через context7, а не з пам'яттю (Next 16, Tailwind 4, zod 4 мають breaking changes).
 
 ## Команди
+
 - Встановити залежності: `npm install`
 - Дев-сервер: `npm run dev` (перед стартом генерує API-клієнт)
 - Згенерувати API-клієнт: `npm run api:generate`
@@ -55,6 +62,7 @@ src/
 - `app/` тонкий: сторінка рендерить компонент модуля або невелику композицію.
 
 ## Конвенції
+
 - Стиль коду: ESLint + Prettier.
 - Файли: kebab-case (`wallet-card.tsx`, `use-create-expense.ts`); компоненти — PascalCase в коді.
   Unit-тести поруч із кодом: `*.test.ts(x)`. E2E — `e2e/*.spec.ts`.
@@ -69,6 +77,7 @@ src/
   бо на них зав'язана інвалідація з WebSocket-подій.
 
 ### Auth і локальна розробка
+
 - Токени — httpOnly cookies (`access`, `refresh`), ставить бекенд. Фронт токени не читає і не зберігає.
 - Бекенд ставить cookie з `Secure` і не має CORS, тому фронт ходить в API **тільки same-origin**:
   у dev Next.js `rewrites` проксить `/api/*` і `/socket.io/*` на бекенд (`API_PROXY_TARGET`).
@@ -90,10 +99,12 @@ src/
 - Після верстки — перевір результат у браузері (обидві теми, desktop 1440 і mobile 390) і звір із макетом.
 
 ## Робочий процес
+
 - Задача → (специфікація/план у `docs/superpowers/` для великих фіч) → feature-гілка `feature/<name>` → PR у `main`.
 - Коміти англійською, Conventional Commits (`feat:`, `fix:`, `chore:`, `test:` …).
 
 ## Правила для агента
+
 - Перед завершенням задачі обов'язково прогнати `npm run lint` і `npm run test`.
   Playwright E2E (`npm run test:e2e`) — тільки коли задача зачіпає критичні флоу (специфікація §12.4).
 - Не чіпати: `src/generated/` (згенерований код), `.env`-файли, секрети, CI-конфіги без явного запиту.
