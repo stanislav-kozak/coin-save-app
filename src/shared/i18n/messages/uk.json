@@ -1,6 +1,12 @@
 {
-  "common": { "appName": "CoinSave", "themeLight": "Світла тема", "themeDark": "Темна тема" },
-  "home": { "title": "Головна" },
+  "common": {
+    "appName": "CoinSave",
+    "themeLight": "Світла тема",
+    "themeDark": "Темна тема"
+  },
+  "home": {
+    "title": "Головна"
+  },
   "styleguide": {
     "title": "Стайлгайд",
     "health": "Стан API",
@@ -15,6 +21,7 @@
     "VALIDATION_ERROR": "Перевірте правильність заповнених полів",
     "HTTP_ERROR": "Запит не виконано. Спробуйте ще раз",
     "INTERNAL_ERROR": "Помилка сервера. Спробуйте пізніше",
+    "TOO_MANY_REQUESTS": "Забагато спроб. Зачекайте хвилину і спробуйте знову",
     "EMAIL_ALREADY_EXISTS": "Користувач з таким email вже існує",
     "INVALID_CREDENTIALS": "Невірний email або пароль",
     "EMAIL_NOT_VERIFIED": "Підтвердіть email, щоб увійти",
@@ -44,5 +51,79 @@
     "CATEGORY_ARCHIVED": "Категорія в архіві",
     "INVALID_PERIOD": "Некоректний період",
     "RECURRING_NOT_FOUND": "Регулярний платіж не знайдено"
+  },
+  "auth": {
+    "brand": {
+      "tagline": "Сімейний бюджет, який росте разом з вами"
+    },
+    "divider": "або",
+    "google": "Продовжити з Google",
+    "fields": {
+      "email": "Email",
+      "password": "Пароль",
+      "name": "Ім'я",
+      "newPassword": "Новий пароль",
+      "confirmPassword": "Підтвердіть пароль"
+    },
+    "placeholders": {
+      "email": "you@example.com",
+      "name": "Тарас Шевченко",
+      "passwordMin": "Мінімум 8 символів"
+    },
+    "validation": {
+      "required": "Заповніть це поле",
+      "emailInvalid": "Введіть коректний email",
+      "passwordTooShort": "Мінімум 8 символів",
+      "passwordsMismatch": "Паролі не збігаються",
+      "nameTooLong": "Не більше 100 символів"
+    },
+    "login": {
+      "title": "Увійти",
+      "subtitle": "Раді бачити вас знову",
+      "forgot": "Забули пароль?",
+      "submit": "Увійти",
+      "noAccount": "Немає акаунту?",
+      "signupLink": "Зареєструватися",
+      "resetDone": "Пароль змінено. Увійдіть з новим паролем"
+    },
+    "signup": {
+      "title": "Створити акаунт",
+      "subtitle": "Почніть керувати сімейним бюджетом",
+      "verifyNote": "Ми надішлемо лист для підтвердження email — вхід буде доступний після підтвердження",
+      "submit": "Зареєструватися",
+      "haveAccount": "Вже є акаунт?",
+      "loginLink": "Увійти"
+    },
+    "checkEmail": {
+      "title": "Перевірте пошту",
+      "sentTo": "Ми надіслали лист для підтвердження на",
+      "sentGeneric": "Ми надіслали лист для підтвердження на вашу пошту",
+      "spamHint": "Не бачите листа? Перевірте папку Спам",
+      "resend": "Надіслати ще раз",
+      "resent": "Новий лист надіслано",
+      "changeEmail": "Змінити email"
+    },
+    "forgot": {
+      "title": "Відновлення паролю",
+      "subtitle": "Введіть email, і ми надішлемо посилання для скидання паролю",
+      "submit": "Надіслати посилання",
+      "remembered": "Згадали пароль?",
+      "loginLink": "Увійти",
+      "sent": "Якщо акаунт з таким email існує, ми надіслали на нього посилання для скидання паролю"
+    },
+    "reset": {
+      "title": "Новий пароль",
+      "subtitle": "Створіть новий пароль для вашого акаунту",
+      "submit": "Зберегти новий пароль",
+      "invalidLink": "Посилання для скидання пароля недійсне або застаріло",
+      "requestNew": "Запросити нове посилання"
+    },
+    "verify": {
+      "pending": "Підтверджуємо email…",
+      "successTitle": "Email підтверджено",
+      "successText": "Тепер ви можете увійти в CoinSave",
+      "errorTitle": "Не вдалося підтвердити email",
+      "toLogin": "Увійти"
+    }
   }
 }

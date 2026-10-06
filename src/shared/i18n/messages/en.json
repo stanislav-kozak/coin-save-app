@@ -1,6 +1,12 @@
 {
-  "common": { "appName": "CoinSave", "themeLight": "Light theme", "themeDark": "Dark theme" },
-  "home": { "title": "Home" },
+  "common": {
+    "appName": "CoinSave",
+    "themeLight": "Light theme",
+    "themeDark": "Dark theme"
+  },
+  "home": {
+    "title": "Home"
+  },
   "styleguide": {
     "title": "Styleguide",
     "health": "API status",
@@ -15,6 +21,7 @@
     "VALIDATION_ERROR": "Please check the fields you filled in",
     "HTTP_ERROR": "The request failed. Please try again",
     "INTERNAL_ERROR": "Server error. Please try again later",
+    "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute and try again",
     "EMAIL_ALREADY_EXISTS": "A user with this email already exists",
     "INVALID_CREDENTIALS": "Wrong email or password",
     "EMAIL_NOT_VERIFIED": "Verify your email to sign in",
@@ -44,5 +51,79 @@
     "CATEGORY_ARCHIVED": "The category is archived",
     "INVALID_PERIOD": "Invalid period",
     "RECURRING_NOT_FOUND": "Recurring payment not found"
+  },
+  "auth": {
+    "brand": {
+      "tagline": "A family budget that grows with you"
+    },
+    "divider": "or",
+    "google": "Continue with Google",
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password"
+    },
+    "placeholders": {
+      "email": "you@example.com",
+      "name": "Jane Doe",
+      "passwordMin": "At least 8 characters"
+    },
+    "validation": {
+      "required": "Fill in this field",
+      "emailInvalid": "Enter a valid email",
+      "passwordTooShort": "At least 8 characters",
+      "passwordsMismatch": "Passwords don't match",
+      "nameTooLong": "100 characters at most"
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Good to see you again",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "No account?",
+      "signupLink": "Sign up",
+      "resetDone": "Password changed. Sign in with your new password"
+    },
+    "signup": {
+      "title": "Create an account",
+      "subtitle": "Start managing your family budget",
+      "verifyNote": "We'll send you an email to confirm your address — you can sign in after confirming",
+      "submit": "Sign up",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "checkEmail": {
+      "title": "Check your email",
+      "sentTo": "We sent a confirmation email to",
+      "sentGeneric": "We sent a confirmation email to your inbox",
+      "spamHint": "Don't see it? Check your Spam folder",
+      "resend": "Send again",
+      "resent": "A new email is on its way",
+      "changeEmail": "Change email"
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "Enter your email and we'll send you a reset link",
+      "submit": "Send link",
+      "remembered": "Remembered it?",
+      "loginLink": "Sign in",
+      "sent": "If an account with this email exists, we've sent it a password reset link"
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Create a new password for your account",
+      "submit": "Save new password",
+      "invalidLink": "This password reset link is invalid or expired",
+      "requestNew": "Request a new link"
+    },
+    "verify": {
+      "pending": "Confirming your email…",
+      "successTitle": "Email confirmed",
+      "successText": "You can now sign in to CoinSave",
+      "errorTitle": "Couldn't confirm your email",
+      "toLogin": "Sign in"
+    }
   }
 }
