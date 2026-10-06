@@ -1,11 +1,18 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 import { SectionError } from '@/shared/ui/section-error';
 import { useCategories, useMonthAnalytics } from '../api/categories-queries';
 import { CategoryCard, CategoryCircle } from './category-card';
 
-export function CategoriesGrid({ spaceId }: { spaceId: string }) {
+type Props = {
+  spaceId: string;
+  /** Lets the dashboard make each category a drop target; `isCard` distinguishes card vs circle. */
+  wrap?: (categoryId: string, node: ReactNode, isCard: boolean) => ReactNode;
+};
+
+export function CategoriesGrid({ spaceId, wrap = (_id, node) => node }: Props) {
   const t = useTranslations('dashboard');
   const categories = useCategories(spaceId);
   const analytics = useMonthAnalytics(spaceId);
@@ -44,13 +51,15 @@ export function CategoriesGrid({ spaceId }: { spaceId: string }) {
       <ul className="grid grid-cols-4 gap-4 md:hidden">
         {items.map((item) => (
           <li key={item.category.id} className="flex justify-center">
-            <CategoryCircle {...item} />
+            {wrap(item.category.id, <CategoryCircle {...item} />, false)}
           </li>
         ))}
       </ul>
       <div className="hidden grid-cols-2 gap-4 md:grid">
         {items.map((item) => (
-          <CategoryCard key={item.category.id} {...item} />
+          <div key={item.category.id}>
+            {wrap(item.category.id, <CategoryCard {...item} />, true)}
+          </div>
         ))}
       </div>
     </section>

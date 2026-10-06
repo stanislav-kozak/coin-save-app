@@ -2,13 +2,21 @@
 
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { SectionError } from '@/shared/ui/section-error';
 import { useWallets } from '../api/wallets-queries';
 import { WalletCard, WalletCircle } from './wallet-card';
 
-export function WalletsPanel({ spaceId, onAdd }: { spaceId: string; onAdd: () => void }) {
+type Props = {
+  spaceId: string;
+  onAdd: () => void;
+  /** Lets the dashboard make each wallet draggable without this module knowing about drag-and-drop. */
+  wrap?: (walletId: string, node: ReactNode, isCard: boolean) => ReactNode;
+};
+
+export function WalletsPanel({ spaceId, onAdd, wrap = (_id, node) => node }: Props) {
   const t = useTranslations('wallets');
   const td = useTranslations('dashboard');
   const wallets = useWallets(spaceId);
@@ -42,16 +50,12 @@ export function WalletsPanel({ spaceId, onAdd }: { spaceId: string; onAdd: () =>
         <>
           <ul className="flex gap-4 overflow-x-auto p-1 md:hidden">
             {wallets.data.map((w) => (
-              <li key={w.id}>
-                <WalletCircle wallet={w} />
-              </li>
+              <li key={w.id}>{wrap(w.id, <WalletCircle wallet={w} />, false)}</li>
             ))}
           </ul>
           <ul className="hidden flex-col gap-3 md:flex">
             {wallets.data.map((w) => (
-              <li key={w.id}>
-                <WalletCard wallet={w} />
-              </li>
+              <li key={w.id}>{wrap(w.id, <WalletCard wallet={w} />, true)}</li>
             ))}
           </ul>
           <button
