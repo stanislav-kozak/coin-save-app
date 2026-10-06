@@ -82,7 +82,10 @@ src/
 - Бекенд ставить cookie з `Secure` і не має CORS, тому фронт ходить в API **тільки same-origin**:
   у dev Next.js `rewrites` проксить `/api/*` і `/socket.io/*` на бекенд (`API_PROXY_TARGET`).
   Не викликати `http://176.117.78.135` напряму з браузера.
-- Захист роутів — перевірка наявності cookie `access` у Next proxy/middleware, без запитів до API.
+- Захист роутів — `src/proxy.ts` перевіряє cookie-ознаку `session` (30 днів, ставить і прибирає бекенд; `access` живе
+  лише 15 хв і на перехідний період теж приймається), без запитів до API. Залогіненого користувача proxy відправляє
+  з guest-only сторінок (`login`, `signup`, `forgot-password`, `check-email`) у застосунок; сторінки з посилань у листах
+  (`verify-email`, `reset-password`) доступні завжди.
 - На 401 — один раз `POST /api/auth/refresh` і повтор запиту; якщо refresh не вдався — редірект на `/{locale}/login`.
 
 ## Дизайн
