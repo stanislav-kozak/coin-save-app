@@ -18,4 +18,10 @@ describe('getErrorCode', () => {
   ])('falls back to UNKNOWN_ERROR for %s', (_label, error) => {
     expect(getErrorCode(error)).toBe('UNKNOWN_ERROR');
   });
+
+  it('maps a rate-limit response to TOO_MANY_REQUESTS whatever its code', () => {
+    expect(
+      getErrorCode({ statusCode: 429, code: 'HTTP_ERROR', message: 'ThrottlerException' }),
+    ).toBe('TOO_MANY_REQUESTS');
+  });
 });
