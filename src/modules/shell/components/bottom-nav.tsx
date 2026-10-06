@@ -30,12 +30,13 @@ export function BottomNav({ spaceId }: { spaceId: string }) {
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex flex-col items-center gap-1 py-2 text-caption',
+                  'flex flex-col items-center gap-1 px-1 py-2 text-caption',
                   active ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
                 <Icon aria-hidden className="size-5" />
-                {label}
+                {/* Long labels ("Налаштування") must not spill on narrow phones */}
+                <span className="max-w-full truncate">{label}</span>
               </Link>
             </li>
           );

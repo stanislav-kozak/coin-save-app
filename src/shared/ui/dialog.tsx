@@ -14,7 +14,7 @@ type ContentProps = { title: string; closeLabel: string; children: ReactNode };
 export function DialogContent({ title, closeLabel, children }: ContentProps) {
   return (
     <Primitive.Portal>
-      <Primitive.Overlay className="fixed inset-0 z-50 bg-foreground/40" />
+      <Primitive.Overlay className="fixed inset-0 z-50 bg-overlay" />
       <Primitive.Content
         aria-describedby={undefined}
         className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-100 -translate-x-1/2 -translate-y-1/2 rounded-card bg-card p-6 text-card-foreground shadow-modal"

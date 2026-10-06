@@ -38,6 +38,8 @@ export function formatMoney(
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
+    // Symbols as in the design (₴, €, $) rather than "грн"/"EUR"; wallets also show the ISO badge.
+    currencyDisplay: 'narrowSymbol',
     signDisplay: opts.sign === 'always' ? 'exceptZero' : 'auto',
   }).format(amount as Intl.StringNumericLiteral);
 }

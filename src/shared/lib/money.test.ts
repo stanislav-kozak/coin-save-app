@@ -9,6 +9,10 @@ describe('money', () => {
     expect(formatMoney('-45', 'USD', 'en')).toBe('-$45.00');
     expect(formatMoney('0', 'EUR', 'en')).toBe('€0.00');
   });
+  it('uses currency symbols like the design, not ISO codes', () => {
+    expect(formatMoney('8240.5', 'UAH', 'uk')).toMatch(/^8\s240,50\s₴$/);
+    expect(formatMoney('0', 'EUR', 'uk')).toMatch(/^0,00\s€$/);
+  });
   it('can force a sign for incomes/expenses', () => {
     expect(formatMoney('340', 'USD', 'en', { sign: 'always' })).toBe('+$340.00');
     expect(formatMoney('-340', 'USD', 'en', { sign: 'always' })).toBe('-$340.00');
