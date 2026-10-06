@@ -1,0 +1,19 @@
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/shared/lib/api-client';
+import { recentDays } from '@/shared/lib/periods';
+
+export const RECENT_DAYS = 3; // spec §6.1: today, yesterday, the day before
+
+export function useRecentExpenses(spaceId: string, now = new Date()) {
+  const { from } = recentDays(now, RECENT_DAYS);
+  return useQuery({
+    queryKey: ['expenses', spaceId, from],
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/spaces/{spaceId}/expenses', {
+        params: { path: { spaceId }, query: { from, to: new Date().toISOString() } },
+      });
+      if (error) throw error;
+      return [...data].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+    },
+  });
+}
