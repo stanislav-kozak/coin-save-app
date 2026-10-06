@@ -2,7 +2,8 @@
   "common": {
     "appName": "CoinSave",
     "themeLight": "Світла тема",
-    "themeDark": "Темна тема"
+    "themeDark": "Темна тема",
+    "retry": "Спробувати ще раз"
   },
   "styleguide": {
     "title": "Стайлгайд",
@@ -153,9 +154,6 @@
       "text": "Можливо, його видалили або вас більше немає серед учасників",
       "back": "До моїх просторів"
     },
-    "home": {
-      "title": "Головна"
-    },
     "retry": "Спробувати ще раз"
   },
   "shell": {
@@ -169,5 +167,51 @@
       "uk": "Українська",
       "en": "English"
     }
+  },
+  "dashboard": {
+    "wallets": "Гаманці",
+    "categories": "Категорії",
+    "recent": "Останні витрати",
+    "soon": "Скоро тут буде більше"
+  },
+  "wallets": {
+    "add": "Додати гаманець",
+    "emptyTitle": "Ще немає гаманців",
+    "emptyText": "Додайте перший гаманець, щоб почати облік витрат",
+    "close": "Закрити",
+    "create": {
+      "title": "Новий гаманець",
+      "name": "Назва",
+      "namePlaceholder": "Наприклад, Monobank",
+      "currency": "Валюта",
+      "initialBalance": "Початковий баланс",
+      "submit": "Додати"
+    },
+    "validation": {
+      "nameRequired": "Введіть назву",
+      "nameTooLong": "Не більше 100 символів",
+      "amountInvalid": "Введіть суму, наприклад 1250.50",
+      "amountTooLarge": "Занадто велика сума"
+    }
+  },
+  "categories": {
+    "spentOfLimit": "{spent} / {limit} · {pct}%",
+    "spent": "{amount} витрачено",
+    "over": "+{amount}",
+    "overLabel": "понад ліміт",
+    "uncategorized": "Без категорії"
+  },
+  "expenses": {
+    "today": "Сьогодні",
+    "yesterday": "Вчора",
+    "emptyTitle": "Витрат ще немає",
+    "emptyText": "Перетягніть гаманець на категорію, щоб додати першу витрату"
+  },
+  "nav": {
+    "home": "Головна",
+    "recurring": "Регулярні",
+    "analytics": "Аналітика",
+    "settings": "Налаштування",
+    "label": "Навігація"
   }
 }

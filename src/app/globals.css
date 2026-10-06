@@ -68,6 +68,8 @@
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--primary);
+  /* Modal backdrop: the design's shadow tint, dark in both themes */
+  --color-overlay: rgb(28 25 23 / 0.5);
   --color-palette-blue: var(--palette-blue);
   --color-palette-teal: var(--palette-teal);
   --color-palette-amber: var(--palette-amber);

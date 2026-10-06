@@ -752,6 +752,11 @@ export interface components {
             token: string;
         };
         CreateWalletDto: {
+            /**
+             * @description Up to 4 decimal places; may be negative (e.g. a credit card)
+             * @example 1250.5
+             */
+            initialBalance: number;
             name: string;
             /** @enum {string} */
             currency: "USD" | "EUR" | "GBP" | "PLN" | "CZK" | "CHF" | "CAD" | "AUD" | "JPY" | "TRY" | "RON" | "UAH" | "RUB";
@@ -784,6 +789,11 @@ export interface components {
             updatedAt: string;
         };
         UpdateWalletDto: {
+            /**
+             * @description Up to 4 decimal places; may be negative (e.g. a credit card)
+             * @example 1250.5
+             */
+            initialBalance?: number;
             name?: string;
             icon?: string;
             color?: string;
