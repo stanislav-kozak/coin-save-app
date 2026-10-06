@@ -76,9 +76,4 @@ describe('LoginForm', () => {
     await fillAndSubmit('a@b.co', 'secret');
     expect(await screen.findByRole('alert')).toHaveTextContent('Забагато спроб');
   });
-
-  it('confirms a finished password reset', () => {
-    renderWithProviders(<LoginForm resetDone />);
-    expect(screen.getByText('Пароль змінено. Увійдіть з новим паролем')).toBeInTheDocument();
-  });
 });

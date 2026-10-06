@@ -83,8 +83,7 @@
       "forgot": "Forgot password?",
       "submit": "Sign in",
       "noAccount": "No account?",
-      "signupLink": "Sign up",
-      "resetDone": "Password changed. Sign in with your new password"
+      "signupLink": "Sign up"
     },
     "signup": {
       "title": "Create an account",
@@ -116,7 +115,10 @@
       "subtitle": "Create a new password for your account",
       "submit": "Save new password",
       "invalidLink": "This password reset link is invalid or expired",
-      "requestNew": "Request a new link"
+      "requestNew": "Request a new link",
+      "successTitle": "Password changed",
+      "successText": "Now sign in with your new password",
+      "toLogin": "Sign in"
     },
     "verify": {
       "pending": "Confirming your email…",

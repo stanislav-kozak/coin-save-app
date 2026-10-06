@@ -17,7 +17,7 @@ import { AuthHeader } from './auth-header';
 import { GoogleButton } from './google-button';
 import { OrDivider } from './or-divider';
 
-export function LoginForm({ resetDone = false }: { resetDone?: boolean }) {
+export function LoginForm() {
   const t = useTranslations('auth');
   const te = useTranslations('errors');
   const vm = useValidationMessage();
@@ -49,7 +49,6 @@ export function LoginForm({ resetDone = false }: { resetDone?: boolean }) {
   return (
     <>
       <AuthHeader title={t('login.title')} subtitle={t('login.subtitle')} />
-      {resetDone ? <p className="mb-4 text-body text-success">{t('login.resetDone')}</p> : null}
       <GoogleButton />
       <OrDivider />
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4">

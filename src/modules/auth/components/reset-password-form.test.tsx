@@ -40,13 +40,13 @@ describe('ResetPasswordForm', () => {
     expect(post).not.toHaveBeenCalled();
   });
 
-  it('saves and sends the user to login with a confirmation', async () => {
+  it('saves and confirms in place, so it also works for a signed-in user', async () => {
     post.mockResolvedValue({ data: { message: 'ok' } });
     renderWithProviders(<ResetPasswordForm token="t1" />);
     await fill('12345678', '12345678');
-    await vi.waitFor(() =>
-      expect(replace).toHaveBeenCalledWith({ pathname: '/login', query: { reset: '1' } }),
-    );
+    expect(await screen.findByRole('heading', { name: 'Пароль змінено' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Увійти' })).toHaveAttribute('href', '/login');
+    expect(replace).not.toHaveBeenCalled();
     expect(post).toHaveBeenCalledWith('/api/auth/reset-password', {
       body: { token: 't1', newPassword: '12345678' },
     });

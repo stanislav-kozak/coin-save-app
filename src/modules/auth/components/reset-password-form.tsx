@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
-import { Link, useRouter } from '@/shared/i18n/navigation';
+import { Link } from '@/shared/i18n/navigation';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
@@ -19,7 +19,6 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
   const t = useTranslations('auth');
   const te = useTranslations('errors');
   const vm = useValidationMessage();
-  const router = useRouter();
   const reset = useResetPassword();
   const { register, handleSubmit, formState } = useForm<
     z.input<typeof resetPasswordSchema>,
@@ -41,14 +40,20 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
     );
   }
 
-  const onSubmit = handleSubmit(async ({ newPassword }) => {
-    try {
-      await reset.mutateAsync({ token, newPassword });
-      router.replace({ pathname: '/login', query: { reset: '1' } });
-    } catch {
-      // shown below via reset.error
-    }
-  });
+  // Confirm in place: /login is guest-only, so a signed-in user redirected there would land on the
+  // app home without ever seeing that the password changed.
+  if (reset.isSuccess) {
+    return (
+      <StatusPanel icon="success" title={t('reset.successTitle')}>
+        <p className="text-body text-muted-foreground">{t('reset.successText')}</p>
+        <Button asChild className="mt-3 w-full">
+          <Link href="/login">{t('reset.toLogin')}</Link>
+        </Button>
+      </StatusPanel>
+    );
+  }
+
+  const onSubmit = handleSubmit(({ newPassword }) => reset.mutate({ token, newPassword }));
 
   return (
     <>
