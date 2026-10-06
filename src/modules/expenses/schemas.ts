@@ -4,7 +4,7 @@ const AMOUNT = /^\d+([.,]\d{1,4})?$/; // positive, ≤ 4 dp (server Decimal(19, 
 
 // Messages are keys of `expenses.validation`.
 export const createExpenseSchema = z.object({
-  walletId: z.string().min(1),
+  walletId: z.string().min(1, { error: 'walletRequired' }),
   categoryId: z.string().optional(),
   amount: z
     .string()

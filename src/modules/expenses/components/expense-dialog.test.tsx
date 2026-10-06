@@ -44,6 +44,23 @@ function Harness({ prefill }: { prefill?: { walletId: string; categoryId: string
   );
 }
 
+/** Drops a second time while the first save may still be in flight. */
+function Relauncher() {
+  const [open, setOpen] = useState(false);
+  const [prefill, setPrefill] = useState<{ walletId: string; categoryId: string }>();
+  const drop = (walletId: string, categoryId: string) => {
+    setPrefill({ walletId, categoryId });
+    setOpen(true);
+  };
+  return (
+    <>
+      <button onClick={() => drop('w1', 'c9')}>drop-mono</button>
+      <button onClick={() => drop('w2', 'c1')}>drop-cash</button>
+      <ExpenseDialog spaceId="sp1" open={open} prefill={prefill} onOpenChange={setOpen} />
+    </>
+  );
+}
+
 describe('ExpenseDialog', () => {
   beforeEach(() => {
     openChanges.length = 0;
@@ -114,5 +131,44 @@ describe('ExpenseDialog', () => {
     const body = post.mock.calls[0][1].body;
     expect(body).toMatchObject({ walletId: 'w2', amount: 5 });
     expect(body.categoryId).toBeUndefined();
+  });
+
+  it('accepts a new drop while the previous save is pending and still reports its failure', async () => {
+    let answerFirst!: (v: unknown) => void;
+    post
+      .mockReturnValueOnce(new Promise((r) => (answerFirst = r)))
+      .mockResolvedValueOnce({ data: { id: 'e2' } });
+    renderWithProviders(<Relauncher />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByText('drop-mono'));
+    await user.type(await screen.findByLabelText('Сума'), '340');
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(screen.queryByLabelText('Сума')).not.toBeInTheDocument());
+
+    await user.click(screen.getByText('drop-cash'));
+    await user.type(await screen.findByLabelText('Сума'), '7');
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+
+    answerFirst({ error: { statusCode: 400, code: 'WALLET_ARCHIVED', message: 'x' } });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(screen.getByLabelText('Сума')).toHaveValue('340');
+    expect(screen.getByText(/Mono/)).toBeInTheDocument();
+    expect(screen.getByText(/Кафе/)).toBeInTheDocument();
+  });
+
+  it('says a wallet is missing instead of silently ignoring the submit', async () => {
+    get.mockImplementation(async (path: string) =>
+      path.endsWith('/wallets')
+        ? { error: { statusCode: 403, code: 'FORBIDDEN', message: 'x' } }
+        : { data: categories },
+    );
+    renderWithProviders(<Harness />);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Сума'), '5');
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    expect(await screen.findByText('Оберіть гаманець')).toBeInTheDocument();
+    expect(post).not.toHaveBeenCalled();
   });
 });

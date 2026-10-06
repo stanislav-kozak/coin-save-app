@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useCategories } from '@/modules/categories';
 import { useWallets } from '@/modules/wallets';
@@ -16,7 +16,12 @@ import { useCreateExpense } from '../api/expenses-mutations';
 import { createExpenseSchema, type ExpenseDraft, type ExpenseFormInput } from '../schemas';
 
 type ValidationKey =
-  'amountRequired' | 'amountInvalid' | 'amountPositive' | 'amountTooLarge' | 'noteTooLong';
+  | 'walletRequired'
+  | 'amountRequired'
+  | 'amountInvalid'
+  | 'amountPositive'
+  | 'amountTooLarge'
+  | 'noteTooLong';
 type Props = {
   spaceId: string;
   open: boolean;
@@ -35,8 +40,13 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
   const create = useCreateExpense(spaceId);
-  const submitting = useRef(false);
-  const reopenedAfterError = useRef(false);
+  const [submitError, setSubmitError] = useState<unknown>(null);
+  const submitting = useRef(false); // one submit per opening (Enter twice)
+  const restoring = useRef(false); // the next open shows a failed save, not a fresh form
+  const isOpen = useRef(open);
+  useEffect(() => {
+    isOpen.current = open;
+  }, [open]);
 
   const { register, handleSubmit, formState, reset, control, setFocus, setValue, getValues } =
     useForm<ExpenseFormInput, unknown, ExpenseDraft>({
@@ -46,11 +56,12 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
   // A fresh open (new drop / FAB) starts clean; reopening after a failure keeps what was typed.
   useEffect(() => {
     if (!open) return;
-    if (reopenedAfterError.current) {
-      reopenedAfterError.current = false;
+    submitting.current = false;
+    if (restoring.current) {
+      restoring.current = false;
       return;
     }
-    create.reset();
+    setSubmitError(null);
     reset({
       walletId: prefill?.walletId ?? wallets.data?.[0]?.id ?? '',
       categoryId: prefill?.categoryId ?? '',
@@ -81,27 +92,27 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
   }, [open, isFree, firstCategoryId, getValues, setValue]);
 
   const walletId = useWatch({ control, name: 'walletId' });
+  const categoryId = useWatch({ control, name: 'categoryId' });
   const wallet = wallets.data?.find((w) => w.id === walletId);
-  const category = categories.data?.find((c) => c.id === prefill?.categoryId);
+  const category = categories.data?.find((c) => c.id === categoryId);
   const errors = formState.errors;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 
   const submit = (draft: ExpenseDraft) => {
     if (submitting.current) return;
     submitting.current = true;
+    const values = getValues();
     onOpenChange(false); // optimistic: the result is already on screen (spec §6.9)
-    create.mutate(
-      { ...draft, categoryId: draft.categoryId || undefined },
-      {
-        onError: () => {
-          reopenedAfterError.current = true;
-          onOpenChange(true);
-        },
-        onSettled: () => {
-          submitting.current = false;
-        },
-      },
-    );
+    // A promise, not per-call callbacks: those are dropped once a newer open resets the observer.
+    create
+      .mutateAsync({ ...draft, categoryId: draft.categoryId || undefined })
+      .catch((error: unknown) => {
+        // Show the failed expense again — even over a newer, unsent one — so it isn't lost silently.
+        restoring.current = !isOpen.current;
+        reset(values);
+        setSubmitError(error);
+        onOpenChange(true);
+      });
   };
 
   return (
@@ -125,8 +136,17 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
             </dl>
           ) : (
             <>
-              <FormField id="expense-wallet" label={t('create.wallet')}>
-                <select id="expense-wallet" className={SELECT} {...register('walletId')}>
+              <FormField
+                id="expense-wallet"
+                label={t('create.wallet')}
+                error={vm(errors.walletId?.message)}
+              >
+                <select
+                  id="expense-wallet"
+                  className={SELECT}
+                  aria-invalid={!!errors.walletId}
+                  {...register('walletId')}
+                >
                   {wallets.data?.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.name} · {w.currency}
@@ -173,9 +193,9 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
               {...register('note')}
             />
           </FormField>
-          {create.error ? (
+          {submitError ? (
             <p role="alert" className="text-caption text-destructive">
-              {te(getErrorCode(create.error))}
+              {te(getErrorCode(submitError))}
             </p>
           ) : null}
           <Button type="submit">{t('create.submit')}</Button>

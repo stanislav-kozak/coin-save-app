@@ -218,6 +218,7 @@
       "close": "Close"
     },
     "validation": {
+      "walletRequired": "Choose a wallet",
       "amountRequired": "Enter an amount",
       "amountInvalid": "Enter a positive amount, e.g. 250.50",
       "amountPositive": "Amount must be greater than zero",

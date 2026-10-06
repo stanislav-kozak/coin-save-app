@@ -218,6 +218,7 @@
       "close": "Закрити"
     },
     "validation": {
+      "walletRequired": "Оберіть гаманець",
       "amountRequired": "Введіть суму",
       "amountInvalid": "Введіть додатну суму, наприклад 250.50",
       "amountPositive": "Сума має бути більшою за нуль",
