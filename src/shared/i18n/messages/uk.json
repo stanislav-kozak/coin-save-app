@@ -4,9 +4,6 @@
     "themeLight": "Світла тема",
     "themeDark": "Темна тема"
   },
-  "home": {
-    "title": "Головна"
-  },
   "styleguide": {
     "title": "Стайлгайд",
     "health": "Стан API",
@@ -127,6 +124,50 @@
       "successText": "Тепер ви можете увійти в CoinSave",
       "errorTitle": "Не вдалося підтвердити email",
       "toLogin": "Увійти"
+    }
+  },
+  "spaces": {
+    "onboarding": {
+      "firstTitle": "Створіть свій перший простір",
+      "title": "Новий простір",
+      "subtitle": "Простір — це спільний бюджет для вашої родини чи команди",
+      "name": "Назва простору",
+      "namePlaceholder": "Наприклад, Family",
+      "currency": "Основна валюта",
+      "submit": "Створити простір"
+    },
+    "validation": {
+      "nameRequired": "Введіть назву простору",
+      "nameTooLong": "Не більше 100 символів"
+    },
+    "switcher": {
+      "label": "Перемкнути простір",
+      "create": "Створити новий простір"
+    },
+    "roles": {
+      "OWNER": "Owner",
+      "MEMBER": "Member"
+    },
+    "unavailable": {
+      "title": "Простір недоступний",
+      "text": "Можливо, його видалили або вас більше немає серед учасників",
+      "back": "До моїх просторів"
+    },
+    "home": {
+      "title": "Головна"
+    },
+    "retry": "Спробувати ще раз"
+  },
+  "shell": {
+    "userMenu": "Меню користувача",
+    "logout": "Вийти",
+    "theme": "Тема",
+    "themeLight": "Світла",
+    "themeDark": "Темна",
+    "language": "Мова",
+    "languages": {
+      "uk": "Українська",
+      "en": "English"
     }
   }
 }

@@ -1,0 +1,48 @@
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderWithProviders } from '@/test-utils/render';
+import { SpaceRedirect } from './space-redirect';
+
+const get = vi.fn();
+vi.mock('@/shared/lib/api-client', () => ({ api: { GET: (...a: unknown[]) => get(...a) } }));
+const replace = vi.fn();
+vi.mock('@/shared/i18n/navigation', () => ({ useRouter: () => ({ replace }) }));
+
+beforeEach(() => {
+  get.mockReset();
+  replace.mockReset();
+  localStorage.clear();
+});
+
+describe('SpaceRedirect', () => {
+  it('sends a user without spaces to onboarding', async () => {
+    get.mockResolvedValue({ data: [] });
+    renderWithProviders(<SpaceRedirect />);
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/onboarding'));
+  });
+
+  it('opens the remembered space if it still exists', async () => {
+    localStorage.setItem('coinsave.lastSpaceId', 'b');
+    get.mockResolvedValue({ data: [{ id: 'a' }, { id: 'b' }] });
+    renderWithProviders(<SpaceRedirect />);
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/b'));
+  });
+
+  it('ignores a remembered space the user lost access to', async () => {
+    localStorage.setItem('coinsave.lastSpaceId', 'gone');
+    get.mockResolvedValue({ data: [{ id: 'a' }] });
+    renderWithProviders(<SpaceRedirect />);
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/a'));
+  });
+
+  it('explains a failed load and retries instead of a blank page', async () => {
+    get
+      .mockResolvedValueOnce({ error: { statusCode: 503, code: 'INTERNAL_ERROR', message: 'x' } })
+      .mockResolvedValueOnce({ data: [{ id: 'a' }] });
+    renderWithProviders(<SpaceRedirect />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Помилка сервера');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Спробувати ще раз' }));
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/a'));
+  });
+});

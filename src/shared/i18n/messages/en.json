@@ -4,9 +4,6 @@
     "themeLight": "Light theme",
     "themeDark": "Dark theme"
   },
-  "home": {
-    "title": "Home"
-  },
   "styleguide": {
     "title": "Styleguide",
     "health": "API status",
@@ -127,6 +124,50 @@
       "successText": "You can now sign in to CoinSave",
       "errorTitle": "Couldn't confirm your email",
       "toLogin": "Sign in"
+    }
+  },
+  "spaces": {
+    "onboarding": {
+      "firstTitle": "Create your first space",
+      "title": "New space",
+      "subtitle": "A space is a shared budget for your family or team",
+      "name": "Space name",
+      "namePlaceholder": "For example, Family",
+      "currency": "Primary currency",
+      "submit": "Create space"
+    },
+    "validation": {
+      "nameRequired": "Enter a space name",
+      "nameTooLong": "100 characters at most"
+    },
+    "switcher": {
+      "label": "Switch space",
+      "create": "Create a new space"
+    },
+    "roles": {
+      "OWNER": "Owner",
+      "MEMBER": "Member"
+    },
+    "unavailable": {
+      "title": "Space unavailable",
+      "text": "It may have been deleted, or you're no longer a member",
+      "back": "Back to my spaces"
+    },
+    "home": {
+      "title": "Home"
+    },
+    "retry": "Try again"
+  },
+  "shell": {
+    "userMenu": "User menu",
+    "logout": "Sign out",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language",
+    "languages": {
+      "uk": "Українська",
+      "en": "English"
     }
   }
 }

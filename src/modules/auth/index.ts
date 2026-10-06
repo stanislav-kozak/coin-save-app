@@ -5,4 +5,5 @@ export { ResetPasswordForm } from './components/reset-password-form';
 export { VerifyEmail } from './components/verify-email';
 export { SignupForm } from './components/signup-form';
 export { CheckEmailClient } from './components/check-email-client';
-export { SessionCheck } from './components/session-check';
+export { StatusPanel } from './components/status-panel';
+export { useCurrentUser } from './api/use-current-user';
