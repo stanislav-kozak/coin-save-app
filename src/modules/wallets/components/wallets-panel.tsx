@@ -1,0 +1,58 @@
+'use client';
+
+import { Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/shared/ui/button';
+import { EmptyState } from '@/shared/ui/empty-state';
+import { useWallets } from '../api/wallets-queries';
+import { WalletCard, WalletCircle } from './wallet-card';
+
+export function WalletsPanel({ spaceId, onAdd }: { spaceId: string; onAdd: () => void }) {
+  const t = useTranslations('wallets');
+  const td = useTranslations('dashboard');
+  const wallets = useWallets(spaceId);
+  if (!wallets.data) return null;
+
+  const addButton = (
+    <Button variant="secondary" size="s" className="w-full" onClick={onAdd}>
+      <Plus aria-hidden className="size-4" />
+      {t('add')}
+    </Button>
+  );
+
+  return (
+    <section aria-labelledby="wallets-title" className="flex flex-col gap-4">
+      <h2 id="wallets-title" className="text-h2">
+        {td('wallets')}
+      </h2>
+      {wallets.data.length === 0 ? (
+        <EmptyState title={t('emptyTitle')} text={t('emptyText')} action={addButton} />
+      ) : (
+        <>
+          <ul className="flex gap-4 overflow-x-auto p-1 md:hidden">
+            {wallets.data.map((w) => (
+              <li key={w.id}>
+                <WalletCircle wallet={w} />
+              </li>
+            ))}
+          </ul>
+          <ul className="hidden flex-col gap-3 md:flex">
+            {wallets.data.map((w) => (
+              <li key={w.id}>
+                <WalletCard wallet={w} />
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={onAdd}
+            className="flex items-center gap-1 self-start text-caption font-medium text-primary"
+          >
+            <Plus aria-hidden className="size-4" />
+            {t('add')}
+          </button>
+        </>
+      )}
+    </section>
+  );
+}
