@@ -43,3 +43,13 @@ export function useResetPassword() {
     },
   });
 }
+
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: async (body: Schemas['ResendVerificationDto']) => {
+      const { data, error } = await api.POST('/api/auth/resend-verification', { body });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
