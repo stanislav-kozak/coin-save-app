@@ -6,7 +6,6 @@ docs
 .playwright-mcp
 .claude
 coverage
-src/generated
 *.log
 .env
 .env.*

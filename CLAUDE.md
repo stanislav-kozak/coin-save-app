@@ -20,7 +20,7 @@ API: Swagger UI — https://app.coinsavekeeper.com/api/docs, контракт �
 - Next.js 16 (App Router), React 19, TypeScript, Node.js 24
 - Стилі: Tailwind CSS v4 + shadcn/ui (Radix)
 - Серверний стан: TanStack Query v5; локальний — `useState`/`useReducer` (Zustand — тільки якщо з'явиться реальний cross-tree client-only стан)
-- API-клієнт: `openapi-typescript` + `openapi-fetch`, типи генеруються в `src/generated/` (gitignored)
+- API-клієнт: `openapi-typescript` + `openapi-fetch`, типи генеруються в `src/generated/` і комітяться в git (spec §12.6)
 - Realtime: `socket.io-client` (invalidation events)
 - i18n: `next-intl` (`uk` — дефолт, `en`), URL-префікс `/{locale}/...`
 - Форми: `react-hook-form` + `zod`
@@ -136,7 +136,8 @@ src/
 
 - Перед завершенням задачі обов'язково прогнати `npm run lint` і `npm run test`.
   Playwright E2E (`npm run test:e2e`) — тільки коли задача зачіпає критичні флоу (специфікація §12.4).
-- Не чіпати: `src/generated/` (згенерований код), `.env`-файли, секрети, CI-конфіги без явного запиту.
+- Не редагувати руками `src/generated/` — лише `npm run api:generate` (і комітити результат разом зі змінами, що його
+  потребують). Не чіпати: `.env`-файли, секрети, CI-конфіги без явного запиту.
 - Не змінювати бекенд (`../coin-save-api`) — проблеми з API фіксуй і повідомляй.
 - У логи та консоль не потрапляють паролі, токени, персональні дані.
 - Один PR = одна задача. Не робити побічних рефакторингів.
