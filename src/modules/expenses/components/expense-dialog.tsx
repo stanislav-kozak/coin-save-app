@@ -2,9 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useCategories } from '@/modules/categories';
+import { useCategories, type PendingSpend } from '@/modules/categories';
 import { useWallets } from '@/modules/wallets';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Badge } from '@/shared/ui/badge';
@@ -28,13 +28,15 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   /** Wallet and category chosen by drag-and-drop; without it the user picks them. */
   prefill?: { walletId: string; categoryId: string };
+  /** Called inside the save transition so the category total can grow before the server answers. */
+  onPendingSpend?: (spend: PendingSpend) => void;
 };
 
 const SELECT =
   'h-10 w-full rounded-control border border-input bg-card px-3 text-body text-foreground outline-none focus-visible:border-primary';
 
 /** "Нова витрата" (Figma 10:176). Closes on submit; reopens with the same values if the server refuses. */
-export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
+export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingSpend }: Props) {
   const t = useTranslations('expenses');
   const te = useTranslations('errors');
   const wallets = useWallets(spaceId);
@@ -102,17 +104,25 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
     if (submitting.current) return;
     submitting.current = true;
     const values = getValues();
+    const currency = wallets.data?.find((w) => w.id === draft.walletId)?.currency;
     onOpenChange(false); // optimistic: the result is already on screen (spec §6.9)
-    // A promise, not per-call callbacks: those are dropped once a newer open resets the observer.
-    create
-      .mutateAsync({ ...draft, categoryId: draft.categoryId || undefined })
-      .catch((error: unknown) => {
+    // The transition lasts until the save settles (incl. the analytics refetch), which is exactly how
+    // long the optimistic category total should show.
+    startTransition(async () => {
+      if (draft.categoryId && currency) {
+        onPendingSpend?.({ categoryId: draft.categoryId, amount: String(draft.amount), currency });
+      }
+      try {
+        // A promise, not per-call callbacks: those are dropped once a newer open resets the observer.
+        await create.mutateAsync({ ...draft, categoryId: draft.categoryId || undefined });
+      } catch (error) {
         // Show the failed expense again — even over a newer, unsent one — so it isn't lost silently.
         restoring.current = !isOpen.current;
         reset(values);
         setSubmitError(error);
         onOpenChange(true);
-      });
+      }
+    });
   };
 
   return (

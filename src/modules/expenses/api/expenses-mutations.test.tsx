@@ -2,12 +2,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { currentMonth, recentDays } from '@/shared/lib/periods';
 import { useCreateExpense } from './expenses-mutations';
 
 const post = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({ api: { POST: (...a: unknown[]) => post(...a) } }));
 
-const listKey = ['expenses', 'sp1', '2026-10-04'];
+const recent = recentDays(new Date(), 7);
+const listKey = ['expenses', 'sp1', recent.from, recent.to];
+const pastKey = ['expenses', 'sp1', '2020-01-01', '2020-01-31'];
 
 function setup() {
   const queryClient = new QueryClient({
@@ -21,6 +24,7 @@ function setup() {
     ],
   );
   queryClient.setQueryData(listKey, []);
+  queryClient.setQueryData(pastKey, []);
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
@@ -80,5 +84,34 @@ describe('useCreateExpense', () => {
       note: 'АТБ',
     });
     expect(Date.parse(body.occurredAt)).toBeGreaterThanOrEqual(before);
+  });
+
+  it('lists the optimistic expense only in periods that include today', async () => {
+    post.mockReturnValue(new Promise(() => {}));
+    const { queryClient, result } = setup();
+    const month = currentMonth(new Date());
+    queryClient.setQueryData(['expenses', 'sp1', month.from, month.to], []);
+    act(() => result.current.mutate({ walletId: 'w1', amount: 5 }));
+    await waitFor(() => expect(queryClient.getQueryData<unknown[]>(listKey)).toHaveLength(1));
+    expect(queryClient.getQueryData(['expenses', 'sp1', month.from, month.to])).toHaveLength(1);
+    expect(queryClient.getQueryData(pastKey)).toEqual([]);
+  });
+
+  it('undoes only its own change when another create is still pending', async () => {
+    post
+      .mockResolvedValueOnce({ error: { statusCode: 400, code: 'WALLET_ARCHIVED', message: 'x' } })
+      .mockReturnValueOnce(new Promise(() => {}));
+    const { queryClient, result } = setup();
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current.mutateAsync({ walletId: 'w1', amount: 40 }).catch(() => {});
+      void result.current.mutateAsync({ walletId: 'w1', amount: 7 }).catch(() => {});
+    });
+    await act(async () => {
+      await first;
+    });
+    expect(balance(queryClient, 'w1')).toBe('93.00');
+    const list = queryClient.getQueryData<{ amount: string }[]>(listKey)!;
+    expect(list.map((e) => e.amount)).toEqual(['7']);
   });
 });

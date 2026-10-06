@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoney, isNegative, subtractMoney } from './money';
+import {
+  addMoney,
+  formatMoney,
+  isNegative,
+  multiplyMoney,
+  percentOf,
+  subtractMoney,
+} from './money';
 
 describe('money', () => {
   it('formats decimal strings without float artefacts', () => {
@@ -27,5 +34,20 @@ describe('money', () => {
     expect(isNegative('-0.01')).toBe(true);
     expect(isNegative('0')).toBe(false);
     expect(isNegative('-0')).toBe(false);
+  });
+  it('adds exactly', () => {
+    expect(addMoney('0.1', '0.2')).toBe('0.30');
+    expect(addMoney('-50', '45.5')).toBe('-4.50');
+  });
+  it('multiplies by a rate, rounded half-up to 4 places like the server Decimal(19, 4)', () => {
+    expect(multiplyMoney('5', '41.2345')).toBe('206.1725');
+    expect(multiplyMoney('0.3333', '0.5')).toBe('0.1667');
+    expect(multiplyMoney('10', '1')).toBe('10.00');
+  });
+  it('computes a rounded percentage like the server', () => {
+    expect(percentOf('1995', '2000')).toBe(100);
+    expect(percentOf('1', '3')).toBe(33);
+    expect(percentOf('2', '3')).toBe(67);
+    expect(percentOf('5', '0')).toBe(0);
   });
 });

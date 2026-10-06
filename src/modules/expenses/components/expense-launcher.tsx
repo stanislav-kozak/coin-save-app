@@ -2,7 +2,8 @@
 
 import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useOptimistic, useState, type ReactNode } from 'react';
+import type { PendingSpend } from '@/modules/categories';
 import { CreateWalletDialog, useWallets } from '@/modules/wallets';
 import { ExpenseDialog } from './expense-dialog';
 
@@ -11,6 +12,8 @@ type Launcher = {
   /** Open "Нова витрата" (prefilled after a drop); with no wallets, asks to add one first. */
   openExpense: (prefill?: Prefill) => void;
   openAddWallet: () => void;
+  /** Expenses being saved, for category totals to show at once; empty again once the server answers. */
+  pendingSpends: PendingSpend[];
 };
 
 const LauncherContext = createContext<Launcher | null>(null);
@@ -27,6 +30,12 @@ export function ExpenseLauncherProvider({
   const [prefill, setPrefill] = useState<Prefill | undefined>();
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
+  // Lives only while the dialog's save transition runs: reverts by itself on success (fresh analytics
+  // arrive first) and on failure.
+  const [pendingSpends, addPendingSpend] = useOptimistic<PendingSpend[], PendingSpend>(
+    [],
+    (list, spend) => [...list, spend],
+  );
 
   const launcher: Launcher = {
     openExpense: (next) => {
@@ -38,6 +47,7 @@ export function ExpenseLauncherProvider({
       setExpenseOpen(true);
     },
     openAddWallet: () => setWalletOpen(true),
+    pendingSpends,
   };
 
   return (
@@ -48,6 +58,7 @@ export function ExpenseLauncherProvider({
         open={expenseOpen}
         onOpenChange={setExpenseOpen}
         prefill={prefill}
+        onPendingSpend={addPendingSpend}
       />
       <CreateWalletDialog spaceId={spaceId} open={walletOpen} onOpenChange={setWalletOpen} />
     </LauncherContext.Provider>

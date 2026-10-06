@@ -24,6 +24,29 @@ export function subtractMoney(a: string, b: string): string {
   return fromMinor(toMinor(a) - toMinor(b));
 }
 
+/** Exact a + b on decimal strings. */
+export function addMoney(a: string, b: string): string {
+  return fromMinor(toMinor(a) + toMinor(b));
+}
+
+/** amount × rate (e.g. an FX rate), rounded half-up to the server's 4 places. */
+export function multiplyMoney(amount: string, rate: string): string {
+  return fromMinor(roundDiv(toMinor(amount) * toMinor(rate), FACTOR));
+}
+
+/** Math.round(spent / limit × 100) without floats, as the server computes `pct`; 0 when no limit. */
+export function percentOf(spent: string, limit: string): number {
+  const l = toMinor(limit);
+  if (l <= ZERO) return 0;
+  return Number(roundDiv(toMinor(spent) * BigInt(100), l));
+}
+
+/** n / d rounded half away from zero (d > 0). */
+function roundDiv(n: bigint, d: bigint): bigint {
+  const half = d / BigInt(2);
+  return n < ZERO ? -((-n + half) / d) : (n + half) / d;
+}
+
 export function isNegative(amount: string): boolean {
   return toMinor(amount) < ZERO;
 }

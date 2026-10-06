@@ -11,7 +11,7 @@ import {
   type Announcements,
 } from '@dnd-kit/core';
 import { useTranslations } from 'next-intl';
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { resolveDrop } from '../lib/resolve-drop';
 
 type Props = {
@@ -24,6 +24,7 @@ type Props = {
 
 export function DndProvider({ children, renderGhost, onDrop, nameOf }: Props) {
   const t = useTranslations('dnd');
+  const id = useId(); // dnd-kit's own ids come from a module counter that differs between server and client
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
   // Spec §6.6
   const sensors = useSensors(
@@ -44,6 +45,7 @@ export function DndProvider({ children, renderGhost, onDrop, nameOf }: Props) {
 
   return (
     <DndContext
+      id={id}
       sensors={sensors}
       accessibility={{
         announcements,
