@@ -169,5 +169,51 @@
       "uk": "Українська",
       "en": "English"
     }
+  },
+  "dashboard": {
+    "wallets": "Wallets",
+    "categories": "Categories",
+    "recent": "Recent transactions",
+    "soon": "More is coming soon"
+  },
+  "wallets": {
+    "add": "Add wallet",
+    "emptyTitle": "No wallets yet",
+    "emptyText": "Add your first wallet to start tracking expenses",
+    "close": "Close",
+    "create": {
+      "title": "New wallet",
+      "name": "Name",
+      "namePlaceholder": "For example, Monobank",
+      "currency": "Currency",
+      "initialBalance": "Starting balance",
+      "submit": "Add"
+    },
+    "validation": {
+      "nameRequired": "Enter a name",
+      "nameTooLong": "100 characters at most",
+      "amountInvalid": "Enter an amount, e.g. 1250.50",
+      "amountTooLarge": "Amount is too large"
+    }
+  },
+  "categories": {
+    "spentOfLimit": "{spent} / {limit} · {pct}%",
+    "spent": "{amount} spent",
+    "over": "+{amount}",
+    "overLabel": "over limit",
+    "uncategorized": "Uncategorized"
+  },
+  "expenses": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "emptyTitle": "No transactions yet",
+    "emptyText": "Drag a wallet onto a category to add your first expense"
+  },
+  "nav": {
+    "home": "Home",
+    "recurring": "Recurring",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "label": "Navigation"
   }
 }
