@@ -74,4 +74,15 @@ describe('SignupForm', () => {
       'Користувач з таким email вже існує',
     );
   });
+
+  it('explains a failed confirmation email and lets the user retry', async () => {
+    post.mockResolvedValue({
+      error: { statusCode: 503, code: 'EMAIL_DELIVERY_FAILED', message: 'x' },
+    });
+    renderWithProviders(<SignupForm />);
+    await fill();
+    expect(await screen.findByRole('alert')).toHaveTextContent('Не вдалося надіслати лист');
+    expect(push).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Зареєструватися' })).toBeEnabled();
+  });
 });

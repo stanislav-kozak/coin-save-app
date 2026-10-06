@@ -25,6 +25,7 @@
     "EMAIL_ALREADY_EXISTS": "A user with this email already exists",
     "INVALID_CREDENTIALS": "Wrong email or password",
     "EMAIL_NOT_VERIFIED": "Verify your email to sign in",
+    "EMAIL_DELIVERY_FAILED": "We couldn't send the confirmation email. Please try signing up again a bit later",
     "INVALID_VERIFICATION_TOKEN": "The verification link is invalid or expired",
     "INVALID_REFRESH_TOKEN": "Your session has ended. Please sign in again",
     "REFRESH_TOKEN_REUSE_DETECTED": "Your session was ended for security reasons. Please sign in again",

@@ -25,6 +25,7 @@
     "EMAIL_ALREADY_EXISTS": "Користувач з таким email вже існує",
     "INVALID_CREDENTIALS": "Невірний email або пароль",
     "EMAIL_NOT_VERIFIED": "Підтвердіть email, щоб увійти",
+    "EMAIL_DELIVERY_FAILED": "Не вдалося надіслати лист для підтвердження. Спробуйте зареєструватися ще раз трохи пізніше",
     "INVALID_VERIFICATION_TOKEN": "Посилання для підтвердження недійсне або застаріло",
     "INVALID_REFRESH_TOKEN": "Сесія завершилась. Увійдіть знову",
     "REFRESH_TOKEN_REUSE_DETECTED": "Сесію завершено з міркувань безпеки. Увійдіть знову",
