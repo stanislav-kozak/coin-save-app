@@ -64,6 +64,41 @@ describe('RecentExpenses', () => {
     expect(screen.getByText('Сьогодні')).toBeInTheDocument();
   });
 
+  it('names expenses in an archived category', async () => {
+    get.mockImplementation(
+      async (path: string, init?: { params?: { query?: Record<string, unknown> } }) => {
+        if (path.endsWith('/categories')) {
+          const archived = {
+            id: 'c9',
+            name: 'Кафе',
+            icon: '☕',
+            color: '#A855F7',
+            sortOrder: 4,
+            archived: true,
+          };
+          return { data: init?.params?.query?.includeArchived ? [archived] : [] };
+        }
+        return {
+          data: [
+            {
+              id: 'e1',
+              type: 'EXPENSE',
+              amount: '120',
+              walletCurrency: 'UAH',
+              walletId: 'w1',
+              categoryId: 'c9',
+              note: null,
+              occurredAt: now(),
+            },
+          ],
+        };
+      },
+    );
+    renderWithProviders(<RecentExpenses spaceId="sp1" />);
+    expect(await screen.findByText('Кафе')).toBeInTheDocument();
+    expect(screen.queryByText('Без категорії')).toBeNull();
+  });
+
   it('says so when there is nothing recent', async () => {
     get.mockResolvedValue({ data: [] });
     renderWithProviders(<RecentExpenses spaceId="sp1" />);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { SectionError } from '@/shared/ui/section-error';
 import { useCategories, useMonthAnalytics } from '../api/categories-queries';
 import { CategoryCard, CategoryCircle } from './category-card';
 
@@ -8,6 +9,23 @@ export function CategoriesGrid({ spaceId }: { spaceId: string }) {
   const t = useTranslations('dashboard');
   const categories = useCategories(spaceId);
   const analytics = useMonthAnalytics(spaceId);
+  const failed = categories.error ?? analytics.error;
+  if (failed && !categories.isFetching && !analytics.isFetching) {
+    return (
+      <section aria-labelledby="categories-title" className="flex flex-col gap-4">
+        <h2 id="categories-title" className="text-h2">
+          {t('categories')}
+        </h2>
+        <SectionError
+          error={failed}
+          onRetry={() => {
+            if (categories.isError) void categories.refetch();
+            if (analytics.isError) void analytics.refetch();
+          }}
+        />
+      </section>
+    );
+  }
   if (!categories.data || !analytics.data) return null;
 
   const { currency } = analytics.data;

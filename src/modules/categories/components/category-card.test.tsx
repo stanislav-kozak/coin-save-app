@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { CategoriesGrid } from './categories-grid';
@@ -92,5 +93,23 @@ describe('CategoriesGrid', () => {
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
     expect(await screen.findByText(/0,00\s₴ витрачено/)).toBeInTheDocument();
     expect(screen.getAllByText('Розваги').length).toBeGreaterThan(0);
+  });
+
+  it('explains a failed load and retries instead of vanishing', async () => {
+    let failed = false;
+    get.mockImplementation(async (path: string) => {
+      if (path.endsWith('/analytics') && !failed) {
+        failed = true;
+        return { error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } };
+      }
+      return path.endsWith('/categories')
+        ? { data: [{ ...groceries, sortOrder: 1 }] }
+        : { data: { currency: 'UAH', byCategory: [] } };
+    });
+    renderWithProviders(<CategoriesGrid spaceId="sp1" />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Помилка сервера');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Спробувати ще раз' }));
+    expect(await screen.findByRole('progressbar', { name: 'Продукти' })).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 });

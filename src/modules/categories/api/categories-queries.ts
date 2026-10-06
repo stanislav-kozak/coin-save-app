@@ -2,12 +2,20 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/shared/lib/api-client';
 import { currentMonth } from '@/shared/lib/periods';
 
-export function useCategories(spaceId: string) {
+/**
+ * Active categories by default. `includeArchived` is for labelling history: an archived category keeps
+ * its expenses (only DELETE unlinks them). Both keys start with ['categories', spaceId] so one
+ * invalidation refreshes both.
+ */
+export function useCategories(spaceId: string, { includeArchived = false } = {}) {
   return useQuery({
-    queryKey: ['categories', spaceId],
+    queryKey: includeArchived ? ['categories', spaceId, 'all'] : ['categories', spaceId],
     queryFn: async () => {
       const { data, error } = await api.GET('/api/spaces/{spaceId}/categories', {
-        params: { path: { spaceId } },
+        params: {
+          path: { spaceId },
+          ...(includeArchived ? { query: { includeArchived: true } } : {}),
+        },
       });
       if (error) throw error;
       return [...data].sort((a, b) => a.sortOrder - b.sortOrder);

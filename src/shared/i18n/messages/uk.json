@@ -2,7 +2,8 @@
   "common": {
     "appName": "CoinSave",
     "themeLight": "Світла тема",
-    "themeDark": "Темна тема"
+    "themeDark": "Темна тема",
+    "retry": "Спробувати ще раз"
   },
   "styleguide": {
     "title": "Стайлгайд",

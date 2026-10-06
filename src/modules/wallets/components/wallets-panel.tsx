@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { SectionError } from '@/shared/ui/section-error';
 import { useWallets } from '../api/wallets-queries';
 import { WalletCard, WalletCircle } from './wallet-card';
 
@@ -11,6 +12,16 @@ export function WalletsPanel({ spaceId, onAdd }: { spaceId: string; onAdd: () =>
   const t = useTranslations('wallets');
   const td = useTranslations('dashboard');
   const wallets = useWallets(spaceId);
+  if (wallets.isError && !wallets.isFetching) {
+    return (
+      <section aria-labelledby="wallets-title" className="flex flex-col gap-4">
+        <h2 id="wallets-title" className="text-h2">
+          {td('wallets')}
+        </h2>
+        <SectionError error={wallets.error} onRetry={() => void wallets.refetch()} />
+      </section>
+    );
+  }
   if (!wallets.data) return null;
 
   const addButton = (

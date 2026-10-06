@@ -2,7 +2,8 @@
   "common": {
     "appName": "CoinSave",
     "themeLight": "Light theme",
-    "themeDark": "Dark theme"
+    "themeDark": "Dark theme",
+    "retry": "Try again"
   },
   "styleguide": {
     "title": "Styleguide",
