@@ -2,10 +2,11 @@
 
 import { ChartPie, Home, Repeat, Settings } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { NewExpenseButton } from '@/modules/expenses';
 import { Link, usePathname } from '@/shared/i18n/navigation';
 import { cn } from '@/shared/lib/utils';
 
-/** Mobile bottom navigation (Figma 10:177). The "+" FAB arrives with expense creation (plan 2/3). */
+/** Mobile bottom navigation (Figma 10:177) with the "+" new-expense button in the middle. */
 export function BottomNav({ spaceId }: { spaceId: string }) {
   const t = useTranslations('nav');
   const pathname = usePathname();
@@ -13,6 +14,7 @@ export function BottomNav({ spaceId }: { spaceId: string }) {
   const items = [
     { href: base, label: t('home'), Icon: Home },
     { href: `${base}/recurring`, label: t('recurring'), Icon: Repeat },
+    null, // the "+" button
     { href: `${base}/analytics`, label: t('analytics'), Icon: ChartPie },
     { href: `${base}/settings`, label: t('settings'), Icon: Settings },
   ];
@@ -21,8 +23,16 @@ export function BottomNav({ spaceId }: { spaceId: string }) {
       aria-label={t('label')}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card md:hidden"
     >
-      <ul className="grid grid-cols-4">
-        {items.map(({ href, label, Icon }) => {
+      <ul className="grid grid-cols-5 items-end">
+        {items.map((item) => {
+          if (!item) {
+            return (
+              <li key="new-expense" className="flex justify-center pb-2">
+                <NewExpenseButton />
+              </li>
+            );
+          }
+          const { href, label, Icon } = item;
           const active = pathname === href;
           return (
             <li key={href}>

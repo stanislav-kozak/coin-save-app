@@ -1,17 +1,14 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useState } from 'react';
 import { CategoriesGrid, useCategories } from '@/modules/categories';
-import { ExpenseDialog, RecentExpenses } from '@/modules/expenses';
-import { CreateWalletDialog, useWallets, WalletsPanel } from '@/modules/wallets';
+import { RecentExpenses, useExpenseLauncher } from '@/modules/expenses';
+import { useWallets, WalletsPanel } from '@/modules/wallets';
 import { useIsDesktop } from '@/shared/hooks/use-is-desktop';
 import { formatMoney } from '@/shared/lib/money';
 import { EntityIcon } from '@/shared/ui/entity-icon';
 import { DndProvider } from './dnd-provider';
 import { DraggableWallet, DroppableCategory } from './dnd-items';
-
-type Drop = { walletId: string; categoryId: string };
 
 /** Main screen (Figma 10:176 / 10:177): drag a wallet onto a category to add an expense (spec §6.2). */
 export function Dashboard({ spaceId }: { spaceId: string }) {
@@ -19,9 +16,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const isDesktop = useIsDesktop();
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
-  const [addingWallet, setAddingWallet] = useState(false);
-  const [drop, setDrop] = useState<Drop | null>(null);
-  const [expenseOpen, setExpenseOpen] = useState(false);
+  const { openExpense, openAddWallet } = useExpenseLauncher();
 
   const walletById = (id: string) => wallets.data?.find((w) => w.id === id);
   const nameOf = (dndId: string) => {
@@ -33,10 +28,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   return (
     <DndProvider
       nameOf={nameOf}
-      onDrop={(target) => {
-        setDrop(target);
-        setExpenseOpen(true);
-      }}
+      onDrop={openExpense}
       renderGhost={(walletId) => {
         const wallet = walletById(walletId);
         if (!wallet) return null;
@@ -57,7 +49,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
       <main className="grid gap-8 px-4 py-6 pb-24 md:grid-cols-[1fr_2fr_1fr] md:px-16 md:pb-8">
         <WalletsPanel
           spaceId={spaceId}
-          onAdd={() => setAddingWallet(true)}
+          onAdd={openAddWallet}
           // Only the visible variant (card on desktop, circle on mobile) registers with dnd-kit.
           wrap={(id, node, isCard) =>
             isCard === isDesktop ? <DraggableWallet id={id}>{node}</DraggableWallet> : node
@@ -77,13 +69,6 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
         />
         <RecentExpenses spaceId={spaceId} />
       </main>
-      <CreateWalletDialog spaceId={spaceId} open={addingWallet} onOpenChange={setAddingWallet} />
-      <ExpenseDialog
-        spaceId={spaceId}
-        open={expenseOpen}
-        onOpenChange={setExpenseOpen}
-        prefill={drop ?? undefined}
-      />
     </DndProvider>
   );
 }
