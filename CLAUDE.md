@@ -113,6 +113,7 @@ src/
 | text-secondary             | `text-muted-foreground`                                                                                           |
 | Радіуси                    | `rounded-card` (16px), `rounded-control` (10px), `rounded-full`                                                   |
 | Тіні                       | `shadow-card`, `shadow-card-raised` (drag/hover), `shadow-modal`                                                  |
+| Палітра іконок/декору      | `bg-palette-blue`, `-teal`, `-amber`, `-violet`, `-emerald` (не залежить від теми)                                |
 | Типографіка                | `text-display`, `text-h1`, `text-h2`, `text-body` (+ `font-medium` для Body Medium), `text-caption`, `text-money` |
 
 ## Робочий процес
