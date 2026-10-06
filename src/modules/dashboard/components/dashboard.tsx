@@ -16,7 +16,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const isDesktop = useIsDesktop();
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
-  const { openExpense, openAddWallet } = useExpenseLauncher();
+  const { openExpense, openAddWallet, pendingSpends } = useExpenseLauncher();
 
   const walletById = (id: string) => wallets.data?.find((w) => w.id === id);
   const nameOf = (dndId: string) => {
@@ -57,6 +57,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
         />
         <CategoriesGrid
           spaceId={spaceId}
+          pending={pendingSpends}
           wrap={(id, node, isCard) =>
             isCard === isDesktop ? (
               <DroppableCategory id={id} isCard={isCard}>
