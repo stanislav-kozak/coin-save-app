@@ -45,4 +45,9 @@ describe('SpaceSwitcher', () => {
       '/onboarding',
     );
   });
+
+  it('offers to switch instead of a blank trigger when the current space is not yours', async () => {
+    renderWithProviders(<SpaceSwitcher currentSpaceId="foreign" />);
+    expect(await screen.findByRole('button', { name: /Перемкнути простір/ })).toBeInTheDocument();
+  });
 });

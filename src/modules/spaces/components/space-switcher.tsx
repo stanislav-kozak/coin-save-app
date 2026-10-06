@@ -28,7 +28,10 @@ export function SpaceSwitcher({ currentSpaceId }: { currentSpaceId: string }) {
         ) : (
           <span className="size-10 shrink-0 rounded-full bg-border" />
         )}
-        <span className="truncate text-h2">{current?.name}</span>
+        <span className="truncate text-h2">
+          {/* Unknown space (no access / deleted): still a usable way out, not a blank button. */}
+          {current?.name ?? (spaces.data ? t('switcher.label') : null)}
+        </span>
         <ChevronDown aria-hidden className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-80">
