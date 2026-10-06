@@ -1017,6 +1017,11 @@ export interface components {
             currency: string;
             period: components["schemas"]["AnalyticsPeriodDto"];
             /**
+             * @description Time zone the period and byDay dates were computed in
+             * @example Europe/Kyiv
+             */
+            timeZone: string;
+            /**
              * Format: decimal
              * @example 1250.5
              */
@@ -2772,6 +2777,8 @@ export interface operations {
     ExpensesController_list: {
         parameters: {
             query?: {
+                /** @description IANA time zone for day boundaries of from/to (the browser's zone). Defaults to Europe/Kyiv. */
+                tz?: string;
                 walletId?: string;
                 categoryId?: string;
                 type?: "EXPENSE" | "INCOME";
@@ -3454,6 +3461,8 @@ export interface operations {
     AnalyticsController_getAnalytics: {
         parameters: {
             query: {
+                /** @description IANA time zone for day boundaries of from/to (the browser's zone). Defaults to Europe/Kyiv. */
+                tz?: string;
                 from: string;
                 to: string;
                 walletIds?: string[];
@@ -3506,6 +3515,8 @@ export interface operations {
     AnalyticsController_exportExpensesCsv: {
         parameters: {
             query: {
+                /** @description IANA time zone for day boundaries of from/to (the browser's zone). Defaults to Europe/Kyiv. */
+                tz?: string;
                 from: string;
                 to: string;
             };
