@@ -19,8 +19,7 @@ describe('FormField', () => {
         <Input id="email" aria-invalid aria-describedby="email-error" />
       </FormField>,
     );
-    const alert = screen.getByRole('alert');
-    expect(alert).toHaveTextContent('Bad email');
-    expect(screen.getByLabelText('Email')).toHaveAttribute('aria-describedby', alert.id);
+    expect(screen.getByRole('alert')).toHaveTextContent('Bad email');
+    expect(screen.getByLabelText('Email')).toHaveAccessibleDescription('Bad email');
   });
 });
