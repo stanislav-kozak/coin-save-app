@@ -1,9 +1,9 @@
-import { SpaceGuard } from '@/modules/spaces';
+import { AppShell } from '@/modules/shell';
 
 export default async function SpaceLayout({
   children,
   params,
 }: LayoutProps<'/[locale]/s/[spaceId]'>) {
   const { spaceId } = await params;
-  return <SpaceGuard spaceId={spaceId}>{children}</SpaceGuard>;
+  return <AppShell spaceId={spaceId}>{children}</AppShell>;
 }

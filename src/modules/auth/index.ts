@@ -6,3 +6,4 @@ export { VerifyEmail } from './components/verify-email';
 export { SignupForm } from './components/signup-form';
 export { CheckEmailClient } from './components/check-email-client';
 export { StatusPanel } from './components/status-panel';
+export { useCurrentUser } from './api/use-current-user';
