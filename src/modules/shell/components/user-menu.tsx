@@ -29,7 +29,8 @@ export function UserMenu() {
       // Leave anyway; the server session expires on its own.
     }
     queryClient.clear(); // the next person on this browser must not see this user's data
-    // Full reload: drops every in-memory cache, socket and pending request.
+    // Full reload on purpose: drops every in-memory cache, socket and pending request.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign(`/${locale}/login`);
   }
 
