@@ -1,5 +1,7 @@
 const SCALE = 4; // server precision: Decimal(19, 4)
-const FACTOR = 10n ** BigInt(SCALE);
+// BigInt() calls instead of `10n` literals: tsconfig targets ES2017.
+const ZERO = BigInt(0);
+const FACTOR = BigInt(10) ** BigInt(SCALE);
 
 function toMinor(amount: string): bigint {
   const trimmed = amount.trim();
@@ -10,7 +12,7 @@ function toMinor(amount: string): bigint {
 }
 
 function fromMinor(minor: bigint): string {
-  const negative = minor < 0n;
+  const negative = minor < ZERO;
   const abs = negative ? -minor : minor;
   let frac = (abs % FACTOR).toString().padStart(SCALE, '0').replace(/0+$/, '');
   if (frac.length < 2) frac = frac.padEnd(2, '0');
@@ -23,7 +25,7 @@ export function subtractMoney(a: string, b: string): string {
 }
 
 export function isNegative(amount: string): boolean {
-  return toMinor(amount) < 0n;
+  return toMinor(amount) < ZERO;
 }
 
 /** Intl formatting straight from the decimal string (Intl reads numeric strings exactly). */
