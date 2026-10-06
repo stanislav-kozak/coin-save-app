@@ -28,7 +28,8 @@ export function CheckEmail() {
         <p className="text-body text-muted-foreground">{t('sentGeneric')}</p>
       )}
       <p className="text-caption text-muted-foreground">{t('spamHint')}</p>
-      {email ? (
+      {/* Each resend invalidates earlier links, so offer it once per visit. */}
+      {email && !resend.isSuccess ? (
         <Button
           variant="secondary"
           disabled={resend.isPending}

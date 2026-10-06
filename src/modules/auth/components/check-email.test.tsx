@@ -34,6 +34,8 @@ describe('CheckEmail', () => {
     expect(screen.getByText('a@b.co')).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Надіслати ще раз' }));
     expect(await screen.findByText('Новий лист надіслано')).toBeInTheDocument();
+    // Each resend invalidates earlier links — don't invite a second click.
+    expect(screen.queryByRole('button', { name: 'Надіслати ще раз' })).toBeNull();
     expect(post).toHaveBeenCalledWith('/api/auth/resend-verification', {
       body: { email: 'a@b.co' },
     });
