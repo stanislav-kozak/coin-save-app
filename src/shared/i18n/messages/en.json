@@ -205,7 +205,25 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "emptyTitle": "No transactions yet",
-    "emptyText": "Drag a wallet onto a category to add your first expense"
+    "emptyText": "Drag a wallet onto a category to add your first expense",
+    "create": {
+      "title": "New expense",
+      "wallet": "Wallet",
+      "category": "Category",
+      "amount": "Amount",
+      "note": "Note",
+      "notePlaceholder": "Optional",
+      "submit": "Add",
+      "noCategory": "Uncategorized",
+      "close": "Close"
+    },
+    "validation": {
+      "amountRequired": "Enter an amount",
+      "amountInvalid": "Enter a positive amount, e.g. 250.50",
+      "amountPositive": "Amount must be greater than zero",
+      "amountTooLarge": "Amount is too large",
+      "noteTooLong": "500 characters at most"
+    }
   },
   "nav": {
     "home": "Home",
@@ -213,5 +231,13 @@
     "analytics": "Analytics",
     "settings": "Settings",
     "label": "Navigation"
+  },
+  "dnd": {
+    "instructions": "To drag a wallet, press space, move with the arrow keys to a category and press space again",
+    "start": "Picked up wallet {wallet}",
+    "over": "{wallet} over category {category}",
+    "outside": "Not over a category",
+    "dropped": "Dropped on {category}",
+    "cancelled": "Dragging cancelled"
   }
 }
