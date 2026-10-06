@@ -1,0 +1,72 @@
+import { screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderWithProviders } from '@/test-utils/render';
+import { RecentExpenses } from './recent-expenses';
+
+const get = vi.fn();
+vi.mock('@/shared/lib/api-client', () => ({ api: { GET: (...a: unknown[]) => get(...a) } }));
+
+beforeEach(() => {
+  get.mockReset();
+});
+
+const now = () => new Date().toISOString();
+
+describe('RecentExpenses', () => {
+  it('renders category, note, signed amount in wallet currency and time; tolerates missing refs', async () => {
+    get.mockImplementation(async (path: string) => {
+      if (path.endsWith('/categories'))
+        return {
+          data: [{ id: 'c1', name: 'Продукти', icon: '🛒', color: '#F97350', sortOrder: 1 }],
+        };
+      return {
+        data: [
+          {
+            id: 'e1',
+            type: 'EXPENSE',
+            amount: '340',
+            walletCurrency: 'UAH',
+            walletId: 'w1',
+            categoryId: 'c1',
+            note: 'АТБ',
+            occurredAt: now(),
+          },
+          {
+            id: 'e2',
+            type: 'INCOME',
+            amount: '15000',
+            walletCurrency: 'UAH',
+            walletId: 'w1',
+            categoryId: null,
+            note: null,
+            occurredAt: now(),
+          },
+          {
+            id: 'e3',
+            type: 'EXPENSE',
+            amount: '5',
+            walletCurrency: 'USD',
+            walletId: 'archived',
+            categoryId: 'deleted',
+            note: null,
+            occurredAt: now(),
+          },
+        ],
+      };
+    });
+    renderWithProviders(<RecentExpenses spaceId="sp1" />);
+    expect(await screen.findByText('Продукти')).toBeInTheDocument();
+    expect(screen.getByText('АТБ')).toBeInTheDocument();
+    expect(screen.getByText(/-340,00\s₴/)).toBeInTheDocument();
+    expect(screen.getByText(/\+15\s000,00\s₴/)).toHaveClass('text-success');
+    expect(screen.getByText(/-5,00\s(USD|\$)/)).toBeInTheDocument();
+    expect(screen.getAllByText('Без категорії')).toHaveLength(2);
+    expect(screen.getByText('Сьогодні')).toBeInTheDocument();
+  });
+
+  it('says so when there is nothing recent', async () => {
+    get.mockResolvedValue({ data: [] });
+    renderWithProviders(<RecentExpenses spaceId="sp1" />);
+    expect(await screen.findByText('Витрат ще немає')).toBeInTheDocument();
+  });
+});
