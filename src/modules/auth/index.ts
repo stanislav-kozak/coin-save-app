@@ -5,4 +5,3 @@ export { ResetPasswordForm } from './components/reset-password-form';
 export { VerifyEmail } from './components/verify-email';
 export { SignupForm } from './components/signup-form';
 export { CheckEmailClient } from './components/check-email-client';
-export { SessionCheck } from './components/session-check';

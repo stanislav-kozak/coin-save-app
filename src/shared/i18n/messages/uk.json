@@ -4,9 +4,6 @@
     "themeLight": "Світла тема",
     "themeDark": "Темна тема"
   },
-  "home": {
-    "title": "Головна"
-  },
   "styleguide": {
     "title": "Стайлгайд",
     "health": "Стан API",

@@ -4,9 +4,6 @@
     "themeLight": "Light theme",
     "themeDark": "Dark theme"
   },
-  "home": {
-    "title": "Home"
-  },
   "styleguide": {
     "title": "Styleguide",
     "health": "API status",
