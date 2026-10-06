@@ -26,7 +26,9 @@ jobs:
       - run: npm ci
       - run: npm run lint -- --max-warnings=0
       - run: npx prettier --check .
-      - run: npm run typecheck # also generates the API client (pretypecheck)
+      - name: API client matches the deployed contract
+        run: npm run api:check
+      - run: npm run typecheck
       - run: npm run test
       - run: npm run build
 

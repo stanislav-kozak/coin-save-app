@@ -13,8 +13,7 @@
     "format": "prettier --write .",
     "api:generate": "node scripts/generate-api.mjs",
     "predev": "npm run api:generate",
-    "prebuild": "npm run api:generate",
-    "pretypecheck": "npm run api:generate"
+    "api:check": "node scripts/generate-api.mjs --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

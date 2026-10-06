@@ -11,9 +11,6 @@ build/
 next-env.d.ts
 *.tsbuildinfo
 
-# OpenAPI codegen (генерується в predev/prebuild)
-src/generated/
-
 # Env
 .env
 .env.*
