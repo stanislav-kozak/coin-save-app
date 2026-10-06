@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { SpaceGuard } from './space-guard';
+import { SpaceSwitcher } from './space-switcher';
 
 const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({ api: { GET: (...a: unknown[]) => get(...a) } }));
@@ -44,6 +45,29 @@ describe('SpaceGuard', () => {
     expect(await screen.findByRole('heading', { name: 'Простір недоступний' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'До моїх просторів' })).toHaveAttribute('href', '/');
     expect(screen.queryByText('inside')).toBeNull();
+    expect(localStorage.getItem('coinsave.lastSpaceId')).toBeNull();
+  });
+
+  it('forgets a lost space so landing and the switcher stop offering it', async () => {
+    localStorage.setItem('coinsave.lastSpaceId', 'gone');
+    let listCalls = 0;
+    get.mockImplementation(async (path: string) => {
+      if (path === '/api/spaces') {
+        listCalls += 1;
+        return { data: listCalls === 1 ? [{ id: 'gone', name: 'Old', role: 'MEMBER' }] : [] };
+      }
+      return { error: { statusCode: 403, code: 'FORBIDDEN_NOT_MEMBER', message: 'x' } };
+    });
+    renderWithProviders(
+      <>
+        <SpaceSwitcher currentSpaceId="gone" />
+        <SpaceGuard spaceId="gone">
+          <p>inside</p>
+        </SpaceGuard>
+      </>,
+    );
+    expect(await screen.findByRole('heading', { name: 'Простір недоступний' })).toBeInTheDocument();
+    await vi.waitFor(() => expect(listCalls).toBe(2)); // the cached list was refreshed
     expect(localStorage.getItem('coinsave.lastSpaceId')).toBeNull();
   });
 });

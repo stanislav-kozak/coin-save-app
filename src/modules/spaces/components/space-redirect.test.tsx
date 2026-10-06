@@ -1,3 +1,5 @@
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { SpaceRedirect } from './space-redirect';
@@ -31,6 +33,16 @@ describe('SpaceRedirect', () => {
     localStorage.setItem('coinsave.lastSpaceId', 'gone');
     get.mockResolvedValue({ data: [{ id: 'a' }] });
     renderWithProviders(<SpaceRedirect />);
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/a'));
+  });
+
+  it('explains a failed load and retries instead of a blank page', async () => {
+    get
+      .mockResolvedValueOnce({ error: { statusCode: 503, code: 'INTERNAL_ERROR', message: 'x' } })
+      .mockResolvedValueOnce({ data: [{ id: 'a' }] });
+    renderWithProviders(<SpaceRedirect />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Помилка сервера');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Спробувати ще раз' }));
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/a'));
   });
 });

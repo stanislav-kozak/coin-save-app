@@ -9,6 +9,14 @@ export const lastSpace = {
       return null;
     }
   },
+  /** Forget `id` if it is the remembered space (e.g. the user lost access to it). */
+  forget(id: string): void {
+    try {
+      if (localStorage.getItem(KEY) === id) localStorage.removeItem(KEY);
+    } catch {
+      // storage blocked: nothing remembered anyway
+    }
+  },
   set(id: string): void {
     try {
       localStorage.setItem(KEY, id);

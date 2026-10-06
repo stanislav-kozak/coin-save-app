@@ -23,12 +23,13 @@ vi.mock('@/shared/i18n/navigation', () => ({
   ),
 }));
 
+// The backend picks the default currency (currently EUR, not UAH) — never assume it.
 const created = {
   id: 'sp1',
   name: 'Family',
   slug: 'family',
   ownerId: 'u1',
-  primaryCurrency: 'UAH',
+  primaryCurrency: 'EUR',
 };
 
 beforeEach(() => {
@@ -47,12 +48,24 @@ async function submit(name: string, currency?: string) {
 }
 
 describe('CreateSpaceForm', () => {
-  it('creates a UAH space with one request and opens it', async () => {
+  it('sets the chosen UAH when the server defaulted to another currency', async () => {
     post.mockResolvedValue({ data: created });
+    patch.mockResolvedValue({ data: { ...created, primaryCurrency: 'UAH' } });
     renderWithProviders(<CreateSpaceForm />);
     await submit(' Family ');
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/sp1'));
     expect(post).toHaveBeenCalledWith('/api/spaces', { body: { name: 'Family' } });
+    expect(patch).toHaveBeenCalledWith('/api/spaces/{spaceId}', {
+      params: { path: { spaceId: 'sp1' } },
+      body: { primaryCurrency: 'UAH' },
+    });
+  });
+
+  it('skips the PATCH when the server default already matches', async () => {
+    post.mockResolvedValue({ data: created });
+    renderWithProviders(<CreateSpaceForm />);
+    await submit('Family', 'EUR');
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/sp1'));
     expect(patch).not.toHaveBeenCalled();
   });
 
@@ -60,11 +73,11 @@ describe('CreateSpaceForm', () => {
     post.mockResolvedValue({ data: created });
     patch.mockResolvedValue({ data: { ...created, primaryCurrency: 'EUR' } });
     renderWithProviders(<CreateSpaceForm />);
-    await submit('Family', 'EUR');
+    await submit('Family', 'USD');
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/sp1'));
     expect(patch).toHaveBeenCalledWith('/api/spaces/{spaceId}', {
       params: { path: { spaceId: 'sp1' } },
-      body: { primaryCurrency: 'EUR' },
+      body: { primaryCurrency: 'USD' },
     });
   });
 
@@ -72,7 +85,7 @@ describe('CreateSpaceForm', () => {
     post.mockResolvedValue({ data: created });
     patch.mockRejectedValue(new TypeError('Failed to fetch'));
     renderWithProviders(<CreateSpaceForm />);
-    await submit('Family', 'EUR');
+    await submit('Family', 'USD');
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/sp1'));
     expect(post).toHaveBeenCalledTimes(1);
   });
@@ -86,6 +99,16 @@ describe('CreateSpaceForm', () => {
     await user.dblClick(screen.getByRole('button', { name: 'Створити простір' }));
     resolve({ data: created });
     await vi.waitFor(() => expect(replace).toHaveBeenCalled());
+    expect(post).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not create a second space while navigating after success', async () => {
+    post.mockResolvedValue({ data: created });
+    renderWithProviders(<CreateSpaceForm />);
+    await submit('Family', 'EUR');
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+    // Navigation is still in flight (router mocked): the form stays on screen.
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Створити простір' }));
     expect(post).toHaveBeenCalledTimes(1);
   });
 

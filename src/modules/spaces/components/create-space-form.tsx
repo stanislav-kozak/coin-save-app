@@ -38,7 +38,8 @@ export function CreateSpaceForm() {
   const isFirst = spaces.data?.length === 0;
 
   const onSubmit = handleSubmit(async (values) => {
-    if (create.isPending) return;
+    // Stays locked after success too: the navigation to the new space isn't instant.
+    if (create.isPending || create.isSuccess) return;
     try {
       const space = await create.mutateAsync(values);
       router.replace(`/s/${space.id}`);
@@ -86,7 +87,7 @@ export function CreateSpaceForm() {
               {te(getErrorCode(create.error))}
             </p>
           ) : null}
-          <Button type="submit" disabled={create.isPending}>
+          <Button type="submit" disabled={create.isPending || create.isSuccess}>
             {t('onboarding.submit')}
           </Button>
         </form>

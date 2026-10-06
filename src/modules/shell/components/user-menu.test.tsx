@@ -42,7 +42,10 @@ describe('UserMenu', () => {
   });
 
   it('signs out: calls logout and reloads into the login page', async () => {
-    post.mockResolvedValue({ data: { message: 'ok' } });
+    post.mockResolvedValue({
+      data: { message: 'ok' },
+      response: new Response(null, { status: 200 }),
+    });
     renderWithProviders(<UserMenu />);
     const user = await openMenu();
     await user.click(await screen.findByRole('menuitem', { name: 'Вийти' }));
@@ -50,11 +53,22 @@ describe('UserMenu', () => {
     expect(post).toHaveBeenCalledWith('/api/auth/logout');
   });
 
-  it('still leaves when the logout request fails', async () => {
-    post.mockRejectedValue(new TypeError('Failed to fetch'));
+  it.each([
+    ['a network error', () => post.mockRejectedValue(new TypeError('Failed to fetch'))],
+    [
+      'a server error',
+      () =>
+        post.mockResolvedValue({
+          error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' },
+          response: new Response(null, { status: 500 }),
+        }),
+    ],
+  ])('stays signed in and says so after %s — cookies were not cleared', async (_label, arrange) => {
+    arrange();
     renderWithProviders(<UserMenu />);
     const user = await openMenu();
     await user.click(await screen.findByRole('menuitem', { name: 'Вийти' }));
-    await vi.waitFor(() => expect(assign).toHaveBeenCalledWith('/uk/login'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Щось пішло не так');
+    expect(assign).not.toHaveBeenCalled();
   });
 });

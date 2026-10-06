@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useEffect, type ReactNode } from 'react';
 import { StatusPanel } from '@/modules/auth';
@@ -11,11 +12,20 @@ import { lastSpace } from '../lib/last-space';
 /** Renders a space's pages only when the user can open it; remembers it for the next landing. */
 export function SpaceGuard({ spaceId, children }: { spaceId: string; children: ReactNode }) {
   const t = useTranslations('spaces.unavailable');
+  const queryClient = useQueryClient();
   const space = useSpace(spaceId);
 
   useEffect(() => {
     if (space.data) lastSpace.set(space.data.id);
   }, [space.data]);
+
+  useEffect(() => {
+    if (!space.isError) return;
+    // The cached list may still contain this space (removed/deleted while the app was open): refresh it
+    // and forget it as "last", or landing and the switcher would send the user straight back here.
+    lastSpace.forget(spaceId);
+    void queryClient.invalidateQueries({ queryKey: ['spaces'], exact: true });
+  }, [space.isError, spaceId, queryClient]);
 
   if (space.isError) {
     return (

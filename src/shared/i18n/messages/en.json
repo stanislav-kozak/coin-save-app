@@ -155,7 +155,8 @@
     },
     "home": {
       "title": "Home"
-    }
+    },
+    "retry": "Try again"
   },
   "shell": {
     "userMenu": "User menu",

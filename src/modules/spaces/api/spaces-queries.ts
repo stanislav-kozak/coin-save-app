@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_CURRENCY } from '@/shared/constants/currencies';
 import { api } from '@/shared/lib/api-client';
 import type { CreateSpaceValues } from '../schemas';
 
@@ -34,7 +33,8 @@ export function useCreateSpace() {
     mutationFn: async ({ name, currency }: CreateSpaceValues) => {
       const { data: space, error } = await api.POST('/api/spaces', { body: { name } });
       if (error) throw error;
-      if (currency !== DEFAULT_CURRENCY) {
+      // POST takes only a name; the server picks the default currency (EUR at the time of writing).
+      if (currency !== space.primaryCurrency) {
         try {
           const { data: updated } = await api.PATCH('/api/spaces/{spaceId}', {
             params: { path: { spaceId: space.id } },
