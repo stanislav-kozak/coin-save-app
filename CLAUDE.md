@@ -119,6 +119,14 @@ src/
 | Палітра іконок/декору      | `bg-palette-blue`, `-teal`, `-amber`, `-violet`, `-emerald` (не залежить від теми)                                |
 | Типографіка                | `text-display`, `text-h1`, `text-h2`, `text-body` (+ `font-medium` для Body Medium), `text-caption`, `text-money` |
 
+## Деплой
+
+- Прод: `https://app.coinsavekeeper.com` — один origin з бекендом (Caddy: `/api/*`, `/socket.io/*` → api, решта → `web:3000`).
+- Образ: `Dockerfile` (Next `output: 'standalone'`, слухає `::`:3000), `ghcr.io/stanislav-kozak/coin-save-app:{main,<sha>}`.
+- CI (`.github/workflows/ci-cd.yml`): PR → lint/format/typecheck/test/build; push у `main` → образ у GHCR → SSH на VPS
+  `./deploy.sh web <sha>` з репо бекенду (compose і Caddy живуть там). Деплой вмикається змінною репо `WEB_DEPLOY_ENABLED=true`.
+- Локально перевірити образ: `docker build -t coin-save-app:local . && docker run -p 3200:3000 coin-save-app:local`.
+
 ## Робочий процес
 
 - Задача → (специфікація/план у `docs/superpowers/` для великих фіч) → feature-гілка `feature/<name>` → PR у `main`.
