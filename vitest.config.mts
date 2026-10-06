@@ -8,5 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
+    // Run in the target market's zone so date/midnight tests can't pass trivially in UTC CI.
+    env: { TZ: 'Europe/Kyiv' },
   },
 });

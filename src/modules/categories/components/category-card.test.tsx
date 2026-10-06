@@ -37,6 +37,21 @@ describe('CategoryCard', () => {
     expect(screen.getByText('понад ліміт')).toBeInTheDocument();
   });
 
+  it('never shows a negative excess when the rounded pct says 100', () => {
+    renderWithProviders(
+      <CategoryCard category={groceries} spent="1995" pct={100} currency="UAH" />,
+    );
+    expect(screen.queryByText('понад ліміт')).toBeNull();
+    expect(screen.queryByText(/\+-/)).toBeNull();
+  });
+
+  it('shows no "+0,00" badge when spending exactly the limit', () => {
+    renderWithProviders(
+      <CategoryCard category={groceries} spent="2000" pct={100} currency="UAH" />,
+    );
+    expect(screen.queryByText('понад ліміт')).toBeNull();
+  });
+
   it('shows only the spent amount without a limit', () => {
     renderWithProviders(
       <CategoryCard

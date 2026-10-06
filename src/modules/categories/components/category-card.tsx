@@ -1,10 +1,10 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { formatMoney, subtractMoney } from '@/shared/lib/money';
+import { formatMoney } from '@/shared/lib/money';
 import { cn } from '@/shared/lib/utils';
 import { EntityIcon } from '@/shared/ui/entity-icon';
-import { limitStatus, type LimitStatus } from '../lib/limit-status';
+import { limitStatus, overLimit, type LimitStatus } from '../lib/limit-status';
 
 export type CategoryView = {
   id: string;
@@ -27,12 +27,13 @@ export function useCategoryCaption({ category, spent, pct, currency }: Props) {
   const locale = useLocale();
   const money = (v: string) => formatMoney(v, currency, locale);
   const limit = category.monthlyLimit;
+  const excess = overLimit(spent, limit);
   return {
-    status: limitStatus(pct, limit),
+    status: limitStatus(spent, limit, pct),
     caption: limit
       ? t('spentOfLimit', { spent: money(spent), limit: money(limit), pct })
       : t('spent', { amount: money(spent) }),
-    over: limit ? t('over', { amount: money(subtractMoney(spent, limit)) }) : null,
+    over: excess ? t('over', { amount: money(excess) }) : null,
     overLabel: t('overLabel'),
   };
 }
