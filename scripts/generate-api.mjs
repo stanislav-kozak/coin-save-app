@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import openapiTS, { astToString } from 'openapi-typescript';
 
-const source = process.env.API_DOCS_URL ?? 'http://176.117.78.135/api/docs.json';
+const source = process.env.API_DOCS_URL ?? 'https://app.coinsavekeeper.com/api/docs.json';
 const outFile = new URL('../src/generated/api.d.ts', import.meta.url);
 
 try {

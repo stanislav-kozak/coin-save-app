@@ -3,7 +3,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/shared/i18n/request.ts');
 
-const apiTarget = process.env.API_PROXY_TARGET ?? 'http://176.117.78.135';
+const apiTarget = process.env.API_PROXY_TARGET ?? 'https://app.coinsavekeeper.com';
 
 const nextConfig: NextConfig = {
   async rewrites() {
