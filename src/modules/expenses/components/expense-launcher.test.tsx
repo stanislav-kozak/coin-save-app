@@ -83,13 +83,14 @@ describe('pending category spends', () => {
     await dropAndSubmit();
     expect(await screen.findByLabelText('pending')).toHaveTextContent('c1:85:UAH');
     answer({ data: { id: 'e1' } });
-    await vi.waitFor(() => expect(screen.getByLabelText('pending')).toHaveTextContent(''));
+    await vi.waitFor(() => expect(screen.getByLabelText('pending')).toBeEmptyDOMElement());
   });
 
   it('drops it again when the server refuses', async () => {
     post.mockResolvedValue({ error: { statusCode: 400, code: 'WALLET_ARCHIVED', message: 'x' } });
     await dropAndSubmit();
     expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
-    expect(screen.getByLabelText('pending')).toHaveTextContent('');
+    // The optimistic value reverts when the save transition ends, a commit after the dialog reopens.
+    await vi.waitFor(() => expect(screen.getByLabelText('pending')).toBeEmptyDOMElement());
   });
 });
