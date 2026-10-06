@@ -70,6 +70,16 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill }: Props) {
     if (open && firstWalletId && !getValues('walletId')) setValue('walletId', firstWalletId);
   }, [open, firstWalletId, getValues, setValue]);
 
+  // Same for the category in free mode, so an expense isn't left uncategorized by accident.
+  // Runs only on (re)open / when categories arrive — choosing "Без категорії" later sticks.
+  const firstCategoryId = categories.data?.[0]?.id;
+  const isFree = !prefill;
+  useEffect(() => {
+    if (open && isFree && firstCategoryId && !getValues('categoryId')) {
+      setValue('categoryId', firstCategoryId);
+    }
+  }, [open, isFree, firstCategoryId, getValues, setValue]);
+
   const walletId = useWatch({ control, name: 'walletId' });
   const wallet = wallets.data?.find((w) => w.id === walletId);
   const category = categories.data?.find((c) => c.id === prefill?.categoryId);

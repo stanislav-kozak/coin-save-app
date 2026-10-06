@@ -102,6 +102,9 @@ describe('ExpenseDialog', () => {
     await screen.findByRole('option', { name: /Cash/ });
     // The first wallet is preselected once wallets arrive, so a wallet is never missing.
     expect(screen.getByLabelText('Гаманець')).toHaveValue('w1');
+    await screen.findByRole('option', { name: /Продукти/ });
+    // …and the first category, so an expense isn't left uncategorized by accident.
+    expect(screen.getByLabelText('Категорія')).toHaveValue('c1');
     await user.selectOptions(screen.getByLabelText('Гаманець'), 'w2');
     await user.selectOptions(screen.getByLabelText('Категорія'), '');
     expect(screen.getByText('USD')).toBeInTheDocument();
