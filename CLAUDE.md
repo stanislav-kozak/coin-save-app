@@ -8,7 +8,7 @@
 - `docs/specs/2026-09-14-coin-save-design-system.md` — дизайн-система (токени, типографіка, компоненти).
 - `docs/superpowers/plans/` — плани реалізації бекенду (довідка: що і як зроблено на API).
 
-API: Swagger UI — http://176.117.78.135/api/docs, контракт — http://176.117.78.135/api/docs.json.
+API: Swagger UI — https://app.coinsavekeeper.com/api/docs, контракт — https://app.coinsavekeeper.com/api/docs.json.
 
 Документація Next.js 16 лежить локально в `node_modules/next/dist/docs/` — для питань по Next читай її
 (правила нижче з `AGENTS.md` керуються самим Next, не редагуй їх вручну):
@@ -81,7 +81,7 @@ src/
 - Токени — httpOnly cookies (`access`, `refresh`), ставить бекенд. Фронт токени не читає і не зберігає.
 - Бекенд ставить cookie з `Secure` і не має CORS, тому фронт ходить в API **тільки same-origin**:
   у dev Next.js `rewrites` проксить `/api/*` і `/socket.io/*` на бекенд (`API_PROXY_TARGET`).
-  Не викликати `http://176.117.78.135` напряму з браузера.
+  Не викликати `https://app.coinsavekeeper.com` напряму з браузера.
 - Захист роутів — `src/proxy.ts` перевіряє cookie-ознаку `session` (30 днів, ставить і прибирає бекенд; `access` живе
   лише 15 хв і на перехідний період теж приймається), без запитів до API. Залогіненого користувача proxy відправляє
   з guest-only сторінок (`login`, `signup`, `forgot-password`, `check-email`) у застосунок; сторінки з посилань у листах
