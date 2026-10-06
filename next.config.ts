@@ -6,6 +6,8 @@ const withNextIntl = createNextIntlPlugin('./src/shared/i18n/request.ts');
 const apiTarget = process.env.API_PROXY_TARGET ?? 'https://app.coinsavekeeper.com';
 
 const nextConfig: NextConfig = {
+  // Self-contained server for the Docker image (see Dockerfile).
+  output: 'standalone',
   async rewrites() {
     // Browser talks to /api on its own origin, so the backend's Secure httpOnly cookies stay first-party.
     return [{ source: '/api/:path*', destination: `${apiTarget}/api/:path*` }];
