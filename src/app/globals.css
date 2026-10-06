@@ -22,12 +22,19 @@
   --border: #e7e1db;
   --foreground: #1c1917;
   --muted-foreground: #78716c;
+
+  /* Icon/decor palette — theme-independent (Figma auth brand panel 10:336–10:340) */
+  --palette-blue: #3b82f6;
+  --palette-teal: #15bba3;
+  --palette-amber: #f59e0b;
+  --palette-violet: #8b5cf6;
+  --palette-emerald: #10b981;
 }
 
 .dark {
   --primary: #fb8a65;
   --primary-hover: #f97350;
-  --primary-foreground: #1c1917;
+  --primary-foreground: #ffffff;
   --success: #4ade80;
   --warning: #facc15;
   --destructive: #f87171;
@@ -61,6 +68,11 @@
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--primary);
+  --color-palette-blue: var(--palette-blue);
+  --color-palette-teal: var(--palette-teal);
+  --color-palette-amber: var(--palette-amber);
+  --color-palette-violet: var(--palette-violet);
+  --color-palette-emerald: var(--palette-emerald);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
