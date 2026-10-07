@@ -458,6 +458,26 @@
       "all": "All wallets",
       "some": "{count} wallets",
       "archived": "(archived)"
+    },
+    "summary": {
+      "expenses": "Expenses",
+      "incomes": "Incomes",
+      "balance": "Period balance",
+      "thisPeriod": "this period",
+      "vs": {
+        "week": "vs last week",
+        "month": "vs last month",
+        "quarter": "vs last quarter",
+        "year": "vs last year"
+      }
+    },
+    "split": {
+      "title": "Split by category",
+      "empty": "No expenses in this period",
+      "uncategorized": "No category"
+    },
+    "limits": {
+      "title": "Category limits"
     }
   }
 }

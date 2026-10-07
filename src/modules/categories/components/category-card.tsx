@@ -168,3 +168,45 @@ export function CategoryTile(props: Props) {
     </button>
   );
 }
+
+/** A limit progress row (analytics «Ліміти категорій», Figma 16:505): icon, name, bar and caption. */
+export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
+  const { category, pct } = props;
+  const { status, caption, over, overLabel } = useCategoryCaption(props);
+  return (
+    <li className="flex items-center gap-3 py-2">
+      <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-body font-medium">{category.name}</span>
+          {status === 'over' && over ? (
+            <span className="shrink-0 rounded-full border border-destructive px-2 text-caption font-medium text-destructive">
+              {over} <span>{overLabel}</span>
+            </span>
+          ) : null}
+        </div>
+        <div
+          role="progressbar"
+          aria-label={category.name}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.min(pct, 100)}
+          className="mt-1 h-2 overflow-hidden rounded-full bg-border"
+        >
+          <div
+            className={cn('h-full rounded-full', BAR[status])}
+            style={{ width: `${status === 'none' ? 0 : Math.min(pct, 100)}%` }}
+          />
+        </div>
+        <p
+          className={cn(
+            'mt-1 text-caption',
+            status === 'over' ? 'text-destructive' : 'text-muted-foreground',
+          )}
+        >
+          {caption}
+        </p>
+      </div>
+    </li>
+  );
+}
