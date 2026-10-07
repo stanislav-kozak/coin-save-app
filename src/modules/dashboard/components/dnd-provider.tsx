@@ -12,6 +12,7 @@ import {
 } from '@dnd-kit/core';
 import { useTranslations } from 'next-intl';
 import { useId, useState, type ReactNode } from 'react';
+import { isTap } from '../lib/is-tap';
 import { keyboardCoordinates } from '../lib/keyboard-coordinates';
 import { resolveDrop } from '../lib/resolve-drop';
 
@@ -22,13 +23,15 @@ type Props = {
   onDrop: (target: { walletId: string; categoryId: string }) => void;
   /** A category dropped somewhere (spec §6.4); the dashboard decides whether it moved. */
   onReorder: (activeId: string, overId: string | null) => void;
+  /** A slow touch tap that dnd-kit turned into a motionless drag: do what a tap would. */
+  onTap?: (dndId: string) => void;
   /** Display name for a dnd id (`wallet:…` / `category:…`), for screen-reader announcements. */
   nameOf: (dndId: string) => string;
 };
 
 const isCategory = (dndId: string) => dndId.startsWith('category:');
 
-export function DndProvider({ children, renderGhost, onDrop, onReorder, nameOf }: Props) {
+export function DndProvider({ children, renderGhost, onDrop, onReorder, onTap, nameOf }: Props) {
   const t = useTranslations('dnd');
   const id = useId(); // dnd-kit's own ids come from a module counter that differs between server and client
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -69,9 +72,10 @@ export function DndProvider({ children, renderGhost, onDrop, onReorder, nameOf }
       }}
       onDragStart={({ active }) => setActiveId(String(active.id))}
       onDragCancel={() => setActiveId(null)}
-      onDragEnd={({ active, over }) => {
+      onDragEnd={({ active, over, delta, activatorEvent }) => {
         setActiveId(null);
         const [a, o] = [String(active.id), over ? String(over.id) : null];
+        if (onTap && isTap({ activatorEvent, delta, activeId: a, overId: o })) return onTap(a);
         if (isCategory(a)) return onReorder(a, o);
         const target = resolveDrop(a, o);
         if (target) onDrop(target);

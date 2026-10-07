@@ -89,4 +89,14 @@ describe('CategoriesGrid', () => {
     renderWithProviders(<CategoriesGrid spaceId="sp1" notice="Не вдалося змінити порядок" />);
     expect(await screen.findByRole('alert')).toHaveTextContent('Не вдалося змінити порядок');
   });
+
+  it('opens the editor for a category tapped on the dashboard', async () => {
+    const handled = vi.fn();
+    renderWithProviders(
+      <CategoriesGrid spaceId="sp1" editRequest="c1" onEditRequestHandled={handled} />,
+    );
+    expect(await screen.findByRole('dialog', { name: 'Категорія' })).toBeInTheDocument();
+    await userEvent.setup().keyboard('{Escape}');
+    expect(handled).toHaveBeenCalled();
+  });
 });

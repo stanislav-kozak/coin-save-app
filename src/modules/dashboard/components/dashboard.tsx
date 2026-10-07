@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { CategoriesGrid, useCategories } from '@/modules/categories';
 import { RecentExpenses, useExpenseLauncher } from '@/modules/expenses';
@@ -25,6 +26,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const { openExpense, openAddWallet, openIncome, pendingSpends } = useExpenseLauncher();
 
   const dropped = useDroppedOrder(spaceId);
+  const [tappedCategory, setTappedCategory] = useState<string | null>(null);
   const order = dropped.order;
   const categoryIds = order ?? categories.data?.map((c) => c.id) ?? [];
 
@@ -42,6 +44,11 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
       onReorder={(activeId, overId) => {
         const next = resolveReorder(activeId, overId, categoryIds);
         if (next) dropped.apply(next);
+      }}
+      onTap={(dndId) => {
+        const [kind, id] = dndId.split(':');
+        if (kind === 'wallet') openIncome(id!);
+        else setTappedCategory(id!);
       }}
       renderGhost={(dndId) => {
         const [kind, id] = dndId.split(':');
@@ -86,6 +93,8 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
             pending={pendingSpends}
             order={order ?? undefined}
             notice={dropped.error ? te(getErrorCode(dropped.error)) : undefined}
+            editRequest={tappedCategory}
+            onEditRequestHandled={() => setTappedCategory(null)}
             wrap={(id, render, isCard) =>
               isCard === isDesktop ? (
                 <SortableCategory id={id} isCard={isCard}>
