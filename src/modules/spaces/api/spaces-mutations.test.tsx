@@ -57,7 +57,9 @@ describe('space hooks', () => {
     const del = setup(() => useDeleteSpace('sp1'));
     await act(() => del.result.current.mutateAsync());
     expect(api.DELETE).toHaveBeenCalledWith('/api/spaces/{spaceId}', path());
-    expect(del.remove).toHaveBeenCalledWith({ queryKey: ['spaces', 'sp1'] });
+    // The open page still observes this space: dropping its cache would refetch it (403) and flash
+    // "unavailable" before navigation. It is left to garbage-collect instead.
+    expect(del.remove).not.toHaveBeenCalled();
     const leave = setup(() => useLeaveSpace('sp1'));
     await act(() => leave.result.current.mutateAsync());
     expect(api.POST).toHaveBeenCalledWith('/api/spaces/{spaceId}/leave', path());

@@ -50,4 +50,10 @@ describe('SpaceSwitcher', () => {
     renderWithProviders(<SpaceSwitcher currentSpaceId="foreign" />);
     expect(await screen.findByRole('button', { name: /Перемкнути простір/ })).toBeInTheDocument();
   });
+
+  it('still offers a way out when the list fails to load', async () => {
+    get.mockResolvedValue({ error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } });
+    renderWithProviders(<SpaceSwitcher currentSpaceId="a" />);
+    expect(await screen.findByText('Перемкнути простір')).toBeInTheDocument();
+  });
 });
