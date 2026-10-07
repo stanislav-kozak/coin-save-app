@@ -32,7 +32,7 @@ export function ConfirmDialog({
   onConfirm,
   onClose,
 }: Props) {
-  const t = useTranslations('settings');
+  const t = useTranslations('common');
   const te = useTranslations('errors');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);

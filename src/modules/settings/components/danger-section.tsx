@@ -7,7 +7,7 @@ import { useRouter } from '@/shared/i18n/navigation';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
-import { ConfirmDialog } from './confirm-dialog';
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { useMyRole } from '../lib/use-my-role';
 import { SettingsSection } from './settings-section';
 

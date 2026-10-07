@@ -4,7 +4,9 @@
     "themeLight": "Light theme",
     "themeDark": "Dark theme",
     "retry": "Try again",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "styleguide": {
     "title": "Styleguide",
@@ -387,5 +389,57 @@
   "realtime": {
     "offline": "No connection to the server. Data may be out of date.",
     "memberJoined": "A new member joined the space"
+  },
+  "recurring": {
+    "title": "Recurring payments",
+    "add": "Add",
+    "addLabel": "Add a recurring payment",
+    "expenses": "Expenses",
+    "incomes": "Incomes",
+    "total": "Total: {amount}/mo",
+    "monthly": "monthly, on day {day}",
+    "until": "until {date}",
+    "paused": "Paused",
+    "pause": "Pause: {name}",
+    "resume": "Resume: {name}",
+    "delete": "Delete: {name}",
+    "deleteTitle": "Delete recurring payment",
+    "confirmDelete": "Delete “{name}”? No new payments will be created; recorded ones stay.",
+    "deleteConfirm": "Delete",
+    "emptyTitle": "No recurring payments yet",
+    "emptyText": "Add subscriptions, bills or salary — they will be recorded every month by themselves",
+    "form": {
+      "createTitle": "New recurring payment",
+      "editTitle": "Recurring payment",
+      "type": "Type",
+      "expense": "Expense",
+      "income": "Income",
+      "name": "Name",
+      "namePlaceholder": "e.g. Netflix",
+      "amount": "Amount",
+      "wallet": "Wallet",
+      "category": "Category",
+      "noCategory": "No category",
+      "day": "Day of month",
+      "shortMonths": "In shorter months — on the last day",
+      "firstPayment": "First payment: {date}",
+      "endDate": "Until",
+      "note": "Note",
+      "save": "Save",
+      "delete": "Delete",
+      "archived": "(archived)"
+    },
+    "validation": {
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Up to 100 characters",
+      "amountRequired": "Enter an amount",
+      "amountInvalid": "Enter a positive amount, e.g. 250.50",
+      "amountPositive": "The amount must be above zero",
+      "amountTooLarge": "The amount is too large",
+      "noteTooLong": "Up to 500 characters",
+      "walletRequired": "Choose a wallet",
+      "endBeforeStart": "The end date must be after the first payment"
+    },
+    "editHint": "Edit:"
   }
 }
