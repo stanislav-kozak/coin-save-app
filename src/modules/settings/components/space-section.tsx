@@ -25,7 +25,7 @@ type Values = z.output<typeof schema>;
 type Changes = { name?: string; primaryCurrency?: Currency };
 
 const SELECT =
-  'h-10 w-full rounded-control border border-input bg-card px-3 text-body text-foreground outline-none focus-visible:border-primary';
+  'h-10 w-full rounded-control border border-input bg-card px-3 text-field md:text-body text-foreground outline-none focus-visible:border-primary';
 
 /** «Простір»: the owner renames it and changes its primary currency (re-converted on the server). */
 export function SpaceSection({ spaceId }: { spaceId: string }) {

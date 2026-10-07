@@ -15,4 +15,10 @@ describe('cn with design-system tokens', () => {
     expect(cn('rounded-card', 'rounded-control')).toBe('rounded-control');
     expect(cn('shadow-card', 'shadow-modal')).toBe('shadow-modal');
   });
+
+  it('keeps the phone input size next to a text color', () => {
+    expect(cn('text-field md:text-body', 'text-foreground')).toBe(
+      'text-field md:text-body text-foreground',
+    );
+  });
 });

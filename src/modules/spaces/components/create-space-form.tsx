@@ -72,7 +72,7 @@ export function CreateSpaceForm() {
           <FormField id="space-currency" label={t('onboarding.currency')}>
             <select
               id="space-currency"
-              className="h-10 w-full rounded-control border border-input bg-card px-3 text-body text-foreground outline-none focus-visible:border-primary"
+              className="h-10 w-full rounded-control border border-input bg-card px-3 text-field md:text-body text-foreground outline-none focus-visible:border-primary"
               {...register('currency')}
             >
               {SUPPORTED_CURRENCIES.map((code) => (

@@ -112,6 +112,9 @@
   --text-h2--font-weight: 600;
   --text-body: 15px;
   --text-body--line-height: 22px;
+  /* Form fields on phones: iOS zooms into any focused field under 16px and the page then pans sideways. */
+  --text-field: 16px;
+  --text-field--line-height: 22px;
   --text-caption: 13px;
   --text-caption--line-height: 18px;
 }
@@ -127,7 +130,26 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    /* No rubber-band: the sticky header and fixed bottom nav stay put at the edges. */
+    overscroll-behavior: none;
+  }
   body {
     @apply bg-background text-foreground text-body font-sans antialiased;
+    /* Nothing may be scrollable sideways on a phone. */
+    overflow-x: clip;
   }
+}
+
+/* iPhone notch / home indicator (viewport-fit=cover). */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+/* Room under page content for the fixed mobile bottom nav (its height + the home indicator). */
+@utility pb-nav {
+  padding-bottom: calc(--spacing(24) + env(safe-area-inset-bottom));
 }

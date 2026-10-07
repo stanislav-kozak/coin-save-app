@@ -33,7 +33,7 @@ type Props = {
 };
 
 const SELECT =
-  'h-10 w-full rounded-control border border-input bg-card px-3 text-body text-foreground outline-none focus-visible:border-primary';
+  'h-10 w-full rounded-control border border-input bg-card px-3 text-field md:text-body text-foreground outline-none focus-visible:border-primary';
 
 /** "Нова витрата" (Figma 10:176). Closes on submit; reopens with the same values if the server refuses. */
 export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingSpend }: Props) {

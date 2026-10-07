@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { Inter } from 'next/font/google';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
@@ -10,6 +10,9 @@ import '../globals.css';
 const inter = Inter({ subsets: ['latin', 'cyrillic'], variable: '--font-inter' });
 
 export const metadata: Metadata = { title: 'CoinSave' };
+
+// Edge-to-edge on phones; the header and bottom nav pad themselves by the safe-area insets.
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
