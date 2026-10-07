@@ -6,6 +6,7 @@ import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useAnalytics } from '../api/analytics-queries';
 import { useAnalyticsPeriod } from '../hooks/use-analytics-period';
+import { shiftPeriod } from '../lib/period';
 import { CategorySplit } from './category-split';
 import { ExportCsvButton } from './export-csv-button';
 import { LimitBars } from './limit-bars';
@@ -20,6 +21,9 @@ export function AnalyticsPage({ spaceId }: { spaceId: string }) {
   const tc = useTranslations('common');
   const { period, walletIds } = useAnalyticsPeriod();
   const analytics = useAnalytics(spaceId, period, walletIds);
+  // The server's previousPeriod* covers the same number of days before `from`, not the previous
+  // calendar month/quarter the label promises, so the previous period is fetched like this one.
+  const previous = useAnalytics(spaceId, shiftPeriod(period, -1), walletIds);
 
   let body;
   if (analytics.isError && !analytics.isFetching) {
@@ -44,7 +48,7 @@ export function AnalyticsPage({ spaceId }: { spaceId: string }) {
     const data = analytics.data;
     body = (
       <>
-        <SummaryCards analytics={data} kind={period.kind} />
+        <SummaryCards analytics={data} previous={previous.data} kind={period.kind} />
         <CategorySplit analytics={data} />
         {/* Spec §10.4: limits are monthly. */}
         {period.kind === 'month' ? <LimitBars analytics={data} /> : null}

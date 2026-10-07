@@ -3,14 +3,17 @@
 import { useTranslations } from 'next-intl';
 import type { components } from '@/generated/api';
 import { CategoryLimitRow } from '@/modules/categories';
-import { percentOf } from '@/shared/lib/money';
+import { isNegative, percentOf, subtractMoney } from '@/shared/lib/money';
 
 type Analytics = Pick<components['schemas']['AnalyticsResponseDto'], 'currency' | 'byCategory'>;
 
 /** «Ліміти категорій» (spec §10.4): shown by the page for month periods only. */
 export function LimitBars({ analytics }: { analytics: Analytics }) {
   const t = useTranslations('analytics.limits');
-  const items = analytics.byCategory.filter((c) => c.categoryId);
+  // Categories with spending or a limit (an archived one with neither is just noise).
+  const items = analytics.byCategory.filter(
+    (c) => c.categoryId && (c.limit != null || isNegative(subtractMoney('0', c.spent))),
+  );
   if (items.length === 0) return null;
   return (
     <section aria-labelledby="limits-title" className="flex flex-col gap-2">

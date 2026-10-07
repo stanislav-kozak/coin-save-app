@@ -9,8 +9,6 @@ const analytics = {
   currency: 'UAH',
   totalExpense: '1000',
   totalIncome: '3500',
-  previousPeriodExpense: '800',
-  previousPeriodIncome: '0',
   byCategory: [
     {
       categoryId: 'c1',
@@ -35,7 +33,13 @@ const analytics = {
 
 describe('SummaryCards', () => {
   it('shows totals, the change vs the previous period and the period balance', () => {
-    renderWithProviders(<SummaryCards analytics={analytics} kind="month" />);
+    renderWithProviders(
+      <SummaryCards
+        analytics={analytics}
+        previous={{ totalExpense: '800', totalIncome: '0' }}
+        kind="month"
+      />,
+    );
     expect(screen.getByText(/1\s000,00\s₴/)).toBeInTheDocument();
     expect(screen.getByText('+25%')).toHaveClass('text-destructive'); // spending grew
     expect(screen.getByText('—')).toBeInTheDocument(); // no income last month

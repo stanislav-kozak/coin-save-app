@@ -79,9 +79,12 @@ const analytics = {
 };
 
 function serve(data: unknown = analytics) {
-  get.mockImplementation(async (path: string) => {
+  get.mockImplementation(async (path: string, opts?: unknown) => {
     if (path.endsWith('/analytics')) {
       if (data === 'pending') return new Promise(() => {});
+      const from = (opts as { params: { query: { from: string } } }).params.query.from;
+      if (from === '2026-09-01')
+        return { data: { ...analytics, totalExpense: '340', totalIncome: '0' } };
       if (data === 'error')
         return { error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } };
       return { data };
@@ -176,6 +179,11 @@ describe('AnalyticsPage', () => {
     expect((click.mock.contexts[0] as HTMLAnchorElement).download).toBe(
       'coinsave-2026-10-01-2026-10-31.csv',
     );
+    // Revoking right away cancels the download in Safari/iOS, so it happens a moment later.
+    expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:x'), {
+      timeout: 3000,
+    });
   });
 
   it('says when the export failed', async () => {
@@ -188,5 +196,40 @@ describe('AnalyticsPage', () => {
     renderWithProviders(<AnalyticsPage spaceId="s1" />);
     await userEvent.setup().click(screen.getByRole('button', { name: /Експорт CSV/ }));
     expect(await screen.findByRole('alert')).toBeInTheDocument();
+  });
+
+  it('compares with the real previous calendar period', async () => {
+    serve();
+    renderWithProviders(<AnalyticsPage spaceId="s1" />);
+    // 425 now vs 340 in September (not the server's "same number of days before")
+    expect(await screen.findByText('+25%')).toBeInTheDocument();
+    const queried = get.mock.calls
+      .filter((c) => c[0].endsWith('/analytics'))
+      .map((c) => c[1].params.query.from);
+    expect(queried).toEqual(expect.arrayContaining(['2026-10-01', '2026-09-01']));
+  });
+
+  it('lists limits only for categories with spending or a limit', async () => {
+    serve({
+      ...analytics,
+      byCategory: [
+        ...analytics.byCategory,
+        {
+          categoryId: 'c3',
+          name: 'Старе',
+          icon: '🧾',
+          color: null,
+          spent: '0',
+          limit: null,
+          pct: 0,
+        },
+      ],
+    });
+    renderWithProviders(<AnalyticsPage spaceId="s1" />);
+    const limits = (
+      await screen.findByRole('heading', { level: 2, name: 'Ліміти категорій' })
+    ).closest('section')!;
+    expect(within(limits).getByText('Продукти')).toBeInTheDocument();
+    expect(within(limits).queryByText('Старе')).toBeNull();
   });
 });

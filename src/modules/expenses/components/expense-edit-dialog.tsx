@@ -109,9 +109,13 @@ export function ExpenseEditDialog({
 
   const save = async (values: Values) => {
     setError(null);
-    const body = changedFields(values, dirtyFields);
-    if (dirtyFields.note && values.note === undefined) body.note = ''; // a cleared note
-    if (body.categoryId === '') delete body.categoryId; // clearing waits for the API (nullable)
+    const { categoryId, note, ...rest } = changedFields(values, dirtyFields);
+    // null clears (uncategorized / no note); a cleared note parses to undefined, which JSON drops.
+    const body = {
+      ...rest,
+      ...(dirtyFields.categoryId ? { categoryId: categoryId || null } : {}),
+      ...(dirtyFields.note ? { note: note || null } : {}),
+    };
     try {
       await update.mutateAsync({ id: expense.id, body });
       onOpenChange(false);
@@ -184,7 +188,7 @@ export function ExpenseEditDialog({
             {expense.type === 'EXPENSE' ? (
               <FormField id="edit-category" label={t('create.category')}>
                 <select id="edit-category" className={SELECT} {...register('categoryId')}>
-                  {expense.categoryId ? null : <option value="">{t('create.noCategory')}</option>}
+                  <option value="">{t('create.noCategory')}</option>
                   {categories.data
                     .filter((c) => !c.archived || c.id === expense.categoryId)
                     .map((c) => (

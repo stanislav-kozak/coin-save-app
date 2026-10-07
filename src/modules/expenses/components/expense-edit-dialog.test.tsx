@@ -84,6 +84,19 @@ describe('ExpenseEditDialog', () => {
     );
   });
 
+  it('can make an expense uncategorized and remove its note', async () => {
+    const onOpenChange = renderDialog();
+    const user = userEvent.setup();
+    await user.selectOptions(await screen.findByLabelText('Категорія'), 'Без категорії');
+    await user.clear(screen.getByLabelText('Нотатка'));
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(api.PATCH).toHaveBeenCalledWith('/api/spaces/{spaceId}/expenses/{expenseId}', {
+      params: { path: { spaceId: 's1', expenseId: 'e1' } },
+      body: { categoryId: null, note: null },
+    });
+  });
+
   it('refuses a date in the future', async () => {
     renderDialog();
     const user = userEvent.setup();

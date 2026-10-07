@@ -7,10 +7,8 @@ import { cn } from '@/shared/lib/utils';
 import { deltaPercent } from '../lib/delta';
 import type { PeriodKind } from '../lib/period';
 
-type Analytics = Pick<
-  components['schemas']['AnalyticsResponseDto'],
-  'currency' | 'totalExpense' | 'totalIncome' | 'previousPeriodExpense' | 'previousPeriodIncome'
->;
+type Totals = Pick<components['schemas']['AnalyticsResponseDto'], 'totalExpense' | 'totalIncome'>;
+type Analytics = Totals & Pick<components['schemas']['AnalyticsResponseDto'], 'currency'>;
 
 const CARD = 'flex flex-col gap-1 rounded-card border border-border bg-card p-4 shadow-card';
 
@@ -25,8 +23,15 @@ function Delta({ value, goodWhenUp }: { value: number | null; goodWhenUp: boolea
   return <span className={cn('rounded-full px-2 text-caption font-medium', tone)}>{text}</span>;
 }
 
+type Props = {
+  analytics: Analytics;
+  /** The previous calendar period's totals (same wallets); «—» while they load. */
+  previous: Totals | undefined;
+  kind: PeriodKind;
+};
+
 /** Figma 16:505: expenses, incomes (vs the previous period) and the period balance. */
-export function SummaryCards({ analytics, kind }: { analytics: Analytics; kind: PeriodKind }) {
+export function SummaryCards({ analytics, previous, kind }: Props) {
   const t = useTranslations('analytics.summary');
   const locale = useLocale();
   const money = (v: string, sign?: 'always') =>
@@ -41,7 +46,7 @@ export function SummaryCards({ analytics, kind }: { analytics: Analytics; kind: 
         <span className="flex items-center gap-2 text-caption text-muted-foreground">
           {t(`vs.${kind}`)}
           <Delta
-            value={deltaPercent(analytics.totalExpense, analytics.previousPeriodExpense)}
+            value={previous ? deltaPercent(analytics.totalExpense, previous.totalExpense) : null}
             goodWhenUp={false}
           />
         </span>
@@ -52,7 +57,7 @@ export function SummaryCards({ analytics, kind }: { analytics: Analytics; kind: 
         <span className="flex items-center gap-2 text-caption text-muted-foreground">
           {t(`vs.${kind}`)}
           <Delta
-            value={deltaPercent(analytics.totalIncome, analytics.previousPeriodIncome)}
+            value={previous ? deltaPercent(analytics.totalIncome, previous.totalIncome) : null}
             goodWhenUp
           />
         </span>

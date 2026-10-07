@@ -4,8 +4,9 @@ import { userTimeZone } from '@/shared/lib/periods';
 import type { Period } from '../lib/period';
 
 /**
- * Spec §10.2. Key `['analytics', spaceId, from, to]` (+ the wallet filter): without a filter it shares
- * the dashboard's month cache; realtime and mutations invalidate the `['analytics', spaceId]` prefix.
+ * Spec §10.2. Key `['analytics', spaceId, from, to]` (+ the wallet filter); realtime and mutations
+ * invalidate the `['analytics', spaceId]` prefix. While another period loads, the last one stays on
+ * screen (`isPlaceholderData`) instead of a skeleton.
  */
 export function useAnalytics(spaceId: string, period: Period, walletIds: string[]) {
   const { from, to } = period;
@@ -24,5 +25,8 @@ export function useAnalytics(spaceId: string, period: Period, walletIds: string[
       if (error) throw error;
       return data;
     },
+    // Only within the same space: another space's totals (and currency) must never show.
+    placeholderData: (previous, previousQuery) =>
+      previousQuery?.queryKey[1] === spaceId ? previous : undefined,
   });
 }

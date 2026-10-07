@@ -35,7 +35,8 @@ export function ExportCsvButton({ spaceId, period }: { spaceId: string; period: 
       link.href = url;
       link.download = `coinsave-${period.from}-${period.to}.csv`;
       link.click();
-      URL.revokeObjectURL(url);
+      // Revoking right away can cancel the download in Safari/iOS.
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (e) {
       setError(e);
     } finally {
