@@ -73,7 +73,8 @@ export function SortableCategory({
       className={cn(
         isCard ? 'rounded-card' : 'rounded-full',
         walletOver && 'bg-primary/5 ring-2 ring-primary',
-        isDragging && 'opacity-40',
+        // Lifted while it moves in place (design system: raised shadow for drag).
+        isDragging && 'relative z-10 shadow-card-raised',
       )}
     >
       {children({ ref: setActivatorNodeRef, ...listeners, ...attributes })}

@@ -10,9 +10,9 @@ import {
   useSensors,
   type Announcements,
 } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useTranslations } from 'next-intl';
 import { useId, useState, type ReactNode } from 'react';
+import { keyboardCoordinates } from '../lib/keyboard-coordinates';
 import { resolveDrop } from '../lib/resolve-drop';
 
 type Props = {
@@ -36,8 +36,7 @@ export function DndProvider({ children, renderGhost, onDrop, onReorder, nameOf }
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
-    // Sortable coordinates also walk a wallet across the category drop targets.
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: keyboardCoordinates }),
   );
   const announcements: Announcements = {
     onDragStart: ({ active }) =>

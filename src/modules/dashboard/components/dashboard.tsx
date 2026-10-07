@@ -41,16 +41,9 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
       }}
       renderGhost={(dndId) => {
         const [kind, id] = dndId.split(':');
-        if (kind === 'category') {
-          const category = categories.data?.find((c) => c.id === id);
-          if (!category) return null;
-          return (
-            <div className="flex w-56 rotate-2 items-center gap-3 rounded-card border border-primary bg-card p-3 shadow-card-raised">
-              <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
-              <p className="truncate text-body font-medium">{category.name}</p>
-            </div>
-          );
-        }
+        // A category is reordered in place (the card itself moves): sortable keyboard coordinates
+        // assume the dragged rect is the item's own, which a smaller tilted ghost breaks.
+        if (kind === 'category') return null;
         const wallet = walletById(id);
         if (!wallet) return null;
         // Design system §4.4: elevated shadow + 2° tilt while dragging
