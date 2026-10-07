@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { CategoriesGrid } from './categories-grid';
@@ -41,5 +42,16 @@ describe('CategoriesGrid', () => {
       0,
     );
     expect(screen.getAllByText(/85,00\s₴/).length).toBeGreaterThan(0);
+  });
+
+  it('opens the category editor from a card and the creator from «Додати категорію»', async () => {
+    renderWithProviders(<CategoriesGrid spaceId="sp1" />);
+    const user = userEvent.setup();
+    // Card and circle are both in the DOM (CSS shows one); either opens the editor.
+    await user.click((await screen.findAllByRole('button', { name: 'Редагувати: Кафе' }))[0]);
+    expect(await screen.findByRole('dialog', { name: 'Категорія' })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Додати категорію' }));
+    expect(await screen.findByRole('dialog', { name: 'Нова категорія' })).toBeInTheDocument();
   });
 });

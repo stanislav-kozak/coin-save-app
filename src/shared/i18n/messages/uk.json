@@ -201,7 +201,36 @@
     "over": "+{amount}",
     "overLabel": "понад ліміт",
     "uncategorized": "Без категорії",
-    "income": "Дохід"
+    "income": "Дохід",
+    "manage": {
+      "createTitle": "Нова категорія",
+      "editTitle": "Категорія",
+      "name": "Назва",
+      "namePlaceholder": "Напр., Спорт",
+      "icon": "Іконка",
+      "color": "Колір",
+      "limit": "Місячний ліміт",
+      "limitHint": "Порожньо — без ліміту",
+      "save": "Зберегти",
+      "add": "Додати категорію",
+      "edit": "Редагувати: {name}",
+      "move": "Перемістити: {name}",
+      "archive": "Архівувати",
+      "delete": "Видалити",
+      "confirmArchive": "Архівувати «{name}»? Вона зникне з головного екрана, історія витрат збережеться.",
+      "confirmDelete": "Видалити «{name}»? Витрати залишаться без категорії.",
+      "archiveConfirm": "Архівувати категорію",
+      "deleteConfirm": "Видалити категорію",
+      "cancel": "Скасувати",
+      "close": "Закрити"
+    },
+    "validation": {
+      "nameRequired": "Введіть назву",
+      "nameTooLong": "Не більше 100 символів",
+      "limitInvalid": "Введіть суму, наприклад 1500",
+      "limitPositive": "Ліміт має бути більшим за нуль",
+      "limitTooLarge": "Занадто велика сума"
+    }
   },
   "expenses": {
     "today": "Сьогодні",

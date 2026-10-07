@@ -1,5 +1,6 @@
 'use client';
 
+import { Pencil } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/shared/lib/money';
 import { cn } from '@/shared/lib/utils';
@@ -13,7 +14,14 @@ export type CategoryView = {
   color?: string | null;
   monthlyLimit: string | null;
 };
-type Props = { category: CategoryView; spent: string; pct: number; currency: string };
+type Props = {
+  category: CategoryView;
+  spent: string;
+  pct: number;
+  currency: string;
+  /** Opens the category editor (pencil on the card, a tap on the circle). */
+  onEdit?: () => void;
+};
 
 const BAR: Record<LimitStatus, string> = {
   none: 'bg-muted-foreground/40',
@@ -40,7 +48,8 @@ export function useCategoryCaption({ category, spent, pct, currency }: Props) {
 
 /** Desktop category card (Figma 8:152). */
 export function CategoryCard(props: Props) {
-  const { category, pct } = props;
+  const { category, pct, onEdit } = props;
+  const t = useTranslations('categories');
   const { status, caption, over, overLabel } = useCategoryCaption(props);
 
   return (
@@ -52,6 +61,16 @@ export function CategoryCard(props: Props) {
           <span className="rounded-full bg-destructive/12 px-2 text-caption font-medium text-destructive">
             {over} <span>{overLabel}</span>
           </span>
+        ) : null}
+        {onEdit ? (
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={t('manage.edit', { name: category.name })}
+            className="flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
+            <Pencil aria-hidden className="size-4" />
+          </button>
         ) : null}
       </header>
       <div
@@ -89,9 +108,10 @@ const RING: Record<LimitStatus, string> = {
 
 /** Mobile icon-only category (Figma 10:177); the limit state shows as a ring. */
 export function CategoryCircle(props: Props) {
-  const { category } = props;
+  const { category, onEdit } = props;
+  const t = useTranslations('categories');
   const { status, caption } = useCategoryCaption(props);
-  return (
+  const circle = (
     <span className={cn('inline-flex rounded-full', RING[status])}>
       <EntityIcon
         id={category.id}
@@ -101,5 +121,17 @@ export function CategoryCircle(props: Props) {
         label={`${category.name}: ${caption}`}
       />
     </span>
+  );
+  if (!onEdit) return circle;
+  return (
+    <button
+      type="button"
+      onClick={onEdit}
+      aria-label={t('manage.edit', { name: category.name })}
+      title={caption}
+      className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+    >
+      {circle}
+    </button>
   );
 }

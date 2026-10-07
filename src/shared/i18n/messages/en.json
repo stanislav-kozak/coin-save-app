@@ -201,7 +201,36 @@
     "over": "+{amount}",
     "overLabel": "over limit",
     "uncategorized": "Uncategorized",
-    "income": "Income"
+    "income": "Income",
+    "manage": {
+      "createTitle": "New category",
+      "editTitle": "Category",
+      "name": "Name",
+      "namePlaceholder": "e.g. Sport",
+      "icon": "Icon",
+      "color": "Color",
+      "limit": "Monthly limit",
+      "limitHint": "Empty means no limit",
+      "save": "Save",
+      "add": "Add category",
+      "edit": "Edit: {name}",
+      "move": "Move: {name}",
+      "archive": "Archive",
+      "delete": "Delete",
+      "confirmArchive": "Archive “{name}”? It disappears from the main screen; its expense history stays.",
+      "confirmDelete": "Delete “{name}”? Its expenses will have no category.",
+      "archiveConfirm": "Archive category",
+      "deleteConfirm": "Delete category",
+      "cancel": "Cancel",
+      "close": "Close"
+    },
+    "validation": {
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Up to 100 characters",
+      "limitInvalid": "Enter an amount, e.g. 1500",
+      "limitPositive": "The limit must be above zero",
+      "limitTooLarge": "The amount is too large"
+    }
   },
   "expenses": {
     "today": "Today",
