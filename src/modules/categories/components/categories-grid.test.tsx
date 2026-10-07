@@ -84,4 +84,9 @@ describe('CategoriesGrid', () => {
     const region = screen.getByText('Завантаження…').closest('[aria-busy="true"]')!;
     expect(region.querySelectorAll('[data-skeleton="card"]')).toHaveLength(6);
   });
+
+  it('shows why a reorder was refused', async () => {
+    renderWithProviders(<CategoriesGrid spaceId="sp1" notice="Не вдалося змінити порядок" />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Не вдалося змінити порядок');
+  });
 });

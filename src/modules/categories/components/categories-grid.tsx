@@ -28,6 +28,8 @@ type Props = {
   pending?: PendingSpend[];
   /** An order to show right now (a just-dropped reorder), ahead of the cache catching up. */
   order?: string[];
+  /** A message about the grid itself (e.g. a refused reorder), shown under the heading. */
+  notice?: string;
 };
 
 export function CategoriesGrid({
@@ -35,6 +37,7 @@ export function CategoriesGrid({
   wrap = (_id, render) => render(),
   pending = [],
   order,
+  notice,
 }: Props) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('categories.manage');
@@ -108,6 +111,11 @@ export function CategoriesGrid({
       <h2 id="categories-title" className="text-h2">
         {t('categories')}
       </h2>
+      {notice ? (
+        <p role="alert" className="text-caption text-destructive">
+          {notice}
+        </p>
+      ) : null}
       <ul className="grid grid-cols-4 gap-4 md:hidden">
         {items.map((item) => (
           <li key={item.category.id} className="flex justify-center">
