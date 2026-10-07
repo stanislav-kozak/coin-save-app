@@ -20,20 +20,13 @@ import {
 } from '../api/recurring-mutations';
 import { useRecurring } from '../api/recurring-queries';
 import { monthlyTotals } from '../lib/monthly-totals';
+import { RecurringDialog } from './recurring-dialog';
 import { RecurringRow } from './recurring-row';
 
 type Rule = components['schemas']['RecurringTransactionResponseDto'];
 
 /** `/recurring` (spec §7.6, Figma 13:437 / 16:471): expenses and incomes with monthly totals. */
-export function RecurringPage({
-  spaceId,
-  onAdd,
-  onEdit,
-}: {
-  spaceId: string;
-  onAdd?: () => void;
-  onEdit?: (rule: Rule) => void;
-}) {
+export function RecurringPage({ spaceId }: { spaceId: string }) {
   const t = useTranslations('recurring');
   const te = useTranslations('errors');
   const tc = useTranslations('common');
@@ -46,6 +39,9 @@ export function RecurringPage({
   const resume = useResumeRecurring(spaceId);
   const remove = useDeleteRecurring(spaceId);
   const [deleting, setDeleting] = useState<Rule | null>(null);
+  // null: closed; 'new': creating; a rule: editing it (the dialog remounts per target).
+  const [editing, setEditing] = useState<Rule | 'new' | null>(null);
+  const onAdd = () => setEditing('new');
   const toggleError = pause.error ?? resume.error;
 
   const look = (rule: Rule) => {
@@ -88,7 +84,7 @@ export function RecurringPage({
               rule={rule}
               look={look(rule)}
               busy={pause.isPending || resume.isPending}
-              onEdit={() => onEdit?.(rule)}
+              onEdit={() => setEditing(rule)}
               onToggle={() => (rule.active ? pause : resume).mutate(rule.id)}
               onDelete={() => setDeleting(rule)}
             />
@@ -153,6 +149,20 @@ export function RecurringPage({
         </button>
       </div>
       {body}
+      {editing ? (
+        <RecurringDialog
+          key={editing === 'new' ? 'new' : editing.id}
+          spaceId={spaceId}
+          rule={editing === 'new' ? undefined : editing}
+          open
+          onOpenChange={(open) => !open && setEditing(null)}
+          onDelete={() => {
+            if (editing === 'new') return;
+            setEditing(null);
+            setDeleting(editing);
+          }}
+        />
+      ) : null}
       {deleting ? (
         <ConfirmDialog
           title={t('deleteTitle')}

@@ -108,7 +108,8 @@ describe('RecurringPage', () => {
     // paused «Спортзал» is excluded from the total
     expect(within(expenses).getByText(/Разом: 448,50\s₴\/міс/)).toBeInTheDocument();
     const incomes = section('Доходи');
-    for (const el of within(incomes).getAllByText(/\+35\s000,00\s₴/)) expect(el).toHaveClass('text-success');
+    for (const el of within(incomes).getAllByText(/\+35\s000,00\s₴/))
+      expect(el).toHaveClass('text-success');
   });
 
   it('pauses and resumes a rule', async () => {
