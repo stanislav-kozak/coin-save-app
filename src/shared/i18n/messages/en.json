@@ -383,5 +383,9 @@
     "failedTitle": "Couldn't accept the invitation",
     "home": "Go home",
     "alreadyTitle": "You're already in this space"
+  },
+  "realtime": {
+    "offline": "No connection to the server. Data may be out of date.",
+    "memberJoined": "A new member joined the space"
   }
 }
