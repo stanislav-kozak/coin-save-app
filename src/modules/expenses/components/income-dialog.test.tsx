@@ -14,7 +14,12 @@ vi.mock('@/shared/lib/api-client', () => ({
 beforeEach(() => {
   post.mockReset();
   get.mockReset();
-  get.mockResolvedValue({ data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '100' }] });
+  get.mockResolvedValue({
+    data: [
+      { id: 'w1', name: 'Mono', currency: 'UAH', balance: '100' },
+      { id: 'w2', name: 'Cash', currency: 'USD', balance: '10' },
+    ],
+  });
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date(2026, 9, 31, 12));
 });
@@ -27,6 +32,23 @@ function Harness() {
   return <IncomeDialog spaceId="sp1" walletId="w1" open={open} onOpenChange={setOpen} />;
 }
 const renderIncome = () => renderWithProviders(<Harness />);
+
+/** Like the launcher: one dialog, the wallet set by whichever "+" was pressed last. */
+function Launcher() {
+  const [open, setOpen] = useState(false);
+  const [walletId, setWalletId] = useState('');
+  const openFor = (id: string) => {
+    setWalletId(id);
+    setOpen(true);
+  };
+  return (
+    <>
+      <button onClick={() => openFor('w1')}>plus-mono</button>
+      <button onClick={() => openFor('w2')}>plus-cash</button>
+      <IncomeDialog spaceId="sp1" walletId={walletId} open={open} onOpenChange={setOpen} />
+    </>
+  );
+}
 
 describe('IncomeDialog', () => {
   it('adds the income now and a monthly rule from next month', async () => {
@@ -110,5 +132,26 @@ describe('IncomeDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Додати' }));
     expect(await screen.findByText('Введіть назву')).toBeInTheDocument();
     expect(post).not.toHaveBeenCalled();
+  });
+
+  it('reopens a failed income for its own wallet even after another wallet\'s "+" was pressed', async () => {
+    let answer!: (v: unknown) => void;
+    post
+      .mockReturnValueOnce(new Promise((r) => (answer = r)))
+      .mockResolvedValueOnce({ data: { id: 'e2' } });
+    renderWithProviders(<Launcher />);
+    const user = userEvent.setup();
+    await user.click(screen.getByText('plus-mono'));
+    await user.type(await screen.findByLabelText('Сума'), '15000');
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(screen.queryByLabelText('Сума')).not.toBeInTheDocument());
+    await user.click(screen.getByText('plus-cash'));
+    await user.keyboard('{Escape}');
+    answer({ error: { statusCode: 400, code: 'WALLET_ARCHIVED', message: 'x' } });
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText('Mono')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+    expect(post.mock.calls[1][1].body).toMatchObject({ walletId: 'w1', amount: 15000 });
   });
 });

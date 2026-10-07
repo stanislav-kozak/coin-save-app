@@ -48,6 +48,9 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
   // 'recurring': the income was saved but its monthly rule wasn't — submitting retries only the rule.
   const [stage, setStage] = useState<'form' | 'recurring'>('form');
   const pendingRule = useRef<CreateRecurring | null>(null);
+  // A failed save reopens for the wallet it was for, even if another wallet's "+" was pressed since.
+  const [restoredWallet, setRestoredWallet] = useState<string | null>(null);
+  const activeWallet = restoredWallet ?? walletId;
   const submitting = useRef(false); // one submit per opening (Enter twice)
   const restoring = useRef(false); // the next open shows a failed save, not a fresh form
   const isOpen = useRef(open);
@@ -69,6 +72,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
       return;
     }
     setSubmitError(null);
+    setRestoredWallet(null);
     setStage('form');
     pendingRule.current = null;
     reset(EMPTY);
@@ -77,13 +81,19 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
   }, [open, walletId]);
 
   const monthly = useWatch({ control, name: 'monthly' });
-  const wallet = wallets.data?.find((w) => w.id === walletId);
+  const wallet = wallets.data?.find((w) => w.id === activeWallet);
   const day = new Date().getDate();
   const errors = formState.errors;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 
-  const reopen = (error: unknown, values: IncomeFormInput, nextStage: 'form' | 'recurring') => {
+  const reopen = (
+    error: unknown,
+    values: IncomeFormInput,
+    nextStage: 'form' | 'recurring',
+    forWallet: string,
+  ) => {
     restoring.current = !isOpen.current;
+    setRestoredWallet(forWallet);
     // A fast answer can reopen before the close ever rendered (no open effect runs), so unlock here.
     submitting.current = false;
     reset(values);
@@ -97,7 +107,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
       await recurring.mutateAsync(rule);
     } catch (error) {
       pendingRule.current = rule;
-      reopen(error, values, 'recurring');
+      reopen(error, values, 'recurring', rule.walletId);
     }
   };
 
@@ -113,23 +123,24 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
     if (submitting.current) return;
     submitting.current = true;
     const values = getValues();
+    const target = activeWallet;
     onOpenChange(false); // optimistic: the balance already shows the income (spec §6.9)
     try {
       await create.mutateAsync({
-        walletId,
+        walletId: target,
         amount: draft.amount,
         note: draft.note,
         type: 'INCOME',
       });
     } catch (error) {
-      reopen(error, values, 'form');
+      reopen(error, values, 'form', target);
       return;
     }
     if (!draft.monthly) return;
     const now = new Date();
     await saveRule(
       {
-        walletId,
+        walletId: target,
         type: 'INCOME',
         amount: draft.amount,
         name: draft.name,
