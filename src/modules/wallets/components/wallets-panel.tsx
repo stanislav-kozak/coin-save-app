@@ -59,9 +59,23 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
               const activate = onAddIncome ? () => onAddIncome(w.id) : undefined;
               const circle = <WalletCircle wallet={w} />;
               return (
-                <li key={w.id}>
+                <li key={w.id} className="relative">
                   {wrap ? (
-                    wrap(w.id, circle, false, activate)
+                    <>
+                      {wrap(w.id, circle, false, activate)}
+                      {activate ? (
+                        // The draggable circle takes Enter/Space to lift it, so keyboard and
+                        // screen-reader users get their own "add income" button (shown on focus).
+                        <button
+                          type="button"
+                          onClick={activate}
+                          aria-label={ti('addFor', { name: w.name })}
+                          className="sr-only rounded-full bg-card text-primary shadow-card focus-visible:not-sr-only focus-visible:absolute focus-visible:-right-1 focus-visible:-bottom-1 focus-visible:flex focus-visible:size-6 focus-visible:items-center focus-visible:justify-center focus-visible:ring-2 focus-visible:ring-ring/50"
+                        >
+                          <Plus aria-hidden className="size-4" />
+                        </button>
+                      ) : null}
+                    </>
                   ) : (
                     <button
                       type="button"
