@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/shared/lib/money';
 import { cn } from '@/shared/lib/utils';
 import { EntityIcon } from '@/shared/ui/entity-icon';
+import { limitFill } from '../lib/limit-fill';
 import { limitStatus, overLimit, type LimitStatus } from '../lib/limit-status';
 
 export type CategoryView = {
@@ -115,41 +116,55 @@ export function CategoryCard(props: Props) {
   );
 }
 
-const RING: Record<LimitStatus, string> = {
-  none: '',
-  ok: '',
-  warning: 'ring-2 ring-warning ring-offset-2 ring-offset-background',
-  over: 'ring-2 ring-destructive ring-offset-2 ring-offset-background',
-};
-
-/** Mobile icon-only category (Figma 10:177); the limit state shows as a ring. */
-export function CategoryCircle(props: Props) {
-  const { category, onEdit, handle } = props;
+/**
+ * Mobile category (user request over Figma 10:177's icon-only circle): icon, name and spent amount,
+ * the tile filled from the bottom by the share of the monthly limit (green → yellow → orange → red).
+ * The tile is the edit button and, from the dashboard, the reorder handle (long-press drags, tap edits).
+ */
+export function CategoryTile(props: Props) {
+  const { category, spent, currency, onEdit, handle } = props;
   const t = useTranslations('categories');
+  const locale = useLocale();
   const { status, caption } = useCategoryCaption(props);
-  const circle = (
-    <span className={cn('inline-flex rounded-full', RING[status])}>
-      <EntityIcon
-        id={category.id}
-        color={category.color}
-        icon={category.icon}
-        size="l"
-        label={`${category.name}: ${caption}`}
-      />
-    </span>
+  const fill = limitFill(spent, category.monthlyLimit);
+  const content = (
+    <>
+      {fill ? (
+        // Height and colour are data (share of the limit), like the desktop progress width.
+        <span
+          aria-hidden
+          data-fill
+          style={{ height: `${fill.height}%`, backgroundColor: fill.color }}
+          className="absolute inset-x-0 bottom-0 opacity-25 transition-[height]"
+        />
+      ) : null}
+      <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
+      <span className="relative w-full truncate text-caption font-medium text-foreground">
+        {category.name}
+      </span>
+      <span
+        className={cn(
+          'relative w-full truncate text-caption tabular-nums',
+          status === 'over' ? 'text-destructive' : 'text-muted-foreground',
+        )}
+      >
+        {formatMoney(spent, currency, locale)}
+      </span>
+    </>
   );
-  if (!onEdit) return circle;
+  const tile =
+    'relative flex w-full flex-col items-center gap-1 overflow-hidden rounded-card border border-border bg-card px-1 py-2 text-center';
+  if (!onEdit) return <div className={tile}>{content}</div>;
   return (
     <button
       type="button"
-      // Long-press reorders (TouchSensor delay), a tap edits.
       {...handle}
       onClick={onEdit}
       aria-label={t('manage.edit', { name: category.name })}
       title={caption}
-      className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+      className={cn(tile, 'outline-none focus-visible:ring-2 focus-visible:ring-ring/50')}
     >
-      {circle}
+      {content}
     </button>
   );
 }

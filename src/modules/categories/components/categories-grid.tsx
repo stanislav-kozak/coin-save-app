@@ -10,7 +10,7 @@ import { useCategories, useMonthAnalytics } from '../api/categories-queries';
 import { pendingByCategory, type PendingSpend } from '../lib/pending-spends';
 import {
   CategoryCard,
-  CategoryCircle,
+  CategoryTile,
   type CategoryView,
   type DragHandleProps,
 } from './category-card';
@@ -70,9 +70,9 @@ export function CategoriesGrid({
           {t('categories')}
         </h2>
         <LoadingRegion label={tl('loading')}>
-          <div className="grid grid-cols-4 gap-4 md:hidden">
-            {Array.from({ length: 8 }, (_, i) => (
-              <Skeleton key={i} shape="circle" className="mx-auto size-12" />
+          <div className="grid grid-cols-3 gap-3 md:hidden">
+            {Array.from({ length: 6 }, (_, i) => (
+              <Skeleton key={i} shape="card" className="h-24" />
             ))}
           </div>
           <div className="hidden grid-cols-2 gap-4 md:grid">
@@ -116,17 +116,13 @@ export function CategoriesGrid({
           {notice}
         </p>
       ) : null}
-      <ul className="grid grid-cols-4 gap-4 md:hidden">
+      <ul className="grid grid-cols-3 gap-3 md:hidden">
         {items.map((item) => (
-          <li key={item.category.id} className="flex justify-center">
+          <li key={item.category.id}>
             {wrap(
               item.category.id,
               (handle) => (
-                <CategoryCircle
-                  {...item}
-                  handle={handle}
-                  onEdit={() => setEditing(item.category)}
-                />
+                <CategoryTile {...item} handle={handle} onEdit={() => setEditing(item.category)} />
               ),
               false,
             )}

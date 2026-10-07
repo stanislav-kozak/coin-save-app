@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { CategoriesGrid } from './categories-grid';
-import { CategoryCard } from './category-card';
+import { CategoryCard, CategoryTile } from './category-card';
 
 const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({ api: { GET: (...a: unknown[]) => get(...a) } }));
@@ -125,5 +125,36 @@ describe('CategoriesGrid', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Спробувати ще раз' }));
     expect(await screen.findByRole('progressbar', { name: 'Продукти' })).toBeInTheDocument();
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+});
+
+describe('CategoryTile (mobile)', () => {
+  it('shows the name and the spent amount under the icon, filled by the share of the limit', () => {
+    renderWithProviders(
+      <CategoryTile category={groceries} spent="1200" pct={60} currency="UAH" onEdit={() => {}} />,
+    );
+    const tile = screen.getByRole('button', { name: 'Редагувати: Продукти' });
+    expect(tile).toHaveTextContent('Продукти');
+    expect(tile).toHaveTextContent(/1\s200,00\s₴/);
+    const fill = tile.querySelector<HTMLElement>('[data-fill]')!;
+    expect(fill.style.height).toBe('60%');
+  });
+
+  it('has no fill without a limit and marks an exceeded one in red', () => {
+    renderWithProviders(
+      <>
+        <CategoryTile
+          category={{ ...groceries, id: 'a', monthlyLimit: null }}
+          spent="10"
+          pct={0}
+          currency="UAH"
+        />
+        <CategoryTile category={{ ...groceries, id: 'b' }} spent="2400" pct={120} currency="UAH" />
+      </>,
+    );
+    const fills = document.querySelectorAll<HTMLElement>('[data-fill]');
+    expect(fills).toHaveLength(1);
+    expect(fills[0]!.style.height).toBe('100%');
+    expect(screen.getByText(/2\s400,00\s₴/)).toHaveClass('text-destructive');
   });
 });
