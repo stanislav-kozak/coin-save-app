@@ -21,7 +21,8 @@ export function ColorPicker({ id, label, value, onChange }: Props) {
   const t = useTranslations('colors');
   const picker = useRef<HTMLInputElement>(null);
   const current = value.toLowerCase();
-  const custom = !ENTITY_COLORS.some((c) => c.hex === current);
+  // No color yet (e.g. a wallet created without one): nothing is checked.
+  const custom = current !== '' && !ENTITY_COLORS.some((c) => c.hex === current);
   return (
     <div role="radiogroup" aria-labelledby={`${id}-label`} className="flex flex-col gap-2">
       <span id={`${id}-label`} className="text-caption font-medium text-muted-foreground">
@@ -48,8 +49,14 @@ export function ColorPicker({ id, label, value, onChange }: Props) {
             name={id}
             value="custom"
             checked={custom}
-            // Selecting it (click or keyboard) opens the system picker below.
-            onChange={() => picker.current?.click()}
+            // Arrowing onto it only moves focus; Space/Enter (or a click on the swatch) opens the
+            // system picker — also when it is already checked and the radio wouldn't change.
+            onChange={() => undefined}
+            onKeyDown={(e) => {
+              if (e.key !== ' ' && e.key !== 'Enter') return;
+              e.preventDefault();
+              picker.current?.click();
+            }}
             aria-label={t('custom')}
             className="peer sr-only"
           />

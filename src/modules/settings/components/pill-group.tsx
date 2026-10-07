@@ -1,6 +1,6 @@
 'use client';
 
-import { useId } from 'react';
+import { useId, useRef, type KeyboardEvent } from 'react';
 import { cn } from '@/shared/lib/utils';
 
 type Option = { value: string; label: string };
@@ -18,20 +18,41 @@ export function PillGroup({
   onChange: (value: string) => void;
 }) {
   const labelId = useId(); // labels contain spaces, so they can't double as ids
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const current = Math.max(
+    0,
+    options.findIndex((o) => o.value === value),
+  );
+
+  // Radio-group keyboard pattern: one tab stop, arrows move and select (wrapping).
+  const onKeyDown = (e: KeyboardEvent) => {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    const next = (current + step + options.length) % options.length;
+    onChange(options[next]!.value);
+    buttons.current[next]?.focus();
+  };
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <span id={labelId} className="text-body text-foreground">
         {label}
       </span>
       <div role="radiogroup" aria-labelledby={labelId} className="flex gap-2">
-        {options.map((o) => {
+        {options.map((o, i) => {
           const checked = o.value === value;
           return (
             <button
               key={o.value}
               type="button"
               role="radio"
+              ref={(el) => {
+                buttons.current[i] = el;
+              }}
               aria-checked={checked}
+              tabIndex={i === current ? 0 : -1}
+              onKeyDown={onKeyDown}
               onClick={() => onChange(o.value)}
               className={cn(
                 'h-8 rounded-full border px-4 text-caption font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
