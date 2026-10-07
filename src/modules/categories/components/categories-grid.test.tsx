@@ -82,7 +82,8 @@ describe('CategoriesGrid', () => {
     get.mockReturnValue(new Promise(() => {}));
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
     const region = screen.getByText('Завантаження…').closest('[aria-busy="true"]')!;
-    expect(region.querySelectorAll('[data-skeleton="card"]')).toHaveLength(6);
+    // 6 desktop cards + 6 mobile tiles (CSS shows one set)
+    expect(region.querySelectorAll('[data-skeleton="card"]')).toHaveLength(12);
   });
 
   it('shows why a reorder was refused', async () => {

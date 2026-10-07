@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
@@ -28,8 +28,9 @@ describe('WalletsPanel', () => {
     });
     renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
     expect(await screen.findByRole('heading', { name: 'Family Card' })).toBeInTheDocument();
-    expect(screen.getByText(/8\s240,50\s₴/)).not.toHaveClass('text-destructive');
-    expect(screen.getByText(/-45,00\s(USD|\$)/)).toHaveClass('text-destructive');
+    const cards = screen.getAllByRole('list')[1]!; // desktop cards (circles come first)
+    expect(within(cards).getByText(/8\s240,50\s₴/)).not.toHaveClass('text-destructive');
+    expect(within(cards).getByText(/-45,00\s(USD|\$)/)).toHaveClass('text-destructive');
   });
 
   it('invites to add the first wallet when there are none', async () => {
@@ -100,5 +101,19 @@ describe('WalletsPanel', () => {
     renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Редагувати: Mono' }));
     expect(await screen.findByRole('dialog', { name: 'Гаманець' })).toBeInTheDocument();
+  });
+
+  it("shows each wallet's name and balance under its circle on phones", async () => {
+    get.mockResolvedValue({
+      data: [
+        { id: 'w1', name: 'Mono', currency: 'UAH', balance: '8240.5', icon: null, color: null },
+        { id: 'w2', name: 'USD', currency: 'USD', balance: '-45', icon: null, color: null },
+      ],
+    });
+    renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
+    const mobile = (await screen.findAllByRole('list'))[0]!; // the circles list comes first
+    expect(within(mobile).getByText('Mono')).toBeInTheDocument();
+    expect(within(mobile).getByText(/8\s240,50\s₴/)).toBeInTheDocument();
+    expect(within(mobile).getByText(/-45,00\s(USD|\$)/)).toHaveClass('text-destructive');
   });
 });

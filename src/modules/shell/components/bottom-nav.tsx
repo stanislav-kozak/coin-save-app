@@ -22,7 +22,7 @@ export function BottomNav({ spaceId }: { spaceId: string }) {
   return (
     <nav
       aria-label={t('label')}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card md:hidden"
+      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card md:hidden"
     >
       <ul className="grid grid-cols-5">
         {items.map((item) => {

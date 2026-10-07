@@ -7,7 +7,7 @@ import { BottomNav } from './bottom-nav';
 export function AppShell({ spaceId, children }: { spaceId: string; children: ReactNode }) {
   return (
     <ExpenseLauncherProvider spaceId={spaceId}>
-      <div className="flex min-h-dvh flex-col bg-background">
+      <div className="pb-nav flex min-h-dvh flex-col bg-background md:pb-0">
         <AppHeader spaceId={spaceId} />
         <SpaceGuard spaceId={spaceId}>{children}</SpaceGuard>
         <BottomNav spaceId={spaceId} />

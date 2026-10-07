@@ -11,7 +11,7 @@ import { SpaceSection } from './space-section';
 export function SettingsPage({ spaceId }: { spaceId: string }) {
   const t = useTranslations('settings');
   return (
-    <main className="mx-auto flex w-full max-w-180 flex-col gap-6 px-4 py-6 pb-24 md:py-10 md:pb-10">
+    <main className="mx-auto flex w-full max-w-180 flex-col gap-6 px-4 py-6 md:py-10">
       <h1 className="text-h1">{t('title')}</h1>
       <SpaceSection spaceId={spaceId} />
       <MembersSection spaceId={spaceId} />
