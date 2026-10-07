@@ -24,13 +24,14 @@ export function SpaceRedirect() {
 
   useEffect(() => {
     // Act on a fresh list only: a stale cache could point back at a space the user just lost.
-    // An invitation opened before signing in finishes first (it may add the space to land on).
+    if (!spaces.data || spaces.isFetching) return;
+    // An invitation opened before signing in finishes first (it adds the space to land on). Only
+    // now that the session is confirmed — otherwise a dead session would bounce login ↔ accept.
     const invitation = pendingInvitation.get();
     if (invitation) {
       router.replace(`/invitations/accept?token=${encodeURIComponent(invitation)}`);
       return;
     }
-    if (!spaces.data || spaces.isFetching) return;
     const id = pickLandingSpace(spaces.data, lastSpace.get());
     router.replace(id ? `/s/${id}` : '/onboarding');
   }, [spaces.data, spaces.isFetching, router]);

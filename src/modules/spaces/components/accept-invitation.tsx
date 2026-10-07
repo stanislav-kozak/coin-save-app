@@ -11,6 +11,7 @@ import { pendingInvitation } from '../lib/pending-invitation';
 
 const isUnauthorized = (e: unknown) =>
   typeof e === 'object' && e !== null && 'statusCode' in e && e.statusCode === 401;
+const isAlreadyMember = (e: unknown) => getErrorCode(e) === 'ALREADY_MEMBER';
 
 /**
  * The email link `/invitations/accept?token=…` (a public page). Signed out: keep the token and sign in —
@@ -26,17 +27,19 @@ export function AcceptInvitation({ token }: { token: string | null }) {
   useEffect(() => {
     if (!token || started.current) return;
     started.current = true;
-    pendingInvitation.set(token);
+    // Not stored while the request runs: leaving mid-way must not resurrect it on the next landing.
+    pendingInvitation.clear();
     accept.mutate(token, {
-      onSuccess: () => pendingInvitation.clear(),
       onError: (error) => {
-        if (isUnauthorized(error)) router.replace('/login');
-        else pendingInvitation.clear();
+        if (!isUnauthorized(error)) return;
+        pendingInvitation.set(token); // signed out: keep it across login, then the landing resumes it
+        router.replace('/login');
       },
     });
   }, [token, accept, router]);
 
-  const failed = !token || (accept.isError && !isUnauthorized(accept.error));
+  const already = accept.isError && isAlreadyMember(accept.error);
+  const failed = !token || (accept.isError && !isUnauthorized(accept.error) && !already);
   return (
     <main className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-100">
@@ -45,6 +48,12 @@ export function AcceptInvitation({ token }: { token: string | null }) {
             <p role="alert" className="text-body text-muted-foreground">
               {te(token ? getErrorCode(accept.error) : 'INVALID_INVITATION_TOKEN')}
             </p>
+            <Button asChild className="mt-3 w-full">
+              <Link href="/">{t('home')}</Link>
+            </Button>
+          </StatusPanel>
+        ) : already ? (
+          <StatusPanel icon="success" title={t('alreadyTitle')}>
             <Button asChild className="mt-3 w-full">
               <Link href="/">{t('home')}</Link>
             </Button>
