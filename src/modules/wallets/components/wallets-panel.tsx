@@ -79,14 +79,18 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
           <ul className="hidden flex-col gap-3 md:flex">
             {wallets.data.map((w) => (
               <li key={w.id} className="relative">
-                {wrap ? wrap(w.id, <WalletCard wallet={w} />, true) : <WalletCard wallet={w} />}
+                {wrap ? (
+                  wrap(w.id, <WalletCard wallet={w} withAction={!!onAddIncome} />, true)
+                ) : (
+                  <WalletCard wallet={w} withAction={!!onAddIncome} />
+                )}
                 {onAddIncome ? (
                   // A sibling of the (draggable) card, not inside it: no nested interactive elements.
                   <button
                     type="button"
                     aria-label={ti('addFor', { name: w.name })}
                     onClick={() => onAddIncome(w.id)}
-                    className="absolute right-3 bottom-3 flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                    className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
                   >
                     <Plus aria-hidden className="size-4" />
                   </button>

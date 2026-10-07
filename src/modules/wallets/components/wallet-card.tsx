@@ -14,10 +14,16 @@ export type WalletView = {
 };
 
 /** Desktop wallet card (Figma 8:144). Negative balances in red (spec §6.8). */
-export function WalletCard({ wallet }: { wallet: WalletView }) {
+export function WalletCard({ wallet, withAction }: { wallet: WalletView; withAction?: boolean }) {
   const locale = useLocale();
   return (
-    <article className="flex items-center gap-3 rounded-card border border-border bg-card p-4 shadow-card">
+    <article
+      className={cn(
+        'flex items-center gap-3 rounded-card border border-border bg-card p-4 shadow-card',
+        // Room for the "+ income" button the panel lays over the card's right edge.
+        withAction && 'pr-12',
+      )}
+    >
       <EntityIcon id={wallet.id} color={wallet.color} icon={wallet.icon} size="l" />
       <div className="min-w-0 flex-1">
         <h3 className="truncate text-body font-medium">{wallet.name}</h3>
