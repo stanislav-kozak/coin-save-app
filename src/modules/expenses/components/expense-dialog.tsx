@@ -118,6 +118,8 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingS
       } catch (error) {
         // Show the failed expense again — even over a newer, unsent one — so it isn't lost silently.
         restoring.current = !isOpen.current;
+        // A fast answer can reopen before the close ever rendered (no open effect runs), so unlock here.
+        submitting.current = false;
         reset(values);
         setSubmitError(error);
         onOpenChange(true);
