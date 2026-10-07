@@ -42,15 +42,13 @@ export function DraggableWallet({
 /**
  * A category: a drop target for wallets (design system §5 "accent border + highlighted fill") and a
  * sortable item (spec §6.4). Only the handle it passes to `children` starts a reorder — the grip on the
- * desktop card, the circle itself on mobile (long-press; a tap still edits).
+ * desktop card, the tile itself on mobile (a tap still edits).
  */
 export function SortableCategory({
   id,
-  isCard,
   children,
 }: {
   id: string;
-  isCard: boolean;
   children: (handle: DragHandleProps) => ReactNode;
 }) {
   const {
@@ -71,8 +69,9 @@ export function SortableCategory({
       // Position while sorting is data from dnd-kit, like the progress width.
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        isCard ? 'rounded-card' : 'rounded-full',
-        walletOver && 'bg-primary/5 ring-2 ring-primary',
+        // Desktop cards and mobile tiles are both rounded-card; the highlight follows their shape.
+        'rounded-card transition-transform',
+        walletOver && 'scale-105 shadow-card-raised ring-2 ring-primary',
         // Lifted while it moves in place (design system: raised shadow for drag).
         isDragging && 'relative z-10 shadow-card-raised',
       )}

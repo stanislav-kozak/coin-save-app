@@ -50,6 +50,14 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
         if (kind === 'category') return null;
         const wallet = walletById(id);
         if (!wallet) return null;
+        // On a phone the ghost is the wallet's circle under the finger: a card would cover the tiles.
+        if (!isDesktop) {
+          return (
+            <span className="inline-flex rotate-2 rounded-full shadow-card-raised ring-2 ring-primary">
+              <EntityIcon id={wallet.id} color={wallet.color} icon={wallet.icon} size="l" />
+            </span>
+          );
+        }
         // Design system §4.4: elevated shadow + 2° tilt while dragging
         return (
           <div className="flex w-56 rotate-2 items-center gap-3 rounded-card border border-primary bg-card p-3 shadow-card-raised">
@@ -88,9 +96,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
             notice={dropped.error ? te(getErrorCode(dropped.error)) : undefined}
             wrap={(id, render, isCard) =>
               isCard === isDesktop ? (
-                <SortableCategory id={id} isCard={isCard}>
-                  {render}
-                </SortableCategory>
+                <SortableCategory id={id}>{render}</SortableCategory>
               ) : (
                 render()
               )
