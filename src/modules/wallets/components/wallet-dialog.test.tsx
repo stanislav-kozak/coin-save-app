@@ -72,4 +72,17 @@ describe('WalletDialog', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByRole('alert')).toBeInTheDocument();
   });
+
+  it('sends only what changed, so a wallet without a color keeps none', async () => {
+    patch.mockResolvedValue({ data: mono });
+    renderWithProviders(
+      <WalletDialog spaceId="sp1" wallet={{ ...mono, color: null }} open onOpenChange={vi.fn()} />,
+    );
+    const user = userEvent.setup();
+    for (const radio of screen.getAllByRole('radio')) expect(radio).not.toBeChecked();
+    await user.type(screen.getByLabelText('Назва'), ' 2');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ name: 'Mono 2' });
+  });
 });

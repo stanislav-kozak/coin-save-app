@@ -127,4 +127,15 @@ describe('CategoryDialog', () => {
       'Категорія з такою назвою вже існує',
     );
   });
+
+  it('edits a category without an icon or color without inventing them', async () => {
+    patch.mockResolvedValue({ data: cafe });
+    renderDialog({ category: { ...cafe, icon: null, color: null } as unknown as typeof cafe });
+    const user = userEvent.setup();
+    await user.clear(screen.getByLabelText('Місячний ліміт'));
+    await user.type(screen.getByLabelText('Місячний ліміт'), '700');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ monthlyLimit: 700 });
+  });
 });

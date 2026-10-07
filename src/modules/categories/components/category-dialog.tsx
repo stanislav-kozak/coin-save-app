@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { firstUnusedColor } from '@/shared/constants/entity-colors';
 import { getErrorCode } from '@/shared/lib/api-error';
+import { changedFields } from '@/shared/lib/changed-fields';
 import { cn } from '@/shared/lib/utils';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -51,8 +52,10 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
 
   const defaults = (): CategoryFormInput => ({
     name: category?.name ?? '',
-    icon: category?.icon ?? CATEGORY_EMOJI[0],
-    color: category?.color ?? firstUnusedColor(categories.data?.map((c) => c.color) ?? []),
+    icon: category ? (category.icon ?? '') : CATEGORY_EMOJI[0],
+    color: category
+      ? (category.color ?? '')
+      : firstUnusedColor(categories.data?.map((c) => c.color) ?? []),
     monthlyLimit: category?.monthlyLimit ?? '',
   });
   // State starts fresh per opening: the grid remounts this dialog (`key`) for each target.
@@ -63,6 +66,8 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
   >({ resolver: zodResolver(categoryFormSchema), defaultValues: defaults() });
 
   const errors = formState.errors;
+  // Read during render: react-hook-form only tracks the formState fields a component subscribes to.
+  const { dirtyFields } = formState;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
   const icons =
     category?.icon && !(CATEGORY_EMOJI as readonly string[]).includes(category.icon)
@@ -81,12 +86,18 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
     }
   };
 
-  const save = ({ monthlyLimit, ...rest }: CategoryFormValues) =>
-    run(() =>
-      category
-        ? update.mutateAsync({ id: category.id, body: { ...rest, monthlyLimit } })
-        : create.mutateAsync({ ...rest, ...(monthlyLimit === null ? {} : { monthlyLimit }) }),
-    );
+  // Edit sends only what changed (an untouched missing icon/color stays missing); create sends all.
+  const save = (values: CategoryFormValues) =>
+    run(() => {
+      if (category) {
+        return update.mutateAsync({
+          id: category.id,
+          body: changedFields(values, dirtyFields),
+        });
+      }
+      const { monthlyLimit, ...rest } = values;
+      return create.mutateAsync({ ...rest, ...(monthlyLimit === null ? {} : { monthlyLimit }) });
+    });
 
   const alert = error ? (
     <p role="alert" className="text-caption text-destructive">

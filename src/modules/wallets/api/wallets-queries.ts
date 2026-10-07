@@ -43,7 +43,7 @@ function useInvalidateWallets(spaceId: string) {
 export function useUpdateWallet(spaceId: string) {
   const invalidate = useInvalidateWallets(spaceId);
   return useMutation({
-    mutationFn: async ({ id, body }: { id: string; body: UpdateWalletValues }) => {
+    mutationFn: async ({ id, body }: { id: string; body: Partial<UpdateWalletValues> }) => {
       const { data, error } = await api.PATCH('/api/spaces/{spaceId}/wallets/{walletId}', {
         params: { path: { spaceId, walletId: id } },
         body,

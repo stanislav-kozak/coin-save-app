@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import { getErrorCode } from '@/shared/lib/api-error';
+import { changedFields } from '@/shared/lib/changed-fields';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { ColorPicker } from '@/shared/ui/color-picker';
@@ -51,11 +52,13 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
     resolver: zodResolver(updateWalletSchema),
     defaultValues: {
       name: wallet.name,
-      color: wallet.color ?? '#3b82f6',
+      color: wallet.color ?? '',
       initialBalance: wallet.initialBalance,
     },
   });
   const errors = formState.errors;
+  // Read during render: react-hook-form only tracks the formState fields a component subscribes to.
+  const { dirtyFields } = formState;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 
   // Not optimistic: rare, and a refusal must show in place.
@@ -107,7 +110,14 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
           <form
             noValidate
             onSubmit={(e) =>
-              void handleSubmit((body) => run(() => update.mutateAsync({ id: wallet.id, body })))(e)
+              void handleSubmit((values) =>
+                run(() =>
+                  update.mutateAsync({
+                    id: wallet.id,
+                    body: changedFields(values, dirtyFields),
+                  }),
+                ),
+              )(e)
             }
             className="flex flex-col gap-4"
           >
