@@ -9,6 +9,7 @@ import { Button } from '@/shared/ui/button';
 import { PageSkeleton, Skeleton } from '@/shared/ui/skeleton';
 import { useSpaces } from '../api/spaces-queries';
 import { lastSpace, pickLandingSpace } from '../lib/last-space';
+import { pendingInvitation } from '../lib/pending-invitation';
 
 /**
  * `/[locale]`: opens the last (or first) space, or onboarding when there is none.
@@ -23,6 +24,12 @@ export function SpaceRedirect() {
 
   useEffect(() => {
     // Act on a fresh list only: a stale cache could point back at a space the user just lost.
+    // An invitation opened before signing in finishes first (it may add the space to land on).
+    const invitation = pendingInvitation.get();
+    if (invitation) {
+      router.replace(`/invitations/accept?token=${encodeURIComponent(invitation)}`);
+      return;
+    }
     if (!spaces.data || spaces.isFetching) return;
     const id = pickLandingSpace(spaces.data, lastSpace.get());
     router.replace(id ? `/s/${id}` : '/onboarding');

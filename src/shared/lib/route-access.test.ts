@@ -46,4 +46,9 @@ describe('getSignedInRedirect', () => {
     expect(getSignedInRedirect('/uk/analytics', true)).toBeNull();
     expect(getSignedInRedirect('/uk/login-help', true)).toBeNull();
   });
+
+  it('lets an invitation link through without a session, so it can keep the token', () => {
+    expect(getLoginRedirect('/uk/invitations/accept', false)).toBeNull();
+    expect(getLoginRedirect('/invitations/accept', false)).toBeNull();
+  });
 });

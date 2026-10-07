@@ -372,5 +372,12 @@
       "confirmLeave": "Leave “{name}”?",
       "leaveConfirm": "Leave"
     }
+  },
+  "invitations": {
+    "joining": "Accepting the invitation…",
+    "joinedTitle": "You've joined the space",
+    "open": "Open the space",
+    "failedTitle": "Couldn't accept the invitation",
+    "home": "Go home"
   }
 }

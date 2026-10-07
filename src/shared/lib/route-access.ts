@@ -8,6 +8,8 @@ export const PUBLIC_PATHS = [
   '/forgot-password',
   '/reset-password',
   '/styleguide',
+  // An email link: it must keep its token while signed out (the page sends to login itself).
+  '/invitations/accept',
 ] as const;
 
 /** Pages that make no sense once signed in. Email-link pages (verify, reset) are deliberately absent. */
