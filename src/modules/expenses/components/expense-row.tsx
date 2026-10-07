@@ -55,7 +55,7 @@ export function ExpenseRow({ expense, category, wallet, onOpen }: Props) {
           {wallet}
         </span>
       ) : null}
-      <span className="block text-right">
+      <span className={cn('block shrink-0 text-right', wallet && 'md:w-36')}>
         <span
           className={cn(
             'block text-body font-semibold tabular-nums',
