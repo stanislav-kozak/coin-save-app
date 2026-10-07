@@ -112,4 +112,27 @@ describe('RecentExpenses', () => {
     const region = screen.getByText('Завантаження…').closest('[aria-busy="true"]')!;
     expect(region.querySelectorAll('[data-skeleton="row"]')).toHaveLength(4);
   });
+
+  it('opens a record for editing', async () => {
+    get.mockResolvedValue({
+      data: [
+        {
+          id: 'e9',
+          type: 'EXPENSE',
+          amount: '5',
+          walletId: 'w1',
+          walletCurrency: 'UAH',
+          categoryId: null,
+          note: null,
+          occurredAt: new Date().toISOString(),
+        },
+      ],
+    });
+    renderWithProviders(<RecentExpenses spaceId="sp1" />);
+    const { default: userEvent } = await import('@testing-library/user-event');
+    await userEvent
+      .setup()
+      .click(await screen.findByRole('button', { name: /Редагувати.*Без категорії/ }));
+    expect(await screen.findByRole('dialog', { name: 'Редагувати запис' })).toBeInTheDocument();
+  });
 });

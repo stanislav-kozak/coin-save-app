@@ -4,7 +4,12 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { components } from '@/generated/api';
 import { useCategories } from '@/modules/categories';
-import { ExpenseRow, groupByDay } from '@/modules/expenses';
+import {
+  ExpenseEditDialog,
+  ExpenseRow,
+  groupByDay,
+  type EditableExpense,
+} from '@/modules/expenses';
 
 type Item = components['schemas']['AnalyticsExpenseItemDto'];
 
@@ -18,6 +23,7 @@ export function PeriodExpenses({ spaceId, items }: { spaceId: string; items: Ite
   const categories = useCategories(spaceId, { includeArchived: true });
   const byId = new Map(categories.data?.map((c) => [c.id, c]));
   const groups = groupByDay(items, now);
+  const [editing, setEditing] = useState<EditableExpense | null>(null);
 
   return (
     <section aria-labelledby="period-list-title" className="flex flex-col gap-3">
@@ -41,12 +47,22 @@ export function PeriodExpenses({ spaceId, items }: { spaceId: string; items: Ite
                   expense={e}
                   category={e.categoryId ? byId.get(e.categoryId) : undefined}
                   wallet={e.walletName}
+                  onOpen={() => setEditing(e)}
                 />
               ))}
             </ul>
           </div>
         ))
       )}
+      {editing ? (
+        <ExpenseEditDialog
+          key={editing.id}
+          spaceId={spaceId}
+          expense={editing}
+          open
+          onOpenChange={(open) => !open && setEditing(null)}
+        />
+      ) : null}
     </section>
   );
 }

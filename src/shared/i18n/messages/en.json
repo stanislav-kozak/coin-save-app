@@ -270,7 +270,9 @@
       "amountTooLarge": "Amount is too large",
       "noteTooLong": "500 characters at most",
       "nameRequired": "Enter a name",
-      "nameTooLong": "Up to 100 characters"
+      "nameTooLong": "Up to 100 characters",
+      "dateInvalid": "Enter a date and time",
+      "dateInFuture": "The date can't be in the future"
     },
     "income": {
       "title": "New income",
@@ -280,6 +282,16 @@
       "recurringFailed": "Income added, but the monthly repeat wasn't created:",
       "retryRecurring": "Create the repeat",
       "addFor": "Add income: {name}"
+    },
+    "edit": {
+      "title": "Edit record",
+      "open": "Edit:",
+      "when": "Date and time",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteTitle": "Delete record",
+      "confirmDelete": "Delete this record? The wallet balance will be recalculated.",
+      "archived": "(archived)"
     }
   },
   "nav": {

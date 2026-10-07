@@ -1,12 +1,14 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { useCategories } from '@/modules/categories';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useRecentExpenses } from '../api/expenses-queries';
 import { groupByDay } from '../lib/group-by-day';
+import { ExpenseEditDialog, type EditableExpense } from './expense-edit-dialog';
 import { ExpenseRow } from './expense-row';
 
 export function RecentExpenses({ spaceId }: { spaceId: string }) {
@@ -15,6 +17,7 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
   const tl = useTranslations('common');
   const locale = useLocale();
   const expenses = useRecentExpenses(spaceId);
+  const [editing, setEditing] = useState<EditableExpense | null>(null);
   // Names for history include archived categories.
   const categories = useCategories(spaceId, { includeArchived: true });
   if (expenses.isError && !expenses.isFetching) {
@@ -70,11 +73,21 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
                 key={e.id}
                 expense={e}
                 category={e.categoryId ? byId.get(e.categoryId) : undefined}
+                onOpen={() => setEditing(e)}
               />
             ))}
           </ul>
         </div>
       ))}
+      {editing ? (
+        <ExpenseEditDialog
+          key={editing.id}
+          spaceId={spaceId}
+          expense={editing}
+          open
+          onOpenChange={(open) => !open && setEditing(null)}
+        />
+      ) : null}
     </section>
   );
 }

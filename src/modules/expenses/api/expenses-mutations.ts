@@ -107,3 +107,44 @@ export function useCreateExpense(spaceId: string) {
       ]),
   });
 }
+
+type UpdateExpense = components['schemas']['UpdateExpenseDto'];
+
+/** Editing or deleting a record moves the wallet balance, the lists and the analytics. */
+function useInvalidateMoney(spaceId: string) {
+  const queryClient = useQueryClient();
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['wallets', spaceId] }),
+      queryClient.invalidateQueries({ queryKey: ['expenses', spaceId] }),
+      queryClient.invalidateQueries({ queryKey: ['analytics', spaceId] }),
+    ]);
+}
+
+export function useUpdateExpense(spaceId: string) {
+  const invalidate = useInvalidateMoney(spaceId);
+  return useMutation({
+    mutationFn: async ({ id, body }: { id: string; body: UpdateExpense }) => {
+      const { data, error } = await api.PATCH('/api/spaces/{spaceId}/expenses/{expenseId}', {
+        params: { path: { spaceId, expenseId: id } },
+        body,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: invalidate,
+  });
+}
+
+export function useDeleteExpense(spaceId: string) {
+  const invalidate = useInvalidateMoney(spaceId);
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await api.DELETE('/api/spaces/{spaceId}/expenses/{expenseId}', {
+        params: { path: { spaceId, expenseId: id } },
+      });
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+}
