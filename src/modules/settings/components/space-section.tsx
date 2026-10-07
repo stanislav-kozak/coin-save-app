@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { useSpace, useSpaces, useUpdateSpace } from '@/modules/spaces';
-import { SUPPORTED_CURRENCIES, currencyLabel } from '@/shared/constants/currencies';
+import { SUPPORTED_CURRENCIES, currencyLabel, type Currency } from '@/shared/constants/currencies';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
@@ -14,17 +14,20 @@ import { Input } from '@/shared/ui/input';
 import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useMyRole } from '../lib/use-my-role';
+import { ConfirmDialog } from './confirm-dialog';
 import { SettingsSection } from './settings-section';
 
 const schema = z.object({
   name: z.string().trim().min(1, { error: 'nameRequired' }).max(100, { error: 'nameTooLong' }),
+  currency: z.enum(SUPPORTED_CURRENCIES),
 });
 type Values = z.output<typeof schema>;
+type Changes = { name?: string; primaryCurrency?: Currency };
 
 const SELECT =
-  'h-10 w-full rounded-control border border-input bg-card px-3 text-body text-foreground outline-none disabled:opacity-60';
+  'h-10 w-full rounded-control border border-input bg-card px-3 text-body text-foreground outline-none focus-visible:border-primary';
 
-/** «Простір»: the owner renames it; the primary currency waits for the backend's contract. */
+/** «Простір»: the owner renames it and changes its primary currency (re-converted on the server). */
 export function SpaceSection({ spaceId }: { spaceId: string }) {
   const t = useTranslations('settings.space');
   const tc = useTranslations('common');
@@ -77,19 +80,31 @@ function SpaceForm({
   const locale = useLocale();
   const update = useUpdateSpace(spaceId);
   const [saved, setSaved] = useState(false);
+  // A currency change re-converts the whole history on the server: ask first (backend contract).
+  const [pending, setPending] = useState<Changes | null>(null);
   const { register, handleSubmit, formState, control } = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { name: space.name },
+    defaultValues: { name: space.name, currency: space.primaryCurrency as Currency },
   });
-  const name = useWatch({ control, name: 'name' });
-  const changed = name.trim() !== space.name;
+  const [name, currency] = useWatch({ control, name: ['name', 'currency'] });
+  const changes = (values: { name: string; currency: Currency }): Changes => ({
+    ...(values.name.trim() !== space.name ? { name: values.name.trim() } : {}),
+    ...(values.currency !== space.primaryCurrency ? { primaryCurrency: values.currency } : {}),
+  });
+  const changed = Object.keys(changes({ name, currency })).length > 0;
   const nameError = formState.errors.name?.message;
 
-  const save = async (values: Values) => {
+  const apply = async (body: Changes) => {
     setSaved(false);
+    await update.mutateAsync(body);
+    setSaved(true);
+  };
+
+  const save = async (values: Values) => {
+    const body = changes(values);
+    if (body.primaryCurrency) return setPending(body);
     try {
-      await update.mutateAsync({ name: values.name });
-      setSaved(true);
+      await apply(body);
     } catch {
       // shown below via update.error
     }
@@ -116,28 +131,16 @@ function SpaceForm({
           {...register('name')}
         />
       </FormField>
-      <div className="flex flex-col gap-1">
-        <FormField id="space-currency" label={t('currency')}>
-          {/* Held until the backend decides how history converts (old totals would mix currencies). */}
-          <select
-            id="space-currency"
-            disabled
-            value={space.primaryCurrency}
-            aria-describedby="space-currency-hint"
-            className={SELECT}
-          >
-            {SUPPORTED_CURRENCIES.map((code) => (
-              <option key={code} value={code}>
-                {currencyLabel(code, locale)}
-              </option>
-            ))}
-          </select>
-        </FormField>
-        <p id="space-currency-hint" className="text-caption text-muted-foreground">
-          {t('currencySoon')}
-        </p>
-      </div>
-      {update.error ? (
+      <FormField id="space-currency" label={t('currency')}>
+        <select id="space-currency" className={SELECT} {...register('currency')}>
+          {SUPPORTED_CURRENCIES.map((code) => (
+            <option key={code} value={code}>
+              {currencyLabel(code, locale)}
+            </option>
+          ))}
+        </select>
+      </FormField>
+      {update.error && !pending ? (
         <p role="alert" className="text-caption text-destructive md:col-span-2">
           {te(getErrorCode(update.error))}
         </p>
@@ -148,8 +151,18 @@ function SpaceForm({
         </p>
       ) : null}
       <Button type="submit" disabled={!changed || update.isPending} className="md:col-start-2">
-        {t('save')}
+        {update.isPending ? t('converting') : t('save')}
       </Button>
+      {pending?.primaryCurrency ? (
+        <ConfirmDialog
+          title={t('confirmCurrencyTitle')}
+          text={t('confirmCurrency', { currency: pending.primaryCurrency })}
+          confirmLabel={t('currencyConfirm')}
+          busyLabel={t('converting')}
+          onConfirm={() => apply(pending)}
+          onClose={() => setPending(null)}
+        />
+      ) : null}
     </form>
   );
 }

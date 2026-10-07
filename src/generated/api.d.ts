@@ -709,8 +709,12 @@ export interface components {
             updatedAt: string;
         };
         UpdateSpaceDto: {
+            /**
+             * @description Changing it re-converts every transaction (amountInPrimary, fxRate) at its own day's rate and category limits at today's rate, rounded.
+             * @enum {string}
+             */
+            primaryCurrency?: "USD" | "EUR" | "GBP" | "PLN" | "CZK" | "CHF" | "CAD" | "AUD" | "JPY" | "TRY" | "RON" | "UAH" | "RUB";
             name?: string;
-            primaryCurrency?: string;
         };
         MemberResponseDto: {
             membershipId: string;
@@ -1654,6 +1658,15 @@ export interface operations {
             };
             /** @description Codes: FORBIDDEN_NOT_MEMBER, FORBIDDEN_NOT_OWNER */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: CURRENCY_API_UNAVAILABLE */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

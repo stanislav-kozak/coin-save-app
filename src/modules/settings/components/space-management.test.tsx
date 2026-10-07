@@ -64,12 +64,11 @@ describe('Settings — space management', () => {
     ]);
   });
 
-  it('lets the owner rename the space; the currency waits for the backend', async () => {
+  it('lets the owner rename the space', async () => {
     serve('OWNER');
     renderWithProviders(<SettingsPage spaceId="sp1" />);
     const user = userEvent.setup();
     const name = await screen.findByDisplayValue('Family');
-    expect(screen.getByLabelText('Основна валюта')).toBeDisabled();
     const save = within(section('Простір')).getByRole('button', { name: 'Зберегти зміни' });
     expect(save).toBeDisabled();
     await user.clear(name);
@@ -81,6 +80,42 @@ describe('Settings — space management', () => {
         body: { name: 'Сім’я' },
       }),
     );
+    expect(screen.queryByRole('dialog')).toBeNull(); // a rename needs no confirmation
+  });
+
+  it('changes the primary currency only after explaining the re-conversion', async () => {
+    serve('OWNER');
+    renderWithProviders(<SettingsPage spaceId="sp1" />);
+    const user = userEvent.setup();
+    await screen.findByDisplayValue('Family');
+    await user.selectOptions(screen.getByLabelText('Основна валюта'), 'EUR');
+    await user.click(within(section('Простір')).getByRole('button', { name: 'Зберегти зміни' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent(/перераховані/);
+    expect(api.PATCH).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole('button', { name: 'Змінити валюту' }));
+    await vi.waitFor(() =>
+      expect(api.PATCH).toHaveBeenCalledWith('/api/spaces/{spaceId}', {
+        params: { path: { spaceId: 'sp1' } },
+        body: { primaryCurrency: 'EUR' },
+      }),
+    );
+  });
+
+  it('keeps the old currency and says why when rates are unavailable', async () => {
+    serve('OWNER');
+    api.PATCH.mockResolvedValue({
+      error: { statusCode: 503, code: 'CURRENCY_API_UNAVAILABLE', message: 'x' },
+    });
+    renderWithProviders(<SettingsPage spaceId="sp1" />);
+    const user = userEvent.setup();
+    await screen.findByDisplayValue('Family');
+    await user.selectOptions(screen.getByLabelText('Основна валюта'), 'EUR');
+    await user.click(within(section('Простір')).getByRole('button', { name: 'Зберегти зміни' }));
+    await user.click(
+      within(await screen.findByRole('dialog')).getByRole('button', { name: 'Змінити валюту' }),
+    );
+    expect(await within(await screen.findByRole('dialog')).findByRole('alert')).toBeInTheDocument();
   });
 
   it('hides owner-only controls from a member, who can leave instead', async () => {

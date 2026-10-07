@@ -10,6 +10,8 @@ type Props = {
   title: string;
   text: string;
   confirmLabel: string;
+  /** Shown on the button while the action runs (slow server work, e.g. re-converting history). */
+  busyLabel?: string;
   tone?: 'danger';
   /** Extra content (e.g. "type the name") that can hold the confirm button back. */
   children?: ReactNode;
@@ -23,6 +25,7 @@ export function ConfirmDialog({
   title,
   text,
   confirmLabel,
+  busyLabel,
   tone,
   children,
   canConfirm = true,
@@ -67,7 +70,7 @@ export function ConfirmDialog({
               disabled={busy || !canConfirm}
               onClick={() => void confirm()}
             >
-              {confirmLabel}
+              {busy && busyLabel ? busyLabel : confirmLabel}
             </Button>
           </div>
         </div>

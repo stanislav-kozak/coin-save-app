@@ -333,13 +333,16 @@
       "title": "Space",
       "name": "Name",
       "currency": "Primary currency",
-      "currencySoon": "Changing the currency is coming soon",
       "save": "Save changes",
       "saved": "Saved",
       "validation": {
         "nameRequired": "Enter a space name",
         "nameTooLong": "Up to 100 characters"
-      }
+      },
+      "confirmCurrencyTitle": "Change the primary currency?",
+      "confirmCurrency": "All analytics totals will be re-converted to {currency} at each expense's own day rate, and category limits at today's rate (rounded). This can take a few seconds.",
+      "currencyConfirm": "Change currency",
+      "converting": "Converting…"
     },
     "members": {
       "title": "Members",

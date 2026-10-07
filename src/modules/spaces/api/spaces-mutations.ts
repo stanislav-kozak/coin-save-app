@@ -4,11 +4,12 @@ import { api } from '@/shared/lib/api-client';
 import { lastSpace } from '../lib/last-space';
 
 type Invite = components['schemas']['InviteMemberDto'];
+type SpaceUpdate = components['schemas']['UpdateSpaceDto'];
 
 export function useUpdateSpace(spaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { name: string }) => {
+    mutationFn: async (body: SpaceUpdate) => {
       const { data, error } = await api.PATCH('/api/spaces/{spaceId}', {
         params: { path: { spaceId } },
         body,
@@ -16,10 +17,18 @@ export function useUpdateSpace(spaceId: string) {
       if (error) throw error;
       return data;
     },
-    onSuccess: () =>
+    onSuccess: (_data, body) =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: ['spaces'], exact: true }),
         queryClient.invalidateQueries({ queryKey: ['spaces', spaceId] }),
+        // A new primary currency re-converts every total and limit on the server.
+        ...(body.primaryCurrency
+          ? [
+              queryClient.invalidateQueries({ queryKey: ['analytics', spaceId] }),
+              queryClient.invalidateQueries({ queryKey: ['expenses', spaceId] }),
+              queryClient.invalidateQueries({ queryKey: ['categories', spaceId] }),
+            ]
+          : []),
       ]),
   });
 }
