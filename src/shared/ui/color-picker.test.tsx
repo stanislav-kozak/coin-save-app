@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
@@ -12,5 +12,15 @@ describe('ColorPicker', () => {
     expect(screen.getByRole('radio', { name: 'Синій' })).toBeChecked();
     await userEvent.setup().click(screen.getByRole('radio', { name: 'Рожевий' }));
     expect(onChange).toHaveBeenCalledWith('#ec4999');
+  });
+
+  it('accepts any color and shows a non-palette value as the selected custom swatch', () => {
+    const onChange = vi.fn();
+    renderWithProviders(<ColorPicker id="c" label="Колір" value="#A855F7" onChange={onChange} />);
+    expect(screen.getByRole('radio', { name: 'Свій колір' })).toBeChecked();
+    const input = document.querySelector<HTMLInputElement>('input[type="color"]')!;
+    expect(input).toHaveValue('#a855f7');
+    fireEvent.change(input, { target: { value: '#123ABC' } });
+    expect(onChange).toHaveBeenLastCalledWith('#123abc');
   });
 });

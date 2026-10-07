@@ -294,6 +294,7 @@
     "emerald": "Emerald",
     "indigo": "Indigo",
     "pink": "Pink",
-    "slate": "Slate"
+    "slate": "Slate",
+    "custom": "Custom color"
   }
 }
