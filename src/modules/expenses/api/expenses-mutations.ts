@@ -5,6 +5,15 @@ import { addMoney, subtractMoney } from '@/shared/lib/money';
 import { dayKey } from '@/shared/lib/periods';
 import type { ExpenseDraft } from '../schemas';
 
+/** An expense (default) or an income (spec §6.3: no category, raises the balance). */
+export type TransactionDraft = ExpenseDraft & { type?: 'EXPENSE' | 'INCOME' };
+
+/** The balance change a transaction makes: income adds, expense subtracts; `undo` reverses it. */
+function applyToBalance(balance: string, draft: TransactionDraft, undo = false): string {
+  const adds = (draft.type === 'INCOME') !== undo;
+  return (adds ? addMoney : subtractMoney)(balance, String(draft.amount));
+}
+
 type Wallet = components['schemas']['WalletResponseDto'];
 type Expense = components['schemas']['ExpenseResponseDto'];
 /** What this create changed optimistically, so a failure undoes exactly that (not other pending creates). */
@@ -22,10 +31,10 @@ export function useCreateExpense(spaceId: string) {
   const expensesKey = ['expenses', spaceId];
 
   return useMutation({
-    mutationFn: async (draft: ExpenseDraft) => {
+    mutationFn: async ({ type = 'EXPENSE', ...draft }: TransactionDraft) => {
       const { data, error } = await api.POST('/api/spaces/{spaceId}/expenses', {
         params: { path: { spaceId } },
-        body: { ...draft, type: 'EXPENSE', occurredAt: new Date().toISOString() },
+        body: { ...draft, type, occurredAt: new Date().toISOString() },
       });
       if (error) throw error;
       return data;
@@ -40,9 +49,7 @@ export function useCreateExpense(spaceId: string) {
         ?.find((w) => w.id === draft.walletId);
       queryClient.setQueryData<Wallet[]>(walletsKey, (list) =>
         list?.map((w) =>
-          w.id === draft.walletId
-            ? { ...w, balance: subtractMoney(w.balance, String(draft.amount)) }
-            : w,
+          w.id === draft.walletId ? { ...w, balance: applyToBalance(w.balance, draft) } : w,
         ),
       );
       // Server-only fields (fxRate, amountInPrimary, createdById…) arrive with the refetch.
@@ -51,7 +58,7 @@ export function useCreateExpense(spaceId: string) {
         spaceId,
         walletId: draft.walletId,
         categoryId: draft.categoryId ?? null,
-        type: 'EXPENSE',
+        type: draft.type ?? 'EXPENSE',
         amount: String(draft.amount),
         walletCurrency: wallet?.currency ?? '',
         note: draft.note ?? null,
@@ -72,9 +79,7 @@ export function useCreateExpense(spaceId: string) {
       if (!applied) return;
       queryClient.setQueryData<Wallet[]>(walletsKey, (list) =>
         list?.map((w) =>
-          w.id === draft.walletId
-            ? { ...w, balance: addMoney(w.balance, String(draft.amount)) }
-            : w,
+          w.id === draft.walletId ? { ...w, balance: applyToBalance(w.balance, draft, true) } : w,
         ),
       );
       for (const key of applied.lists) {

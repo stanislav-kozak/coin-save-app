@@ -94,3 +94,22 @@ describe('pending category spends', () => {
     await vi.waitFor(() => expect(screen.getByLabelText('pending')).toBeEmptyDOMElement());
   });
 });
+
+function IncomeProbe() {
+  const { openIncome } = useExpenseLauncher();
+  return <button onClick={() => openIncome('w1')}>income</button>;
+}
+
+describe('openIncome', () => {
+  it('opens the income dialog for that wallet', async () => {
+    get.mockResolvedValue({ data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1' }] });
+    renderWithProviders(
+      <ExpenseLauncherProvider spaceId="sp1">
+        <IncomeProbe />
+      </ExpenseLauncherProvider>,
+    );
+    await userEvent.setup().click(screen.getByText('income'));
+    expect(await screen.findByRole('dialog', { name: 'Новий дохід' })).toBeInTheDocument();
+    expect(await screen.findByText(/Mono/)).toBeInTheDocument();
+  });
+});

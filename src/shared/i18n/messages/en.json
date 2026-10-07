@@ -225,7 +225,18 @@
       "amountInvalid": "Enter a positive amount, e.g. 250.50",
       "amountPositive": "Amount must be greater than zero",
       "amountTooLarge": "Amount is too large",
-      "noteTooLong": "500 characters at most"
+      "noteTooLong": "500 characters at most",
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Up to 100 characters"
+    },
+    "income": {
+      "title": "New income",
+      "monthly": "Monthly, on day {day}",
+      "name": "Name",
+      "namePlaceholder": "e.g. Salary",
+      "recurringFailed": "Income added, but the monthly repeat wasn't created:",
+      "retryRecurring": "Create the repeat",
+      "addFor": "Add income: {name}"
     }
   },
   "nav": {

@@ -5,14 +5,26 @@ import type { ReactNode } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { categoryDndId, walletDndId } from '../lib/resolve-drop';
 
-/** Wallet card/circle you can pick up (design system §5 "Wallet card — drag state"). */
-export function DraggableWallet({ id, children }: { id: string; children: ReactNode }) {
+/**
+ * Wallet card/circle you can pick up (design system §5 "Wallet card — drag state"). `onClick` fires on a
+ * tap/click that never became a drag (the sensors need 4px / a 150ms press first).
+ */
+export function DraggableWallet({
+  id,
+  onClick,
+  children,
+}: {
+  id: string;
+  onClick?: () => void;
+  children: ReactNode;
+}) {
   const { setNodeRef, listeners, attributes, isDragging } = useDraggable({ id: walletDndId(id) });
   return (
     <div
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onClick={onClick}
       // touch-none: a long-press must start a drag, not scroll the page (spec §6.6 TouchSensor)
       className={cn(
         'cursor-grab touch-none rounded-card outline-none focus-visible:ring-2 focus-visible:ring-ring/50',

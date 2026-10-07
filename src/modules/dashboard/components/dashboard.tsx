@@ -16,7 +16,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const isDesktop = useIsDesktop();
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
-  const { openExpense, openAddWallet, pendingSpends } = useExpenseLauncher();
+  const { openExpense, openAddWallet, openIncome, pendingSpends } = useExpenseLauncher();
 
   const walletById = (id: string) => wallets.data?.find((w) => w.id === id);
   const nameOf = (dndId: string) => {
@@ -50,9 +50,16 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
         <WalletsPanel
           spaceId={spaceId}
           onAdd={openAddWallet}
+          onAddIncome={openIncome}
           // Only the visible variant (card on desktop, circle on mobile) registers with dnd-kit.
-          wrap={(id, node, isCard) =>
-            isCard === isDesktop ? <DraggableWallet id={id}>{node}</DraggableWallet> : node
+          wrap={(id, node, isCard, onActivate) =>
+            isCard === isDesktop ? (
+              <DraggableWallet id={id} onClick={onActivate}>
+                {node}
+              </DraggableWallet>
+            ) : (
+              node
+            )
           }
         />
         <CategoriesGrid

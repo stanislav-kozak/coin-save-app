@@ -12,12 +12,18 @@ import { WalletCard, WalletCircle } from './wallet-card';
 type Props = {
   spaceId: string;
   onAdd: () => void;
-  /** Lets the dashboard make each wallet draggable without this module knowing about drag-and-drop. */
-  wrap?: (walletId: string, node: ReactNode, isCard: boolean) => ReactNode;
+  /** "+" on a desktop card / a tap on a mobile circle: add income to that wallet (spec §6.3). */
+  onAddIncome?: (walletId: string) => void;
+  /**
+   * Lets the dashboard make each wallet draggable without this module knowing about drag-and-drop.
+   * `onActivate` is the circle's tap action, for the wrapper to attach when it owns the element.
+   */
+  wrap?: (walletId: string, node: ReactNode, isCard: boolean, onActivate?: () => void) => ReactNode;
 };
 
-export function WalletsPanel({ spaceId, onAdd, wrap = (_id, node) => node }: Props) {
+export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
   const t = useTranslations('wallets');
+  const ti = useTranslations('expenses.income');
   const td = useTranslations('dashboard');
   const wallets = useWallets(spaceId);
   if (wallets.isError && !wallets.isFetching) {
@@ -49,13 +55,43 @@ export function WalletsPanel({ spaceId, onAdd, wrap = (_id, node) => node }: Pro
       ) : (
         <>
           <ul className="flex gap-4 overflow-x-auto p-1 md:hidden">
-            {wallets.data.map((w) => (
-              <li key={w.id}>{wrap(w.id, <WalletCircle wallet={w} />, false)}</li>
-            ))}
+            {wallets.data.map((w) => {
+              const activate = onAddIncome ? () => onAddIncome(w.id) : undefined;
+              const circle = <WalletCircle wallet={w} />;
+              return (
+                <li key={w.id}>
+                  {wrap ? (
+                    wrap(w.id, circle, false, activate)
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={activate}
+                      aria-label={ti('addFor', { name: w.name })}
+                      className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                    >
+                      {circle}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
           </ul>
           <ul className="hidden flex-col gap-3 md:flex">
             {wallets.data.map((w) => (
-              <li key={w.id}>{wrap(w.id, <WalletCard wallet={w} />, true)}</li>
+              <li key={w.id} className="relative">
+                {wrap ? wrap(w.id, <WalletCard wallet={w} />, true) : <WalletCard wallet={w} />}
+                {onAddIncome ? (
+                  // A sibling of the (draggable) card, not inside it: no nested interactive elements.
+                  <button
+                    type="button"
+                    aria-label={ti('addFor', { name: w.name })}
+                    onClick={() => onAddIncome(w.id)}
+                    className="absolute right-3 bottom-3 flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                  >
+                    <Plus aria-hidden className="size-4" />
+                  </button>
+                ) : null}
+              </li>
             ))}
           </ul>
           <button

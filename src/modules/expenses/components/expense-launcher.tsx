@@ -6,12 +6,15 @@ import { createContext, useContext, useOptimistic, useState, type ReactNode } fr
 import type { PendingSpend } from '@/modules/categories';
 import { CreateWalletDialog, useWallets } from '@/modules/wallets';
 import { ExpenseDialog } from './expense-dialog';
+import { IncomeDialog } from './income-dialog';
 
 type Prefill = { walletId: string; categoryId: string };
 type Launcher = {
   /** Open "Нова витрата" (prefilled after a drop); with no wallets, asks to add one first. */
   openExpense: (prefill?: Prefill) => void;
   openAddWallet: () => void;
+  /** Open "Новий дохід" for a wallet (its "+" on desktop, a tap on its circle on mobile). */
+  openIncome: (walletId: string) => void;
   /** Expenses being saved, for category totals to show at once; empty again once the server answers. */
   pendingSpends: PendingSpend[];
 };
@@ -30,6 +33,9 @@ export function ExpenseLauncherProvider({
   const [prefill, setPrefill] = useState<Prefill | undefined>();
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
+  // The wallet stays set after closing, so a save that fails can reopen the dialog for it.
+  const [incomeWallet, setIncomeWallet] = useState('');
+  const [incomeOpen, setIncomeOpen] = useState(false);
   // Lives only while the dialog's save transition runs: reverts by itself on success (fresh analytics
   // arrive first) and on failure.
   const [pendingSpends, addPendingSpend] = useOptimistic<PendingSpend[], PendingSpend>(
@@ -47,6 +53,10 @@ export function ExpenseLauncherProvider({
       setExpenseOpen(true);
     },
     openAddWallet: () => setWalletOpen(true),
+    openIncome: (walletId) => {
+      setIncomeWallet(walletId);
+      setIncomeOpen(true);
+    },
     pendingSpends,
   };
 
@@ -59,6 +69,12 @@ export function ExpenseLauncherProvider({
         onOpenChange={setExpenseOpen}
         prefill={prefill}
         onPendingSpend={addPendingSpend}
+      />
+      <IncomeDialog
+        spaceId={spaceId}
+        walletId={incomeWallet}
+        open={incomeOpen}
+        onOpenChange={setIncomeOpen}
       />
       <CreateWalletDialog spaceId={spaceId} open={walletOpen} onOpenChange={setWalletOpen} />
     </LauncherContext.Provider>
