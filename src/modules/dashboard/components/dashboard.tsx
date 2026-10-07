@@ -1,31 +1,33 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import { CategoriesGrid, useCategories, useReorderCategories } from '@/modules/categories';
+import { CategoriesGrid, useCategories } from '@/modules/categories';
 import { RecentExpenses, useExpenseLauncher } from '@/modules/expenses';
 import { useWallets, WalletsPanel } from '@/modules/wallets';
 import { useIsDesktop } from '@/shared/hooks/use-is-desktop';
+import { getErrorCode } from '@/shared/lib/api-error';
 import { formatMoney } from '@/shared/lib/money';
 import { EntityIcon } from '@/shared/ui/entity-icon';
 import { DndProvider } from './dnd-provider';
 import { DraggableWallet, SortableCategory } from './dnd-items';
 import { categoryDndId } from '../lib/resolve-drop';
 import { resolveReorder } from '../lib/resolve-reorder';
+import { useDroppedOrder } from '../lib/use-dropped-order';
 
 /** Main screen (Figma 10:176 / 10:177): drag a wallet onto a category to add an expense (spec §6.2). */
 export function Dashboard({ spaceId }: { spaceId: string }) {
   const locale = useLocale();
+  const te = useTranslations('errors');
   const isDesktop = useIsDesktop();
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
   const { openExpense, openAddWallet, openIncome, pendingSpends } = useExpenseLauncher();
 
-  const reorder = useReorderCategories(spaceId);
-  // The dropped order, applied in the same commit as the drop: React Query notifies observers a
-  // macrotask later, which would first paint the old order (cards snap back, then jump).
-  const [order, setOrder] = useState<string[] | null>(null);
+  const dropped = useDroppedOrder(spaceId);
+  const [tappedCategory, setTappedCategory] = useState<string | null>(null);
+  const order = dropped.order;
   const categoryIds = order ?? categories.data?.map((c) => c.id) ?? [];
 
   const walletById = (id: string) => wallets.data?.find((w) => w.id === id);
@@ -41,9 +43,12 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
       onDrop={openExpense}
       onReorder={(activeId, overId) => {
         const next = resolveReorder(activeId, overId, categoryIds);
-        if (!next) return;
-        setOrder(next);
-        reorder.mutate(next, { onSettled: () => setOrder(null) });
+        if (next) dropped.apply(next);
+      }}
+      onTap={(dndId) => {
+        const [kind, id] = dndId.split(':');
+        if (kind === 'wallet') openIncome(id!);
+        else setTappedCategory(id!);
       }}
       renderGhost={(dndId) => {
         const [kind, id] = dndId.split(':');
@@ -87,6 +92,9 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
             spaceId={spaceId}
             pending={pendingSpends}
             order={order ?? undefined}
+            notice={dropped.error ? te(getErrorCode(dropped.error)) : undefined}
+            editRequest={tappedCategory}
+            onEditRequestHandled={() => setTappedCategory(null)}
             wrap={(id, render, isCard) =>
               isCard === isDesktop ? (
                 <SortableCategory id={id} isCard={isCard}>
