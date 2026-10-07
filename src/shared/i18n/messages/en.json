@@ -381,6 +381,7 @@
     "joinedTitle": "You've joined the space",
     "open": "Open the space",
     "failedTitle": "Couldn't accept the invitation",
-    "home": "Go home"
+    "home": "Go home",
+    "alreadyTitle": "You're already in this space"
   }
 }

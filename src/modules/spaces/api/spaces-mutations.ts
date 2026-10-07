@@ -38,7 +38,8 @@ function useForgetSpace(spaceId: string) {
   const queryClient = useQueryClient();
   return () => {
     lastSpace.forget(spaceId);
-    queryClient.removeQueries({ queryKey: ['spaces', spaceId] });
+    // Not removeQueries(['spaces', spaceId]): the open page still observes it and would refetch a 403,
+    // flashing "unavailable" before navigation. The stale entry is garbage-collected instead.
     return queryClient.invalidateQueries({ queryKey: ['spaces'], exact: true });
   };
 }

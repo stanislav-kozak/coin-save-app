@@ -56,4 +56,18 @@ describe('AcceptInvitation', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(post).not.toHaveBeenCalled();
   });
+
+  it('does not keep the token while the request is in flight', async () => {
+    post.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(<AcceptInvitation token="tok" />);
+    await vi.waitFor(() => expect(post).toHaveBeenCalled());
+    expect(localStorage.getItem(KEY)).toBeNull(); // leaving now can't resurrect it later
+  });
+
+  it('treats an invitation to a space you are already in as done, not as a failure', async () => {
+    post.mockResolvedValue({ error: { statusCode: 409, code: 'ALREADY_MEMBER', message: 'x' } });
+    renderWithProviders(<AcceptInvitation token="tok" />);
+    expect(await screen.findByText('Ви вже в цьому просторі')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
 });

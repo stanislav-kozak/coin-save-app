@@ -5,8 +5,9 @@ const LIMIT = /^\d+([.,]\d{1,4})?$/; // positive, ≤ 4 dp (server Decimal(19, 4
 // Messages are keys of `categories.validation`.
 export const categoryFormSchema = z.object({
   name: z.string().trim().min(1, { error: 'nameRequired' }).max(100, { error: 'nameTooLong' }),
-  icon: z.string().min(1),
-  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+  // Empty only when editing a category that never had one: left as is.
+  icon: z.string(),
+  color: z.union([z.string().regex(/^#[0-9a-f]{6}$/i), z.literal('')]),
   // Empty means "no limit" (sent as null on edit, which removes an existing one).
   monthlyLimit: z
     .string()

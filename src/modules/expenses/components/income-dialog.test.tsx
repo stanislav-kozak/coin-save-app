@@ -154,4 +154,18 @@ describe('IncomeDialog', () => {
     await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(2));
     expect(post.mock.calls[1][1].body).toMatchObject({ walletId: 'w1', amount: 15000 });
   });
+
+  it('repeats on the day the label promised, even if midnight passes while it is open', async () => {
+    vi.setSystemTime(new Date(2026, 9, 31, 23, 59));
+    post.mockResolvedValue({ data: { id: 'x' } });
+    renderIncome();
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Сума'), '100');
+    await user.click(screen.getByRole('checkbox', { name: 'Щомісяця, 31-го числа' }));
+    await user.type(screen.getByLabelText('Назва'), 'Оренда');
+    vi.setSystemTime(new Date(2026, 10, 1, 0, 1));
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+    expect(post.mock.calls[1][1].body).toMatchObject({ dayOfMonth: 31, startDate: '2026-11-01' });
+  });
 });

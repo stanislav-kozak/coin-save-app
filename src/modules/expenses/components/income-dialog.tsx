@@ -50,6 +50,9 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
   const pendingRule = useRef<CreateRecurring | null>(null);
   // A failed save reopens for the wallet it was for, even if another wallet's "+" was pressed since.
   const [restoredWallet, setRestoredWallet] = useState<string | null>(null);
+  // The moment this form was opened: the "Щомісяця, N-го" label and the rule both use its date, so
+  // midnight passing while the dialog is open can't make them disagree.
+  const [openedAt, setOpenedAt] = useState(() => new Date());
   const activeWallet = restoredWallet ?? walletId;
   const submitting = useRef(false); // one submit per opening (Enter twice)
   const restoring = useRef(false); // the next open shows a failed save, not a fresh form
@@ -73,6 +76,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
     }
     setSubmitError(null);
     setRestoredWallet(null);
+    setOpenedAt(new Date());
     setStage('form');
     pendingRule.current = null;
     reset(EMPTY);
@@ -82,7 +86,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
 
   const monthly = useWatch({ control, name: 'monthly' });
   const wallet = wallets.data?.find((w) => w.id === activeWallet);
-  const day = new Date().getDate();
+  const day = openedAt.getDate();
   const errors = formState.errors;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 
@@ -137,7 +141,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
       return;
     }
     if (!draft.monthly) return;
-    const now = new Date();
+    const now = openedAt;
     await saveRule(
       {
         walletId: target,

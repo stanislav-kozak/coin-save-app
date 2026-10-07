@@ -55,4 +55,12 @@ describe('SpaceRedirect', () => {
     );
     expect(replace).not.toHaveBeenCalledWith('/s/a');
   });
+
+  it('resumes an invitation only once the session is confirmed', async () => {
+    localStorage.setItem('coinsave.pendingInvitation', 'tok');
+    get.mockResolvedValue({ error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } });
+    renderWithProviders(<SpaceRedirect />);
+    await screen.findByRole('alert');
+    expect(replace).not.toHaveBeenCalled();
+  });
 });

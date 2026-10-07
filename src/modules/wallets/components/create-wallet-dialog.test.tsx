@@ -74,4 +74,15 @@ describe('CreateWalletDialog', () => {
     await vi.waitFor(() => expect(post).toHaveBeenCalled());
     expect(post.mock.calls[0][1].body).toMatchObject({ name: 'Cash', color: '#f59e0b' });
   });
+
+  it('keeps what was typed when the wallets list changes meanwhile', async () => {
+    let answer!: (v: unknown) => void;
+    get.mockReturnValue(new Promise((r) => (answer = r)));
+    renderWithProviders(<CreateWalletDialog spaceId="sp1" open onOpenChange={vi.fn()} />);
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('Назва'), 'Cash');
+    answer({ data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '0', color: '#3b82f6' }] });
+    await vi.waitFor(() => expect(screen.getByRole('radio', { name: 'Бірюзовий' })).toBeChecked());
+    expect(screen.getByLabelText('Назва')).toHaveValue('Cash');
+  });
 });

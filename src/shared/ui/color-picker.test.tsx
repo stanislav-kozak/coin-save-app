@@ -1,6 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { ColorPicker } from './color-picker';
 
@@ -22,5 +22,28 @@ describe('ColorPicker', () => {
     expect(input).toHaveValue('#a855f7');
     fireEvent.change(input, { target: { value: '#123ABC' } });
     expect(onChange).toHaveBeenLastCalledWith('#123abc');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('opens the system picker on Space/Enter, not when arrowing onto «Свій колір»', async () => {
+    const opened = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const onChange = vi.fn();
+    renderWithProviders(<ColorPicker id="c" label="Колір" value="#a855f7" onChange={onChange} />);
+    const custom = screen.getByRole('radio', { name: 'Свій колір' });
+    fireEvent.click(custom); // what an arrow key does to a radio
+    expect(opened).not.toHaveBeenCalled();
+    fireEvent.keyDown(custom, { key: ' ' });
+    expect(opened).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(custom, { key: 'Enter' });
+    expect(opened).toHaveBeenCalledTimes(2);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('checks nothing when there is no color yet', () => {
+    renderWithProviders(<ColorPicker id="c" label="Колір" value="" onChange={vi.fn()} />);
+    for (const radio of screen.getAllByRole('radio')) expect(radio).not.toBeChecked();
   });
 });

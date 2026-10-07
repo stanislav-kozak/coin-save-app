@@ -29,7 +29,7 @@ export function SpaceSwitcher({ currentSpaceId }: { currentSpaceId: string }) {
         ) : (
           <Skeleton shape="circle" className="size-10 shrink-0" />
         )}
-        {spaces.data ? (
+        {spaces.data || spaces.isError ? (
           <span className="truncate text-h2">
             {/* Unknown space (no access / deleted): still a usable way out, not a blank button. */}
             {current?.name ?? t('switcher.label')}
