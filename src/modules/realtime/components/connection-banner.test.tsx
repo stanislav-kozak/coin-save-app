@@ -17,10 +17,9 @@ beforeEach(() => {
 describe('ConnectionBanner', () => {
   it('stays hidden while connected or still connecting', () => {
     renderWithProviders(<ConnectionBanner />);
-    expect(screen.queryByRole('status')).toBeNull();
     state.status = 'connecting';
     renderWithProviders(<ConnectionBanner />);
-    expect(screen.queryByRole('status')).toBeNull();
+    for (const region of screen.getAllByRole('status')) expect(region).toBeEmptyDOMElement();
   });
 
   it('says the data may be stale after a lasting outage', () => {
@@ -35,5 +34,16 @@ describe('ConnectionBanner', () => {
     state.joined = true;
     renderWithProviders(<ConnectionBanner />);
     expect(screen.getByRole('status')).toHaveTextContent('До простору приєднався новий учасник');
+  });
+
+  it('keeps an empty live region mounted so the message is announced when it appears', () => {
+    renderWithProviders(<ConnectionBanner />);
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+  });
+
+  it('is opaque, so scrolled content does not show through', () => {
+    state.status = 'disconnected';
+    renderWithProviders(<ConnectionBanner />);
+    expect(screen.getByRole('status')).toHaveClass('bg-card');
   });
 });

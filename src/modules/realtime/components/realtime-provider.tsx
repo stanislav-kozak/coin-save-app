@@ -11,6 +11,7 @@ export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected';
 const OFFLINE_AFTER_MS = 5_000; // spec §8.6: only a lasting outage is worth a banner
 const NOTICE_MS = 5_000;
 const REFRESH_COOLDOWN_MS = 30_000;
+const SERVER_DROP_RETRY_MS = 1_000;
 
 const RealtimeContext = createContext<{ status: ConnectionStatus; memberJoined: boolean }>({
   status: 'connecting',
@@ -46,6 +47,12 @@ export function RealtimeProvider({ spaceId, children }: { spaceId: string; child
         offlineTimer = setTimeout(() => setStatus('disconnected'), OFFLINE_AFTER_MS);
       }
     };
+    // Socket.IO only retries by itself after transport failures. After a server denial or a
+    // server-side disconnect the socket is closed for good, so reconnect explicitly.
+    const retryIn = (ms: number) => {
+      clearTimeout(retryTimer);
+      retryTimer = setTimeout(() => socket.connect(), ms);
+    };
 
     socket.on('connect', () => {
       clearTimeout(offlineTimer);
@@ -56,20 +63,27 @@ export function RealtimeProvider({ spaceId, children }: { spaceId: string; child
       if (everConnected) void queryClient.invalidateQueries();
       everConnected = true;
     });
-    socket.on('disconnect', wentOffline);
+    socket.on('disconnect', (reason: string) => {
+      if (reason === 'io client disconnect') return; // we closed it (unmount)
+      wentOffline();
+      if (reason === 'io server disconnect') retryIn(SERVER_DROP_RETRY_MS);
+    });
     socket.on('connect_error', (error: Error) => {
       wentOffline();
-      if (error.message !== 'UNAUTHORIZED') return; // transient: Socket.IO retries with backoff
-      // Denied by the server (the 15-min access token expired): the client won't retry by itself.
+      if (socket.active) return; // transient: Socket.IO retries with backoff
       const wait = lastRefresh + REFRESH_COOLDOWN_MS - Date.now();
-      if (wait > 0) {
-        clearTimeout(retryTimer);
-        retryTimer = setTimeout(() => socket.connect(), wait);
+      if (error.message === 'UNAUTHORIZED' && wait <= 0) {
+        // The 15-min access token expired (sleep, idle): any authenticated request refreshes the
+        // cookies (or sends a dead session to login). Reconnect even if that request itself failed.
+        lastRefresh = Date.now();
+        void api
+          .GET('/api/auth/me')
+          .catch(() => undefined)
+          .finally(() => socket.connect());
         return;
       }
-      lastRefresh = Date.now();
-      // Any authenticated request refreshes the cookies (or sends a dead session to login).
-      void api.GET('/api/auth/me').then(() => socket.connect());
+      // Any other denial (or a refresh just tried): try again after the cool-down.
+      retryIn(wait > 0 ? wait : REFRESH_COOLDOWN_MS);
     });
     for (const event of REALTIME_EVENTS) {
       socket.on(event, (payload: unknown) => {

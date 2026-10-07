@@ -8,7 +8,8 @@ export function createSocket(): Socket {
   return io({
     path: '/socket.io',
     withCredentials: true,
-    transports: ['websocket', 'polling'],
+    // Default transports: long-polling first, upgraded to WebSocket when possible — so a network that
+    // blocks WebSockets (corporate proxy) still gets live updates (spec §8.6).
     autoConnect: false,
   });
 }

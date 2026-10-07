@@ -142,4 +142,36 @@ describe('RealtimeProvider', () => {
     unmount();
     expect(socket.disconnects).toBe(1);
   });
+
+  it('still reconnects when the session refresh itself fails (flaky network)', async () => {
+    get.mockRejectedValue(new TypeError('Failed to fetch'));
+    setup();
+    await act(async () => socket.trigger('connect_error', new Error('UNAUTHORIZED')));
+    expect(socket.connects).toBe(2);
+  });
+
+  it('retries any other server denial after the cool-down instead of giving up', async () => {
+    setup();
+    await act(async () => socket.trigger('connect_error', new Error('FORBIDDEN_ORIGIN')));
+    expect(get).not.toHaveBeenCalled();
+    expect(socket.connects).toBe(1);
+    await act(async () => void vi.advanceTimersByTime(31_000));
+    expect(socket.connects).toBe(2);
+  });
+
+  it("leaves transient errors to Socket.IO's own backoff", async () => {
+    setup();
+    socket.active = true; // still reconnecting by itself
+    await act(async () => socket.trigger('connect_error', new Error('xhr poll error')));
+    await act(async () => void vi.advanceTimersByTime(31_000));
+    expect(socket.connects).toBe(1);
+  });
+
+  it("reconnects after the server drops the connection, which Socket.IO won't do by itself", async () => {
+    setup();
+    act(() => socket.trigger('connect'));
+    await act(async () => socket.trigger('disconnect', 'io server disconnect'));
+    await act(async () => void vi.advanceTimersByTime(1_000));
+    expect(socket.connects).toBe(2);
+  });
 });
