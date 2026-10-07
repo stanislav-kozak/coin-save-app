@@ -25,9 +25,16 @@ type Props = {
   ) => ReactNode;
   /** Expenses sent but not yet in analytics — shown at once (spec §6.9), replaced by server data. */
   pending?: PendingSpend[];
+  /** An order to show right now (a just-dropped reorder), ahead of the cache catching up. */
+  order?: string[];
 };
 
-export function CategoriesGrid({ spaceId, wrap = (_id, render) => render(), pending = [] }: Props) {
+export function CategoriesGrid({
+  spaceId,
+  wrap = (_id, render) => render(),
+  pending = [],
+  order,
+}: Props) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('categories.manage');
   // null: closed; 'new': creating; a category: editing it.
@@ -56,7 +63,14 @@ export function CategoriesGrid({ spaceId, wrap = (_id, render) => render(), pend
   const { currency } = analytics.data;
   const byId = new Map(analytics.data.byCategory.map((c) => [c.categoryId, c]));
   const extra = pendingByCategory(pending, analytics.data);
-  const items = categories.data.map((category) => {
+  const rank = (id: string) => {
+    const i = order?.indexOf(id) ?? -1;
+    return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+  };
+  const sorted = order
+    ? [...categories.data].sort((a, b) => rank(a.id) - rank(b.id)) // stable: unknown ids keep cache order
+    : categories.data;
+  const items = sorted.map((category) => {
     // Categories without spending this month are absent from analytics — show them at zero.
     const stats = byId.get(category.id);
     const added = extra.get(category.id);

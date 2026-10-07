@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
+import { useState } from 'react';
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { CategoriesGrid, useCategories, useReorderCategories } from '@/modules/categories';
 import { RecentExpenses, useExpenseLauncher } from '@/modules/expenses';
@@ -22,7 +23,10 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const { openExpense, openAddWallet, openIncome, pendingSpends } = useExpenseLauncher();
 
   const reorder = useReorderCategories(spaceId);
-  const categoryIds = categories.data?.map((c) => c.id) ?? [];
+  // The dropped order, applied in the same commit as the drop: React Query notifies observers a
+  // macrotask later, which would first paint the old order (cards snap back, then jump).
+  const [order, setOrder] = useState<string[] | null>(null);
+  const categoryIds = order ?? categories.data?.map((c) => c.id) ?? [];
 
   const walletById = (id: string) => wallets.data?.find((w) => w.id === id);
   const nameOf = (dndId: string) => {
@@ -37,7 +41,9 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
       onDrop={openExpense}
       onReorder={(activeId, overId) => {
         const next = resolveReorder(activeId, overId, categoryIds);
-        if (next) reorder.mutate(next);
+        if (!next) return;
+        setOrder(next);
+        reorder.mutate(next, { onSettled: () => setOrder(null) });
       }}
       renderGhost={(dndId) => {
         const [kind, id] = dndId.split(':');
@@ -80,6 +86,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
           <CategoriesGrid
             spaceId={spaceId}
             pending={pendingSpends}
+            order={order ?? undefined}
             wrap={(id, render, isCard) =>
               isCard === isDesktop ? (
                 <SortableCategory id={id} isCard={isCard}>
