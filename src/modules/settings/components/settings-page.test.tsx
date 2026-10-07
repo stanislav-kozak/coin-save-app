@@ -71,7 +71,9 @@ beforeEach(() => {
     if (path.endsWith('/members')) return { data: [] };
     if (path.endsWith('/invitations')) return { data: [] };
     if (path === '/api/auth/me') return { data: { id: 'u1', email: 'me@x.y', name: 'Я' } };
-    return { data: { id: 'sp1', name: 'Тест', primaryCurrency: 'UAH', role: 'OWNER' } };
+    if (path === '/api/spaces')
+      return { data: [{ id: 'sp1', name: 'Тест', primaryCurrency: 'UAH', role: 'OWNER' }] };
+    return { data: { id: 'sp1', name: 'Тест', primaryCurrency: 'UAH', ownerId: 'u1' } };
   });
   patch.mockResolvedValue({ data: {} });
 });

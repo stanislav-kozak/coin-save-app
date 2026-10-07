@@ -326,6 +326,51 @@
     "categories": {
       "title": "Archived categories",
       "none": "No archived categories"
+    },
+    "close": "Close",
+    "cancel": "Cancel",
+    "space": {
+      "title": "Space",
+      "name": "Name",
+      "currency": "Primary currency",
+      "currencySoon": "Changing the currency is coming soon",
+      "save": "Save changes",
+      "saved": "Saved",
+      "validation": {
+        "nameRequired": "Enter a space name",
+        "nameTooLong": "Up to 100 characters"
+      }
+    },
+    "members": {
+      "title": "Members",
+      "you": "(you)",
+      "roles": {
+        "OWNER": "Owner",
+        "MEMBER": "Member"
+      },
+      "remove": "Remove: {name}",
+      "removeTitle": "Remove member",
+      "confirmRemove": "Remove {name} from the space? A new invitation brings them back.",
+      "removeConfirm": "Remove",
+      "invite": "Invite a member",
+      "send": "Send invitation",
+      "sent": "Invitation sent to {email}",
+      "emailInvalid": "Enter a valid email",
+      "pending": "Awaiting acceptance",
+      "expires": "until {date}",
+      "revoke": "Revoke: {email}"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "delete": "Delete space",
+      "deleteHint": "This cannot be undone",
+      "confirmDelete": "Delete “{name}” with all its wallets, categories and expenses? Type the space name to confirm.",
+      "typeName": "Space name",
+      "deleteConfirm": "Delete forever",
+      "leave": "Leave space",
+      "leaveHint": "You lose access until you're invited again",
+      "confirmLeave": "Leave “{name}”?",
+      "leaveConfirm": "Leave"
     }
   }
 }
