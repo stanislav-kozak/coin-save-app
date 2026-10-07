@@ -90,4 +90,15 @@ describe('WalletsPanel', () => {
     expect(await screen.findByRole('button', { name: 'Спробувати ще раз' })).toBeInTheDocument();
     expect(screen.queryByText('Завантаження…')).toBeNull();
   });
+
+  it('opens the wallet editor from the desktop card', async () => {
+    get.mockResolvedValue({
+      data: [
+        { id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', initialBalance: '0', color: null },
+      ],
+    });
+    renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Редагувати: Mono' }));
+    expect(await screen.findByRole('dialog', { name: 'Гаманець' })).toBeInTheDocument();
+  });
 });

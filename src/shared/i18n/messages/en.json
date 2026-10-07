@@ -194,6 +194,16 @@
       "nameTooLong": "100 characters at most",
       "amountInvalid": "Enter an amount, e.g. 1250.50",
       "amountTooLarge": "Amount is too large"
+    },
+    "edit": {
+      "title": "Wallet",
+      "save": "Save",
+      "archive": "Archive",
+      "confirmArchive": "Archive “{name}”? It disappears from the main screen; its history stays.",
+      "archiveConfirm": "Archive wallet",
+      "cancel": "Cancel",
+      "edit": "Edit: {name}",
+      "restore": "Restore"
     }
   },
   "categories": {

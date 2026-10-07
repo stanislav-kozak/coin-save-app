@@ -7,7 +7,8 @@ const LIMIT = 1_000_000_000;
 // Messages are keys of `wallets.validation`.
 const amountField = z
   .string()
-  .trim()
+  // Thousands separators as typed or pasted ("1 250,50", incl. NBSP), like expense amounts.
+  .transform((v) => v.replace(/\s/g, ''))
   .transform((v) => (v === '' ? '0' : v.replace(',', '.')))
   .refine((v) => AMOUNT.test(v), { error: 'amountInvalid' })
   // Safe as a JS number: ≤ 4 dp and |x| ≤ 1e9 are represented exactly enough for the API's
@@ -23,3 +24,7 @@ export const createWalletSchema = z.object({
 });
 
 export type CreateWalletValues = z.output<typeof createWalletSchema>;
+
+/** Editing a wallet: everything but the currency (its history is in that currency). */
+export const updateWalletSchema = createWalletSchema.omit({ currency: true });
+export type UpdateWalletValues = z.output<typeof updateWalletSchema>;
