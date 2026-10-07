@@ -30,9 +30,6 @@ type Props = {
   order?: string[];
   /** A message about the grid itself (e.g. a refused reorder), shown under the heading. */
   notice?: string;
-  /** A category to open in the editor (a slow touch tap the dashboard's drag-and-drop absorbed). */
-  editRequest?: string | null;
-  onEditRequestHandled?: () => void;
 };
 
 export function CategoriesGrid({
@@ -41,8 +38,6 @@ export function CategoriesGrid({
   pending = [],
   order,
   notice,
-  editRequest,
-  onEditRequestHandled,
 }: Props) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('categories.manage');
@@ -100,8 +95,6 @@ export function CategoriesGrid({
   const sorted = order
     ? [...categories.data].sort((a, b) => rank(a.id) - rank(b.id)) // stable: unknown ids keep cache order
     : categories.data;
-  const requested = editRequest ? categories.data.find((c) => c.id === editRequest) : undefined;
-  const current = editing ?? requested ?? null;
   const items = sorted.map((category) => {
     // Categories without spending this month are absent from analytics — show them at zero.
     const stats = byId.get(category.id);
@@ -162,15 +155,11 @@ export function CategoriesGrid({
         {tc('add')}
       </button>
       <CategoryDialog
-        key={current === 'new' ? 'new' : (current?.id ?? 'closed')}
+        key={editing === 'new' ? 'new' : (editing?.id ?? 'closed')}
         spaceId={spaceId}
-        open={current !== null}
-        onOpenChange={(open) => {
-          if (open) return;
-          setEditing(null);
-          onEditRequestHandled?.();
-        }}
-        category={current === 'new' || current === null ? undefined : current}
+        open={editing !== null}
+        onOpenChange={(open) => !open && setEditing(null)}
+        category={editing === 'new' || editing === null ? undefined : editing}
       />
     </section>
   );
