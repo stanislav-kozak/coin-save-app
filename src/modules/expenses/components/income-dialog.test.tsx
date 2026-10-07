@@ -167,5 +167,7 @@ describe('IncomeDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Додати' }));
     await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(2));
     expect(post.mock.calls[1][1].body).toMatchObject({ dayOfMonth: 31, startDate: '2026-11-01' });
+    // …and the income itself is dated then too, so November doesn't get it twice (now + on the 30th).
+    expect(post.mock.calls[0][1].body.occurredAt).toBe(new Date(2026, 9, 31, 23, 59).toISOString());
   });
 });

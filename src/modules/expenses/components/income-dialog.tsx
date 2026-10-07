@@ -135,6 +135,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
         amount: draft.amount,
         note: draft.note,
         type: 'INCOME',
+        occurredAt: openedAt, // the same moment the monthly rule is based on
       });
     } catch (error) {
       reopen(error, values, 'form', target);
