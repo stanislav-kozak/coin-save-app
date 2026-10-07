@@ -203,7 +203,8 @@
       "archiveConfirm": "Archive wallet",
       "cancel": "Cancel",
       "edit": "Edit: {name}",
-      "restore": "Restore"
+      "restore": "Restore",
+      "restoreItem": "Restore: {name}"
     }
   },
   "categories": {
@@ -307,5 +308,24 @@
     "pink": "Pink",
     "slate": "Slate",
     "custom": "Custom color"
+  },
+  "settings": {
+    "title": "Settings",
+    "preferences": {
+      "title": "Language and theme",
+      "language": "Interface language",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "wallets": {
+      "title": "Wallets",
+      "none": "No wallets yet",
+      "archived": "Archived"
+    },
+    "categories": {
+      "title": "Archived categories",
+      "none": "No archived categories"
+    }
   }
 }

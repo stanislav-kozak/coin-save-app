@@ -12,6 +12,11 @@ vi.mock('@/shared/lib/api-client', () => ({
 vi.mock('@/shared/i18n/navigation', () => ({
   useRouter: () => ({ replace: vi.fn() }),
   usePathname: () => '/s/a',
+  Link: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
 }));
 const assign = vi.fn();
 
@@ -36,7 +41,7 @@ async function openMenu() {
 
 describe('UserMenu', () => {
   it('shows initials and the email', async () => {
-    renderWithProviders(<UserMenu />);
+    renderWithProviders(<UserMenu spaceId="a" />);
     await openMenu();
     expect(await screen.findByText('kozak@b.co')).toBeInTheDocument();
   });
@@ -46,7 +51,7 @@ describe('UserMenu', () => {
       data: { message: 'ok' },
       response: new Response(null, { status: 200 }),
     });
-    renderWithProviders(<UserMenu />);
+    renderWithProviders(<UserMenu spaceId="a" />);
     const user = await openMenu();
     await user.click(await screen.findByRole('menuitem', { name: 'Вийти' }));
     await vi.waitFor(() => expect(assign).toHaveBeenCalledWith('/uk/login'));
@@ -65,10 +70,19 @@ describe('UserMenu', () => {
     ],
   ])('stays signed in and says so after %s — cookies were not cleared', async (_label, arrange) => {
     arrange();
-    renderWithProviders(<UserMenu />);
+    renderWithProviders(<UserMenu spaceId="a" />);
     const user = await openMenu();
     await user.click(await screen.findByRole('menuitem', { name: 'Вийти' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Щось пішло не так');
     expect(assign).not.toHaveBeenCalled();
+  });
+
+  it('links to the space settings', async () => {
+    renderWithProviders(<UserMenu spaceId="a" />);
+    await openMenu();
+    expect(screen.getByRole('menuitem', { name: 'Налаштування' })).toHaveAttribute(
+      'href',
+      '/s/a/settings',
+    );
   });
 });
