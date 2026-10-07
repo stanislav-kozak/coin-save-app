@@ -1,14 +1,17 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { CategoriesGrid, useCategories } from '@/modules/categories';
+import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+import { CategoriesGrid, useCategories, useReorderCategories } from '@/modules/categories';
 import { RecentExpenses, useExpenseLauncher } from '@/modules/expenses';
 import { useWallets, WalletsPanel } from '@/modules/wallets';
 import { useIsDesktop } from '@/shared/hooks/use-is-desktop';
 import { formatMoney } from '@/shared/lib/money';
 import { EntityIcon } from '@/shared/ui/entity-icon';
 import { DndProvider } from './dnd-provider';
-import { DraggableWallet, DroppableCategory } from './dnd-items';
+import { DraggableWallet, SortableCategory } from './dnd-items';
+import { categoryDndId } from '../lib/resolve-drop';
+import { resolveReorder } from '../lib/resolve-reorder';
 
 /** Main screen (Figma 10:176 / 10:177): drag a wallet onto a category to add an expense (spec §6.2). */
 export function Dashboard({ spaceId }: { spaceId: string }) {
@@ -16,7 +19,10 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const isDesktop = useIsDesktop();
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
-  const { openExpense, openAddWallet, pendingSpends } = useExpenseLauncher();
+  const { openExpense, openAddWallet, openIncome, pendingSpends } = useExpenseLauncher();
+
+  const reorder = useReorderCategories(spaceId);
+  const categoryIds = categories.data?.map((c) => c.id) ?? [];
 
   const walletById = (id: string) => wallets.data?.find((w) => w.id === id);
   const nameOf = (dndId: string) => {
@@ -29,8 +35,16 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
     <DndProvider
       nameOf={nameOf}
       onDrop={openExpense}
-      renderGhost={(walletId) => {
-        const wallet = walletById(walletId);
+      onReorder={(activeId, overId) => {
+        const next = resolveReorder(activeId, overId, categoryIds);
+        if (next) reorder.mutate(next);
+      }}
+      renderGhost={(dndId) => {
+        const [kind, id] = dndId.split(':');
+        // A category is reordered in place (the card itself moves): sortable keyboard coordinates
+        // assume the dragged rect is the item's own, which a smaller tilted ghost breaks.
+        if (kind === 'category') return null;
+        const wallet = walletById(id);
         if (!wallet) return null;
         // Design system §4.4: elevated shadow + 2° tilt while dragging
         return (
@@ -50,24 +64,33 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
         <WalletsPanel
           spaceId={spaceId}
           onAdd={openAddWallet}
+          onAddIncome={openIncome}
           // Only the visible variant (card on desktop, circle on mobile) registers with dnd-kit.
-          wrap={(id, node, isCard) =>
-            isCard === isDesktop ? <DraggableWallet id={id}>{node}</DraggableWallet> : node
-          }
-        />
-        <CategoriesGrid
-          spaceId={spaceId}
-          pending={pendingSpends}
-          wrap={(id, node, isCard) =>
+          wrap={(id, node, isCard, onActivate) =>
             isCard === isDesktop ? (
-              <DroppableCategory id={id} isCard={isCard}>
+              <DraggableWallet id={id} onClick={onActivate}>
                 {node}
-              </DroppableCategory>
+              </DraggableWallet>
             ) : (
               node
             )
           }
         />
+        <SortableContext items={categoryIds.map(categoryDndId)} strategy={rectSortingStrategy}>
+          <CategoriesGrid
+            spaceId={spaceId}
+            pending={pendingSpends}
+            wrap={(id, render, isCard) =>
+              isCard === isDesktop ? (
+                <SortableCategory id={id} isCard={isCard}>
+                  {render}
+                </SortableCategory>
+              ) : (
+                render()
+              )
+            }
+          />
+        </SortableContext>
         <RecentExpenses spaceId={spaceId} />
       </main>
     </DndProvider>

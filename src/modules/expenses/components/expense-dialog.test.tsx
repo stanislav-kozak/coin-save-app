@@ -171,4 +171,17 @@ describe('ExpenseDialog', () => {
     expect(await screen.findByText('Оберіть гаманець')).toBeInTheDocument();
     expect(post).not.toHaveBeenCalled();
   });
+
+  it('can be sent again after the server refused it at once', async () => {
+    post
+      .mockResolvedValueOnce({ error: { statusCode: 400, code: 'WALLET_ARCHIVED', message: 'x' } })
+      .mockResolvedValueOnce({ data: { id: 'e1' } });
+    renderWithProviders(<Harness prefill={{ walletId: 'w1', categoryId: 'c9' }} />);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Сума'), '340');
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+  });
 });

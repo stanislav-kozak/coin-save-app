@@ -185,7 +185,8 @@
       "namePlaceholder": "For example, Monobank",
       "currency": "Currency",
       "initialBalance": "Starting balance",
-      "submit": "Add"
+      "submit": "Add",
+      "color": "Color"
     },
     "validation": {
       "nameRequired": "Enter a name",
@@ -199,7 +200,37 @@
     "spent": "{amount} spent",
     "over": "+{amount}",
     "overLabel": "over limit",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "income": "Income",
+    "manage": {
+      "createTitle": "New category",
+      "editTitle": "Category",
+      "name": "Name",
+      "namePlaceholder": "e.g. Sport",
+      "icon": "Icon",
+      "color": "Color",
+      "limit": "Monthly limit",
+      "limitHint": "Empty means no limit",
+      "save": "Save",
+      "add": "Add category",
+      "edit": "Edit: {name}",
+      "move": "Move: {name}",
+      "archive": "Archive",
+      "delete": "Delete",
+      "confirmArchive": "Archive “{name}”? It disappears from the main screen; its expense history stays.",
+      "confirmDelete": "Delete “{name}”? Its expenses will have no category.",
+      "archiveConfirm": "Archive category",
+      "deleteConfirm": "Delete category",
+      "cancel": "Cancel",
+      "close": "Close"
+    },
+    "validation": {
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Up to 100 characters",
+      "limitInvalid": "Enter an amount, e.g. 1500",
+      "limitPositive": "The limit must be above zero",
+      "limitTooLarge": "The amount is too large"
+    }
   },
   "expenses": {
     "today": "Today",
@@ -223,7 +254,18 @@
       "amountInvalid": "Enter a positive amount, e.g. 250.50",
       "amountPositive": "Amount must be greater than zero",
       "amountTooLarge": "Amount is too large",
-      "noteTooLong": "500 characters at most"
+      "noteTooLong": "500 characters at most",
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Up to 100 characters"
+    },
+    "income": {
+      "title": "New income",
+      "monthly": "Monthly, on day {day}",
+      "name": "Name",
+      "namePlaceholder": "e.g. Salary",
+      "recurringFailed": "Income added, but the monthly repeat wasn't created:",
+      "retryRecurring": "Create the repeat",
+      "addFor": "Add income: {name}"
     }
   },
   "nav": {
@@ -234,11 +276,24 @@
     "label": "Navigation"
   },
   "dnd": {
-    "instructions": "To drag a wallet, press space, move with the arrow keys to a category and press space again",
+    "instructions": "To drag a wallet or a category, press space, move with the arrow keys and press space again: a wallet on a category adds an expense, a category moves to its new place",
     "start": "Picked up wallet {wallet}",
     "over": "{wallet} over category {category}",
     "outside": "Not over a category",
     "dropped": "Dropped on {category}",
-    "cancelled": "Dragging cancelled"
+    "cancelled": "Dragging cancelled",
+    "reorderStart": "Moving category {category}",
+    "reorderOver": "{category} over {target}",
+    "reorderDropped": "{category} moved"
+  },
+  "colors": {
+    "blue": "Blue",
+    "teal": "Teal",
+    "amber": "Amber",
+    "violet": "Violet",
+    "emerald": "Emerald",
+    "indigo": "Indigo",
+    "pink": "Pink",
+    "slate": "Slate"
   }
 }

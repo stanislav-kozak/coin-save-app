@@ -19,6 +19,7 @@ export const createWalletSchema = z.object({
   name: z.string().trim().min(1, { error: 'nameRequired' }).max(100, { error: 'nameTooLong' }),
   currency: z.enum(SUPPORTED_CURRENCIES),
   initialBalance: amountField,
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
 });
 
 export type CreateWalletValues = z.output<typeof createWalletSchema>;

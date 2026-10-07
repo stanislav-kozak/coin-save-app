@@ -40,4 +40,39 @@ describe('WalletsPanel', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: /Додати гаманець/ }));
     expect(onAdd).toHaveBeenCalled();
   });
+
+  it('offers adding income per wallet', async () => {
+    get.mockResolvedValue({
+      data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', icon: null, color: null }],
+    });
+    const onAddIncome = vi.fn();
+    renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} onAddIncome={onAddIncome} />);
+    // Both variants are in the DOM (CSS shows one): the desktop card's "+" and the mobile circle.
+    const buttons = await screen.findAllByRole('button', { name: 'Додати дохід: Mono' });
+    expect(buttons).toHaveLength(2);
+    const user = userEvent.setup();
+    for (const button of buttons) await user.click(button);
+    expect(onAddIncome.mock.calls).toEqual([['w1'], ['w1']]);
+  });
+
+  it('keeps adding income reachable by keyboard when the circles are draggable', async () => {
+    get.mockResolvedValue({
+      data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', icon: null, color: null }],
+    });
+    const onAddIncome = vi.fn();
+    renderWithProviders(
+      <WalletsPanel
+        spaceId="sp1"
+        onAdd={vi.fn()}
+        onAddIncome={onAddIncome}
+        // Like the dashboard: the wrapper owns the element (and Enter/Space start a drag there).
+        wrap={(_id, node) => <div role="button">{node}</div>}
+      />,
+    );
+    const buttons = await screen.findAllByRole('button', { name: 'Додати дохід: Mono' });
+    expect(buttons).toHaveLength(2); // desktop "+" and the circle's own
+    buttons[0].focus();
+    await userEvent.setup().keyboard('{Enter}');
+    expect(onAddIncome).toHaveBeenCalledWith('w1');
+  });
 });

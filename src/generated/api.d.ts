@@ -828,8 +828,11 @@ export interface components {
             orderedIds: string[];
         };
         UpdateCategoryDto: {
-            /** @example 12.5 */
-            monthlyLimit?: number;
+            /**
+             * @description Omit to keep the current limit; null removes it
+             * @example 12.5
+             */
+            monthlyLimit?: number | null;
             name?: string;
             icon?: string;
             color?: string;

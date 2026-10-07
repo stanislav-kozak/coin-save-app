@@ -114,4 +114,12 @@ describe('useCreateExpense', () => {
     const list = queryClient.getQueryData<{ amount: string }[]>(listKey)!;
     expect(list.map((e) => e.amount)).toEqual(['7']);
   });
+
+  it('raises the balance for an income', async () => {
+    post.mockReturnValue(new Promise(() => {}));
+    const { queryClient, result } = setup();
+    act(() => result.current.mutate({ walletId: 'w1', amount: 15000, type: 'INCOME' }));
+    await waitFor(() => expect(balance(queryClient, 'w1')).toBe('15100.00'));
+    expect(post.mock.calls[0][1].body).toMatchObject({ type: 'INCOME', amount: 15000 });
+  });
 });

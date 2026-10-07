@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createWalletSchema } from './schemas';
 
-const base = { name: 'Mono', currency: 'UAH' };
+const base = { color: '#3b82f6', name: 'Mono', currency: 'UAH' };
 const parse = (initialBalance: string) => createWalletSchema.safeParse({ ...base, initialBalance });
 
 describe('createWalletSchema', () => {

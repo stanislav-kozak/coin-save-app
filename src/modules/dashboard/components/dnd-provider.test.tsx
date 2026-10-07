@@ -7,7 +7,12 @@ import { DndProvider } from './dnd-provider';
 describe('DndProvider', () => {
   it('ties drag instructions to a React id, not a counter that differs between server and client', () => {
     renderWithProviders(
-      <DndProvider nameOf={(id) => id} onDrop={() => {}} renderGhost={() => null}>
+      <DndProvider
+        nameOf={(id) => id}
+        onDrop={() => {}}
+        onReorder={() => {}}
+        renderGhost={() => null}
+      >
         <DraggableWallet id="w1">
           <span>Mono</span>
         </DraggableWallet>

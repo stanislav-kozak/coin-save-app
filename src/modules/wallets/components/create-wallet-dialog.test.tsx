@@ -5,10 +5,15 @@ import { renderWithProviders } from '@/test-utils/render';
 import { CreateWalletDialog } from './create-wallet-dialog';
 
 const post = vi.fn();
-vi.mock('@/shared/lib/api-client', () => ({ api: { POST: (...a: unknown[]) => post(...a) } }));
+const get = vi.fn();
+vi.mock('@/shared/lib/api-client', () => ({
+  api: { POST: (...a: unknown[]) => post(...a), GET: (...a: unknown[]) => get(...a) },
+}));
 
 beforeEach(() => {
   post.mockReset();
+  get.mockReset();
+  get.mockResolvedValue({ data: [] });
 });
 
 async function fill(user: ReturnType<typeof userEvent.setup>, balance: string) {
@@ -27,7 +32,7 @@ describe('CreateWalletDialog', () => {
     await vi.waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
     expect(post).toHaveBeenCalledWith('/api/spaces/{spaceId}/wallets', {
       params: { path: { spaceId: 'sp1' } },
-      body: { name: 'Mono', currency: 'UAH', initialBalance: 1250.5 },
+      body: { name: 'Mono', currency: 'UAH', initialBalance: 1250.5, color: '#3b82f6' },
     });
   });
 
@@ -53,5 +58,20 @@ describe('CreateWalletDialog', () => {
     await user.click(button);
     resolve({ data: { id: 'w1' } });
     await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(1));
+  });
+
+  it('sends the chosen color, defaulting to the first one no wallet uses', async () => {
+    get.mockResolvedValue({
+      data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '0', color: '#3b82f6' }],
+    });
+    post.mockResolvedValue({ data: { id: 'w2' } });
+    renderWithProviders(<CreateWalletDialog spaceId="sp1" open onOpenChange={vi.fn()} />);
+    const user = userEvent.setup();
+    await vi.waitFor(() => expect(screen.getByRole('radio', { name: 'Бірюзовий' })).toBeChecked());
+    await user.type(screen.getByLabelText('Назва'), 'Cash');
+    await user.click(screen.getByRole('radio', { name: 'Бурштиновий' }));
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalled());
+    expect(post.mock.calls[0][1].body).toMatchObject({ name: 'Cash', color: '#f59e0b' });
   });
 });
