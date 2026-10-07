@@ -120,7 +120,13 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
             </p>
             {alert}
             <div className="flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setConfirm(null)}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setConfirm(null);
+                  setError(null); // a failed archive/delete must not show under the form
+                }}
+              >
                 {t('manage.cancel')}
               </Button>
               <Button

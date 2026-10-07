@@ -30,7 +30,7 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
   const create = useCreateWallet(spaceId);
   const wallets = useWallets(spaceId);
   const defaultColor = firstUnusedColor(wallets.data?.map((w) => w.color) ?? []);
-  const { register, handleSubmit, formState, reset, control } = useForm<
+  const { register, handleSubmit, formState, reset, control, getFieldState, setValue } = useForm<
     z.input<typeof createWalletSchema>,
     unknown,
     CreateWalletValues
@@ -44,11 +44,17 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
     },
   });
 
-  // Each opening starts clean, with a color no wallet has yet (wallets may load after mount).
+  // Each opening starts clean…
   useEffect(() => {
     if (open)
       reset({ name: '', currency: DEFAULT_CURRENCY, initialBalance: '', color: defaultColor });
-  }, [open, defaultColor, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on (re)open, not on every refetch
+  }, [open]);
+  // …and follows the wallets list (loaded late, or changed by a family member) only while the user
+  // hasn't picked a color, never touching what they typed.
+  useEffect(() => {
+    if (open && !getFieldState('color').isDirty) setValue('color', defaultColor);
+  }, [open, defaultColor, getFieldState, setValue]);
   const errors = formState.errors;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 

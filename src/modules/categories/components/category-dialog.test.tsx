@@ -138,4 +138,17 @@ describe('CategoryDialog', () => {
     await vi.waitFor(() => expect(patch).toHaveBeenCalled());
     expect(patch.mock.calls[0][1].body).toEqual({ monthlyLimit: 700 });
   });
+
+  it('forgets a failed archive once the confirmation is cancelled', async () => {
+    patch.mockResolvedValue({
+      error: { statusCode: 404, code: 'CATEGORY_NOT_FOUND', message: 'x' },
+    });
+    renderDialog({ category: cafe });
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Архівувати' }));
+    await user.click(screen.getByRole('button', { name: 'Архівувати категорію' }));
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Скасувати' }));
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
 });
