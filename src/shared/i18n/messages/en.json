@@ -200,7 +200,8 @@
     "spent": "{amount} spent",
     "over": "+{amount}",
     "overLabel": "over limit",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "income": "Income"
   },
   "expenses": {
     "today": "Today",

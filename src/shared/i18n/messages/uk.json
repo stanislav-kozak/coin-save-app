@@ -200,7 +200,8 @@
     "spent": "{amount} витрачено",
     "over": "+{amount}",
     "overLabel": "понад ліміт",
-    "uncategorized": "Без категорії"
+    "uncategorized": "Без категорії",
+    "income": "Дохід"
   },
   "expenses": {
     "today": "Сьогодні",

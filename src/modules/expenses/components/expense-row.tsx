@@ -30,7 +30,7 @@ export function ExpenseRow({ expense, category }: Props) {
         size="s"
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-body font-medium">{category?.name ?? t('uncategorized')}</p>
+        <p className="truncate text-body font-medium">{category?.name ?? (isIncome ? t('income') : t('uncategorized'))}</p>
         {expense.note ? (
           <p className="truncate text-caption text-muted-foreground">{expense.note}</p>
         ) : null}
