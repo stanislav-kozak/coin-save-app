@@ -54,4 +54,21 @@ describe('CategoriesGrid', () => {
     await user.click(screen.getByRole('button', { name: 'Додати категорію' }));
     expect(await screen.findByRole('dialog', { name: 'Нова категорія' })).toBeInTheDocument();
   });
+
+  it('derives the percentage from the shown limit, not a stale analytics value', async () => {
+    // Right after a limit change the category list is fresh while analytics still has the old pct.
+    get.mockImplementation(async (path: string) =>
+      path.endsWith('/categories')
+        ? { data: [{ id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: '60' }] }
+        : {
+            data: {
+              currency: 'UAH',
+              byCategory: [{ categoryId: 'c1', spent: '88', limit: '50', pct: 176 }],
+              expenses: [],
+            },
+          },
+    );
+    renderWithProviders(<CategoriesGrid spaceId="sp1" />);
+    expect((await screen.findAllByText(/88,00\s₴ \/ 60,00\s₴ · 147%/)).length).toBeGreaterThan(0);
+  });
 });

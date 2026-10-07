@@ -60,8 +60,9 @@ export function CategoriesGrid({ spaceId, wrap = (_id, render) => render(), pend
     // Categories without spending this month are absent from analytics — show them at zero.
     const stats = byId.get(category.id);
     const added = extra.get(category.id);
-    if (!added) return { category, spent: stats?.spent ?? '0', pct: stats?.pct ?? 0, currency };
-    const spent = addMoney(stats?.spent ?? '0', added);
+    const spent = added ? addMoney(stats?.spent ?? '0', added) : (stats?.spent ?? '0');
+    // Computed like the server (Math.round(spent / limit × 100)) from the limit shown next to it:
+    // right after a limit edit the category list is fresh while analytics' pct is not yet.
     const pct = category.monthlyLimit ? percentOf(spent, category.monthlyLimit) : 0;
     return { category, spent, pct, currency };
   });
