@@ -4,7 +4,9 @@
     "themeLight": "Light theme",
     "themeDark": "Dark theme",
     "retry": "Try again",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "styleguide": {
     "title": "Styleguide",
@@ -387,5 +389,25 @@
   "realtime": {
     "offline": "No connection to the server. Data may be out of date.",
     "memberJoined": "A new member joined the space"
+  },
+  "recurring": {
+    "title": "Recurring payments",
+    "add": "Add",
+    "addLabel": "Add a recurring payment",
+    "expenses": "Expenses",
+    "incomes": "Incomes",
+    "total": "Total: {amount}/mo",
+    "monthly": "monthly, on day {day}",
+    "until": "until {date}",
+    "paused": "Paused",
+    "pause": "Pause: {name}",
+    "resume": "Resume: {name}",
+    "delete": "Delete: {name}",
+    "edit": "Edit: {name}",
+    "deleteTitle": "Delete recurring payment",
+    "confirmDelete": "Delete “{name}”? No new payments will be created; recorded ones stay.",
+    "deleteConfirm": "Delete",
+    "emptyTitle": "No recurring payments yet",
+    "emptyText": "Add subscriptions, bills or salary — they will be recorded every month by themselves"
   }
 }

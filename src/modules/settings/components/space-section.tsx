@@ -14,7 +14,7 @@ import { Input } from '@/shared/ui/input';
 import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useMyRole } from '../lib/use-my-role';
-import { ConfirmDialog } from './confirm-dialog';
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { SettingsSection } from './settings-section';
 
 const schema = z.object({

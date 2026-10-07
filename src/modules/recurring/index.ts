@@ -7,3 +7,4 @@ export {
 } from './api/recurring-mutations';
 export { useRecurring } from './api/recurring-queries';
 export { nextMonthStart } from './lib/next-month-start';
+export { RecurringPage } from './components/recurring-page';
