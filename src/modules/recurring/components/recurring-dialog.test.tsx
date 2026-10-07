@@ -21,7 +21,7 @@ const netflix = {
   amount: '249',
   currency: 'UAH',
   name: 'Netflix',
-  note: null,
+  note: null as string | null,
   dayOfMonth: 15,
   startDate: '2026-10-15T00:00:00.000Z',
   endDate: '2027-01-01T00:00:00.000Z',
@@ -155,5 +155,44 @@ describe('RecurringDialog', () => {
     await screen.findByRole('option', { name: /Cash/ });
     await user.selectOptions(screen.getByLabelText('День місяця'), '31');
     expect(screen.getByText('У коротші місяці — останнього дня')).toBeInTheDocument();
+  });
+
+  it("shows the rule's own wallet and category, even archived, once the lists load", async () => {
+    api.GET.mockImplementation(async (path: string) =>
+      path.endsWith('/wallets')
+        ? {
+            data: [
+              { id: 'w1', name: 'Mono', currency: 'UAH', balance: '0', archived: false },
+              { id: 'w2', name: 'Cash', currency: 'USD', balance: '0', archived: true },
+            ],
+          }
+        : {
+            data: [
+              {
+                id: 'c1',
+                name: 'Підписки',
+                icon: '📺',
+                color: null,
+                sortOrder: 0,
+                archived: false,
+              },
+              { id: 'c2', name: 'Старе', icon: '🧾', color: null, sortOrder: 1, archived: true },
+            ],
+          },
+    );
+    renderDialog({ ...netflix, walletId: 'w2', categoryId: 'c2' });
+    expect(await screen.findByLabelText('Гаманець')).toHaveValue('w2');
+    expect(screen.getByLabelText('Категорія')).toHaveValue('c2');
+    expect(screen.getByRole('option', { name: /Старе/ })).toHaveTextContent('(архів)');
+    expect(screen.getByText('USD')).toBeInTheDocument();
+  });
+
+  it('removes a note when it is cleared', async () => {
+    renderDialog({ ...netflix, note: 'сімейний план' });
+    const user = userEvent.setup();
+    await user.clear(await screen.findByLabelText('Нотатка'));
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(api.PATCH).toHaveBeenCalled());
+    expect(api.PATCH.mock.calls[0][1].body).toEqual({ note: '' });
   });
 });

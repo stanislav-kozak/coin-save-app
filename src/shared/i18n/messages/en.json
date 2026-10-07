@@ -403,7 +403,6 @@
     "pause": "Pause: {name}",
     "resume": "Resume: {name}",
     "delete": "Delete: {name}",
-    "edit": "Edit: {name}",
     "deleteTitle": "Delete recurring payment",
     "confirmDelete": "Delete “{name}”? No new payments will be created; recorded ones stay.",
     "deleteConfirm": "Delete",
@@ -427,7 +426,8 @@
       "endDate": "Until",
       "note": "Note",
       "save": "Save",
-      "delete": "Delete"
+      "delete": "Delete",
+      "archived": "(archived)"
     },
     "validation": {
       "nameRequired": "Enter a name",
@@ -439,6 +439,7 @@
       "noteTooLong": "Up to 500 characters",
       "walletRequired": "Choose a wallet",
       "endBeforeStart": "The end date must be after the first payment"
-    }
+    },
+    "editHint": "Edit:"
   }
 }

@@ -57,9 +57,10 @@ export function RecurringRow({
       <button
         type="button"
         onClick={onEdit}
-        aria-label={t('edit', { name: rule.name })}
         className="flex min-w-0 flex-1 items-center gap-3 rounded-control text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       >
+        {/* No aria-label: the row's text (name, day, amount, paused) is what a screen reader reads. */}
+        <span className="sr-only">{t('editHint')}</span>
         <EntityIcon id={look.id} color={look.color} icon={look.icon} size="m" />
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">

@@ -167,4 +167,14 @@ describe('RecurringPage', () => {
     renderWithProviders(<RecurringPage spaceId="s1" />);
     expect(await screen.findByRole('button', { name: 'Спробувати ще раз' })).toBeInTheDocument();
   });
+
+  it('tells screen readers the whole row, not only "edit"', async () => {
+    serve();
+    renderWithProviders(<RecurringPage spaceId="s1" />);
+    const row = await screen.findByRole('button', {
+      name: /Редагувати.*Netflix.*щомісяця, 15-го.*-249,00/,
+    });
+    expect(row).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Спортзал.*На паузі/ })).toBeInTheDocument();
+  });
 });
