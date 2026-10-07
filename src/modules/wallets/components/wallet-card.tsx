@@ -36,24 +36,27 @@ export function WalletCard({ wallet, withAction }: { wallet: WalletView; withAct
   );
 }
 
-/** Mobile icon-only wallet (Figma 10:177); a negative balance shows as a red ring. */
+/**
+ * Mobile wallet: the circle with its name and balance underneath (user request over Figma 10:177's
+ * icon-only circle — the balance must be visible without dragging). Negative balances in red.
+ */
 export function WalletCircle({ wallet }: { wallet: WalletView }) {
   const locale = useLocale();
   const negative = isNegative(wallet.balance);
   return (
-    <span
-      className={cn(
-        'inline-flex rounded-full',
-        negative && 'ring-2 ring-destructive ring-offset-2 ring-offset-background',
-      )}
-    >
-      <EntityIcon
-        id={wallet.id}
-        color={wallet.color}
-        icon={wallet.icon}
-        size="l"
-        label={`${wallet.name}: ${formatMoney(wallet.balance, wallet.currency, locale)}`}
-      />
+    <span className="flex w-20 flex-col items-center gap-1 text-center">
+      <EntityIcon id={wallet.id} color={wallet.color} icon={wallet.icon} size="l" />
+      <span className="w-full truncate text-caption font-medium text-foreground">
+        {wallet.name}
+      </span>
+      <span
+        className={cn(
+          'w-full truncate text-caption tabular-nums',
+          negative ? 'text-destructive' : 'text-muted-foreground',
+        )}
+      >
+        {formatMoney(wallet.balance, wallet.currency, locale)}
+      </span>
     </span>
   );
 }
