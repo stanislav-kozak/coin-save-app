@@ -60,7 +60,8 @@ describe('RecentExpenses', () => {
     expect(screen.getByText(/-340,00\s₴/)).toBeInTheDocument();
     expect(screen.getByText(/\+15\s000,00\s₴/)).toHaveClass('text-success');
     expect(screen.getByText(/-5,00\s(USD|\$)/)).toBeInTheDocument();
-    expect(screen.getAllByText('Без категорії')).toHaveLength(2);
+    expect(screen.getAllByText('Без категорії')).toHaveLength(1);
+    expect(screen.getByText('Дохід')).toBeInTheDocument(); // uncategorized income
     expect(screen.getByText('Сьогодні')).toBeInTheDocument();
   });
 
