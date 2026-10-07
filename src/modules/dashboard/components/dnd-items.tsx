@@ -1,6 +1,9 @@
 'use client';
 
-import { useDraggable, useDroppable } from '@dnd-kit/core';
+import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import type { DragHandleProps } from '@/modules/categories';
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { categoryDndId, walletDndId } from '../lib/resolve-drop';
@@ -36,26 +39,44 @@ export function DraggableWallet({
   );
 }
 
-/** Category card/circle you can drop on (design system §5 "accent border + highlighted fill"). */
-export function DroppableCategory({
+/**
+ * A category: a drop target for wallets (design system §5 "accent border + highlighted fill") and a
+ * sortable item (spec §6.4). Only the handle it passes to `children` starts a reorder — the grip on the
+ * desktop card, the circle itself on mobile (long-press; a tap still edits).
+ */
+export function SortableCategory({
   id,
   isCard,
   children,
 }: {
   id: string;
   isCard: boolean;
-  children: ReactNode;
+  children: (handle: DragHandleProps) => ReactNode;
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id: categoryDndId(id) });
+  const {
+    setNodeRef,
+    setActivatorNodeRef,
+    listeners,
+    attributes,
+    transform,
+    transition,
+    isDragging,
+    isOver,
+    active,
+  } = useSortable({ id: categoryDndId(id) });
+  const walletOver = isOver && String(active?.id).startsWith('wallet:');
   return (
     <div
       ref={setNodeRef}
+      // Position while sorting is data from dnd-kit, like the progress width.
+      style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
         isCard ? 'rounded-card' : 'rounded-full',
-        isOver && 'bg-primary/5 ring-2 ring-primary',
+        walletOver && 'bg-primary/5 ring-2 ring-primary',
+        isDragging && 'opacity-40',
       )}
     >
-      {children}
+      {children({ ref: setActivatorNodeRef, ...listeners, ...attributes })}
     </div>
   );
 }

@@ -73,3 +73,41 @@ export function useDeleteCategory(spaceId: string) {
     onSuccess: invalidate,
   });
 }
+
+type Category = components['schemas']['CategoryResponseDto'];
+
+/**
+ * Spec §6.4: `orderedIds` lists every active category. Shown at once; a refusal restores the previous
+ * order (one drag at a time, so the whole snapshot is safe to put back).
+ */
+export function useReorderCategories(spaceId: string) {
+  const queryClient = useQueryClient();
+  const key = ['categories', spaceId];
+  return useMutation({
+    mutationFn: async (orderedIds: string[]) => {
+      const { data, error } = await api.PATCH('/api/spaces/{spaceId}/categories/reorder', {
+        params: { path: { spaceId } },
+        body: { orderedIds },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onMutate: async (orderedIds) => {
+      await queryClient.cancelQueries({ queryKey: key, exact: true });
+      const previous = queryClient.getQueryData<Category[]>(key);
+      queryClient.setQueryData<Category[]>(key, (list) => {
+        if (!list) return list;
+        const byId = new Map(list.map((c) => [c.id, c]));
+        return orderedIds.flatMap((id, sortOrder) => {
+          const c = byId.get(id);
+          return c ? [{ ...c, sortOrder }] : [];
+        });
+      });
+      return { previous };
+    },
+    onError: (_error, _ids, context) => {
+      if (context?.previous) queryClient.setQueryData(key, context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['categories', spaceId] }),
+  });
+}

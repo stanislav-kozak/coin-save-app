@@ -7,18 +7,27 @@ import { addMoney, percentOf } from '@/shared/lib/money';
 import { SectionError } from '@/shared/ui/section-error';
 import { useCategories, useMonthAnalytics } from '../api/categories-queries';
 import { pendingByCategory, type PendingSpend } from '../lib/pending-spends';
-import { CategoryCard, CategoryCircle, type CategoryView } from './category-card';
+import {
+  CategoryCard,
+  CategoryCircle,
+  type CategoryView,
+  type DragHandleProps,
+} from './category-card';
 import { CategoryDialog } from './category-dialog';
 
 type Props = {
   spaceId: string;
   /** Lets the dashboard make each category a drop target; `isCard` distinguishes card vs circle. */
-  wrap?: (categoryId: string, node: ReactNode, isCard: boolean) => ReactNode;
+  wrap?: (
+    categoryId: string,
+    render: (handle?: DragHandleProps) => ReactNode,
+    isCard: boolean,
+  ) => ReactNode;
   /** Expenses sent but not yet in analytics — shown at once (spec §6.9), replaced by server data. */
   pending?: PendingSpend[];
 };
 
-export function CategoriesGrid({ spaceId, wrap = (_id, node) => node, pending = [] }: Props) {
+export function CategoriesGrid({ spaceId, wrap = (_id, render) => render(), pending = [] }: Props) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('categories.manage');
   // null: closed; 'new': creating; a category: editing it.
@@ -67,7 +76,13 @@ export function CategoriesGrid({ spaceId, wrap = (_id, node) => node, pending = 
           <li key={item.category.id} className="flex justify-center">
             {wrap(
               item.category.id,
-              <CategoryCircle {...item} onEdit={() => setEditing(item.category)} />,
+              (handle) => (
+                <CategoryCircle
+                  {...item}
+                  handle={handle}
+                  onEdit={() => setEditing(item.category)}
+                />
+              ),
               false,
             )}
           </li>
@@ -78,7 +93,9 @@ export function CategoriesGrid({ spaceId, wrap = (_id, node) => node, pending = 
           <div key={item.category.id}>
             {wrap(
               item.category.id,
-              <CategoryCard {...item} onEdit={() => setEditing(item.category)} />,
+              (handle) => (
+                <CategoryCard {...item} handle={handle} onEdit={() => setEditing(item.category)} />
+              ),
               true,
             )}
           </div>

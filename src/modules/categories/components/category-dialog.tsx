@@ -62,7 +62,6 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
     CategoryFormValues
   >({ resolver: zodResolver(categoryFormSchema), defaultValues: defaults() });
 
-
   const errors = formState.errors;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
   const icons =

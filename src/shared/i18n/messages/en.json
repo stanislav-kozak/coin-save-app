@@ -276,12 +276,15 @@
     "label": "Navigation"
   },
   "dnd": {
-    "instructions": "To drag a wallet, press space, move with the arrow keys to a category and press space again",
+    "instructions": "To drag a wallet or a category, press space, move with the arrow keys and press space again: a wallet on a category adds an expense, a category moves to its new place",
     "start": "Picked up wallet {wallet}",
     "over": "{wallet} over category {category}",
     "outside": "Not over a category",
     "dropped": "Dropped on {category}",
-    "cancelled": "Dragging cancelled"
+    "cancelled": "Dragging cancelled",
+    "reorderStart": "Moving category {category}",
+    "reorderOver": "{category} over {target}",
+    "reorderDropped": "{category} moved"
   },
   "colors": {
     "blue": "Blue",
