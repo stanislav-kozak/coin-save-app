@@ -70,7 +70,7 @@ export function useCreateExpense(spaceId: string) {
         amount: String(draft.amount),
         walletCurrency: wallet?.currency ?? '',
         note: draft.note ?? null,
-        occurredAt: new Date().toISOString(),
+        occurredAt: (draft.occurredAt ?? new Date()).toISOString(),
       } as unknown as Expense;
       const today = dayKey(new Date());
       const lists = queryClient
