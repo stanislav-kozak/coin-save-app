@@ -1,5 +1,6 @@
 'use client';
 
+import { Check } from 'lucide-react';
 import { DropdownMenu as Primitive } from 'radix-ui';
 import type { ComponentProps } from 'react';
 import { cn } from '@/shared/lib/utils';
@@ -52,4 +53,36 @@ export function DropdownMenuSeparator({
   ...props
 }: ComponentProps<typeof Primitive.Separator>) {
   return <Primitive.Separator className={cn('my-2 h-px bg-border', className)} {...props} />;
+}
+
+/** A menu item with a check box (multi-select filters); keeps the menu open on toggle by default. */
+export function DropdownMenuCheckboxItem({
+  className,
+  children,
+  onSelect,
+  ...props
+}: ComponentProps<typeof Primitive.CheckboxItem>) {
+  return (
+    <Primitive.CheckboxItem
+      className={cn(
+        'flex cursor-pointer items-center gap-3 rounded-control px-2 py-2 text-body outline-none select-none data-[highlighted]:bg-accent',
+        className,
+      )}
+      onSelect={(e) => {
+        e.preventDefault(); // stay open: several wallets are picked in a row
+        onSelect?.(e);
+      }}
+      {...props}
+    >
+      <span
+        aria-hidden
+        className="flex size-4 items-center justify-center rounded-sm border border-border"
+      >
+        <Primitive.ItemIndicator>
+          <Check className="size-3" />
+        </Primitive.ItemIndicator>
+      </span>
+      {children}
+    </Primitive.CheckboxItem>
+  );
 }

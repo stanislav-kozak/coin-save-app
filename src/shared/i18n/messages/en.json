@@ -441,5 +441,23 @@
       "endBeforeStart": "The end date must be after the first payment"
     },
     "editHint": "Edit:"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "period": {
+      "label": "Period",
+      "week": "Week",
+      "month": "Month",
+      "quarter": "Quarter",
+      "year": "Year",
+      "previous": "Previous period",
+      "next": "Next period",
+      "quarterLabel": "Q{n} {year}"
+    },
+    "wallets": {
+      "all": "All wallets",
+      "some": "{count} wallets",
+      "archived": "(archived)"
+    }
   }
 }
