@@ -1,12 +1,12 @@
-import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
+import { AnalyticsPage } from '@/modules/analytics';
 
-// Placeholder until this section's task.
-export default function Page() {
-  const t = useTranslations();
+export default async function Page({ params }: PageProps<'/[locale]/s/[spaceId]/analytics'>) {
+  const { spaceId } = await params;
+  // The period lives in the URL's search params (read on the client).
   return (
-    <main className="px-4 py-8 md:px-16">
-      <h1 className="text-h1">{t('nav.analytics')}</h1>
-      <p className="mt-2 text-body text-muted-foreground">{t('dashboard.soon')}</p>
-    </main>
+    <Suspense>
+      <AnalyticsPage spaceId={spaceId} />
+    </Suspense>
   );
 }

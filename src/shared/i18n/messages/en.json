@@ -478,6 +478,16 @@
     },
     "limits": {
       "title": "Category limits"
-    }
+    },
+    "list": {
+      "title": "Records in the period",
+      "empty": "No records"
+    },
+    "csv": {
+      "export": "Export CSV",
+      "hint": "All records of the period, regardless of the wallet filter"
+    },
+    "emptyTitle": "No records in this period",
+    "emptyText": "Pick another period or add an expense on the main screen"
   }
 }

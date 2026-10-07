@@ -7,3 +7,5 @@ export {
   useExpenseLauncher,
 } from './components/expense-launcher';
 export { RecentExpenses } from './components/recent-expenses';
+export { ExpenseRow } from './components/expense-row';
+export { groupByDay } from './lib/group-by-day';
