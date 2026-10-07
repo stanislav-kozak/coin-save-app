@@ -5,6 +5,7 @@ import {
   isNegative,
   multiplyMoney,
   percentOf,
+  splitPercent,
   subtractMoney,
 } from './money';
 
@@ -49,5 +50,12 @@ describe('money', () => {
     expect(percentOf('1', '3')).toBe(33);
     expect(percentOf('2', '3')).toBe(67);
     expect(percentOf('5', '0')).toBe(0);
+  });
+
+  it('splits a total into whole percents that add up to exactly 100', () => {
+    expect(splitPercent(['1', '1', '1'])).toEqual([34, 33, 33]);
+    expect(splitPercent(['400', '200', '150', '120', '80', '50'])).toEqual([40, 20, 15, 12, 8, 5]);
+    expect(splitPercent(['0.01', '999.99'])).toEqual([0, 100]);
+    expect(splitPercent(['0', '0'])).toEqual([0, 0]);
   });
 });

@@ -889,12 +889,14 @@ export interface components {
             updatedAt: string;
         };
         UpdateExpenseDto: {
+            /** @description Omit to keep; null makes the expense uncategorized */
+            categoryId?: string | null;
             /** @example 12.5 */
             amount?: number;
+            /** @description Omit to keep; null removes the note */
+            note?: string | null;
             walletId?: string;
-            categoryId?: string;
             occurredAt?: string;
-            note?: string;
         };
         CreateRecurringTransactionDto: {
             /** @example 12.5 */

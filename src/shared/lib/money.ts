@@ -41,6 +41,30 @@ export function percentOf(spent: string, limit: string): number {
   return Number(roundDiv(toMinor(spent) * BigInt(100), l));
 }
 
+/**
+ * Whole-percent shares of the total that add up to exactly 100 (largest remainder; ties go to the
+ * earlier item). All zero when the total is zero.
+ */
+export function splitPercent(values: string[]): number[] {
+  const minors = values.map(toMinor);
+  const total = minors.reduce((a, b) => a + b, ZERO);
+  if (total <= ZERO) return values.map(() => 0);
+  const hundred = BigInt(100);
+  const floors = minors.map((v) => (v * hundred) / total);
+  const remainders = minors.map((v) => (v * hundred) % total);
+  let left = 100 - floors.reduce((a, b) => a + Number(b), 0);
+  const order = remainders
+    .map((r, i) => [r, i] as const)
+    .sort((a, b) => (a[0] === b[0] ? a[1] - b[1] : a[0] > b[0] ? -1 : 1));
+  const out = floors.map(Number);
+  for (const [, i] of order) {
+    if (left <= 0) break;
+    out[i]! += 1;
+    left -= 1;
+  }
+  return out;
+}
+
 /** n / d rounded half away from zero (d > 0). */
 function roundDiv(n: bigint, d: bigint): bigint {
   const half = d / BigInt(2);
