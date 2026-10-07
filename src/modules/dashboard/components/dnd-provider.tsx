@@ -12,6 +12,7 @@ import {
 } from '@dnd-kit/core';
 import { useTranslations } from 'next-intl';
 import { useId, useState, type ReactNode } from 'react';
+import { dropCollision } from '../lib/drop-collision';
 import { keyboardCoordinates } from '../lib/keyboard-coordinates';
 import { resolveDrop } from '../lib/resolve-drop';
 
@@ -63,6 +64,7 @@ export function DndProvider({ children, renderGhost, onDrop, onReorder, nameOf }
     <DndContext
       id={id}
       sensors={sensors}
+      collisionDetection={dropCollision}
       accessibility={{
         announcements,
         screenReaderInstructions: { draggable: t('instructions') },
