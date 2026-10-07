@@ -185,7 +185,8 @@
       "namePlaceholder": "Наприклад, Monobank",
       "currency": "Валюта",
       "initialBalance": "Початковий баланс",
-      "submit": "Додати"
+      "submit": "Додати",
+      "color": "Колір"
     },
     "validation": {
       "nameRequired": "Введіть назву",
@@ -240,5 +241,15 @@
     "outside": "Поза категоріями",
     "dropped": "Відпущено на {category}",
     "cancelled": "Перетягування скасовано"
+  },
+  "colors": {
+    "blue": "Синій",
+    "teal": "Бірюзовий",
+    "amber": "Бурштиновий",
+    "violet": "Фіолетовий",
+    "emerald": "Смарагдовий",
+    "indigo": "Індиго",
+    "pink": "Рожевий",
+    "slate": "Сірий"
   }
 }

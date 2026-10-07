@@ -185,7 +185,8 @@
       "namePlaceholder": "For example, Monobank",
       "currency": "Currency",
       "initialBalance": "Starting balance",
-      "submit": "Add"
+      "submit": "Add",
+      "color": "Color"
     },
     "validation": {
       "nameRequired": "Enter a name",
@@ -240,5 +241,15 @@
     "outside": "Not over a category",
     "dropped": "Dropped on {category}",
     "cancelled": "Dragging cancelled"
+  },
+  "colors": {
+    "blue": "Blue",
+    "teal": "Teal",
+    "amber": "Amber",
+    "violet": "Violet",
+    "emerald": "Emerald",
+    "indigo": "Indigo",
+    "pink": "Pink",
+    "slate": "Slate"
   }
 }

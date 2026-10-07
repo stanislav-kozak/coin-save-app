@@ -2,19 +2,22 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocale, useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import {
   DEFAULT_CURRENCY,
   SUPPORTED_CURRENCIES,
   currencyLabel,
 } from '@/shared/constants/currencies';
+import { firstUnusedColor } from '@/shared/constants/entity-colors';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
+import { ColorPicker } from '@/shared/ui/color-picker';
 import { Dialog, DialogContent } from '@/shared/ui/dialog';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
-import { useCreateWallet } from '../api/wallets-queries';
+import { useCreateWallet, useWallets } from '../api/wallets-queries';
 import { createWalletSchema, type CreateWalletValues } from '../schemas';
 
 type ValidationKey = 'nameRequired' | 'nameTooLong' | 'amountInvalid' | 'amountTooLarge';
@@ -25,14 +28,27 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
   const te = useTranslations('errors');
   const locale = useLocale();
   const create = useCreateWallet(spaceId);
-  const { register, handleSubmit, formState, reset } = useForm<
+  const wallets = useWallets(spaceId);
+  const defaultColor = firstUnusedColor(wallets.data?.map((w) => w.color) ?? []);
+  const { register, handleSubmit, formState, reset, control } = useForm<
     z.input<typeof createWalletSchema>,
     unknown,
     CreateWalletValues
   >({
     resolver: zodResolver(createWalletSchema),
-    defaultValues: { name: '', currency: DEFAULT_CURRENCY, initialBalance: '' },
+    defaultValues: {
+      name: '',
+      currency: DEFAULT_CURRENCY,
+      initialBalance: '',
+      color: defaultColor,
+    },
   });
+
+  // Each opening starts clean, with a color no wallet has yet (wallets may load after mount).
+  useEffect(() => {
+    if (open)
+      reset({ name: '', currency: DEFAULT_CURRENCY, initialBalance: '', color: defaultColor });
+  }, [open, defaultColor, reset]);
   const errors = formState.errors;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 
@@ -75,6 +91,18 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
               ))}
             </select>
           </FormField>
+          <Controller
+            control={control}
+            name="color"
+            render={({ field }) => (
+              <ColorPicker
+                id="wallet-color"
+                label={t('create.color')}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
           <FormField
             id="wallet-balance"
             label={t('create.initialBalance')}

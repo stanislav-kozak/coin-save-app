@@ -29,6 +29,9 @@
   --palette-amber: #f59e0b;
   --palette-violet: #8b5cf6;
   --palette-emerald: #10b981;
+  --palette-indigo: #6366f1;
+  --palette-pink: #ec4999;
+  --palette-slate: #64748b;
 }
 
 .dark {
@@ -75,6 +78,9 @@
   --color-palette-amber: var(--palette-amber);
   --color-palette-violet: var(--palette-violet);
   --color-palette-emerald: var(--palette-emerald);
+  --color-palette-indigo: var(--palette-indigo);
+  --color-palette-pink: var(--palette-pink);
+  --color-palette-slate: var(--palette-slate);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
