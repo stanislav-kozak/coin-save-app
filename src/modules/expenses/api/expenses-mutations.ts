@@ -6,7 +6,11 @@ import { dayKey } from '@/shared/lib/periods';
 import type { ExpenseDraft } from '../schemas';
 
 /** An expense (default) or an income (spec §6.3: no category, raises the balance). */
-export type TransactionDraft = ExpenseDraft & { type?: 'EXPENSE' | 'INCOME' };
+export type TransactionDraft = ExpenseDraft & {
+  type?: 'EXPENSE' | 'INCOME';
+  /** When it happened; now by default. */
+  occurredAt?: Date;
+};
 
 /** The balance change a transaction makes: income adds, expense subtracts; `undo` reverses it. */
 function applyToBalance(balance: string, draft: TransactionDraft, undo = false): string {
@@ -31,10 +35,14 @@ export function useCreateExpense(spaceId: string) {
   const expensesKey = ['expenses', spaceId];
 
   return useMutation({
-    mutationFn: async ({ type = 'EXPENSE', ...draft }: TransactionDraft) => {
+    mutationFn: async ({
+      type = 'EXPENSE',
+      occurredAt = new Date(),
+      ...draft
+    }: TransactionDraft) => {
       const { data, error } = await api.POST('/api/spaces/{spaceId}/expenses', {
         params: { path: { spaceId } },
-        body: { ...draft, type, occurredAt: new Date().toISOString() },
+        body: { ...draft, type, occurredAt: occurredAt.toISOString() },
       });
       if (error) throw error;
       return data;
