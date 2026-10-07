@@ -165,4 +165,36 @@ describe('Settings — space management', () => {
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
+
+  it('shows a retry instead of an endless skeleton when a section fails to load', async () => {
+    serve('OWNER');
+    const base = api.GET.getMockImplementation()!;
+    api.GET.mockImplementation(async (path: string, ...rest: unknown[]) =>
+      path.endsWith('/members')
+        ? { error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } }
+        : base(path, ...rest),
+    );
+    renderWithProviders(<SettingsPage spaceId="sp1" />);
+    expect(
+      await within(section('Учасники')).findByRole('button', { name: 'Спробувати ще раз' }),
+    ).toBeInTheDocument();
+  });
+
+  it('says why revoking an invitation failed', async () => {
+    serve('OWNER');
+    api.DELETE.mockResolvedValue({
+      error: { statusCode: 404, code: 'INVITATION_NOT_FOUND', message: 'x' },
+    });
+    renderWithProviders(<SettingsPage spaceId="sp1" />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Відкликати: olek@x.y' }));
+    expect(await within(section('Учасники')).findByRole('alert')).toBeInTheDocument();
+  });
+
+  it('names the language and theme choices for screen readers', async () => {
+    serve('OWNER');
+    renderWithProviders(<SettingsPage spaceId="sp1" />);
+    expect(await screen.findByRole('radiogroup', { name: 'Мова інтерфейсу' })).toBeInTheDocument();
+    expect(screen.getByRole('radiogroup', { name: 'Тема' })).toBeInTheDocument();
+  });
 });

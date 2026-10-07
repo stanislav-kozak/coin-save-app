@@ -116,4 +116,18 @@ describe('SettingsPage', () => {
     await user.click(within(ws).getByRole('button', { name: 'Редагувати: Mono' }));
     expect(await screen.findByRole('dialog', { name: 'Гаманець' })).toBeInTheDocument();
   });
+
+  it('says why restoring failed', async () => {
+    patch.mockResolvedValue({
+      error: { statusCode: 404, code: 'CATEGORY_NOT_FOUND', message: 'x' },
+    });
+    renderWithProviders(<SettingsPage spaceId="sp1" />);
+    const cats = (
+      await screen.findByRole('heading', { level: 2, name: 'Архівовані категорії' })
+    ).closest('section')!;
+    await userEvent
+      .setup()
+      .click(await within(cats).findByRole('button', { name: 'Відновити: Спорт' }));
+    expect(await within(cats).findByRole('alert')).toBeInTheDocument();
+  });
 });

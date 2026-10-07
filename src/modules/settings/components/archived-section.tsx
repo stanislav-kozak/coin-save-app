@@ -12,6 +12,8 @@ import {
 } from '@/modules/wallets';
 import { Button } from '@/shared/ui/button';
 import { EntityIcon } from '@/shared/ui/entity-icon';
+import { getErrorCode } from '@/shared/lib/api-error';
+import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { SettingsSection } from './settings-section';
 
@@ -27,6 +29,15 @@ function Row({ item, muted, children }: { item: Item; muted?: boolean; children:
       {children}
     </li>
   );
+}
+
+function MutationError({ error }: { error: unknown }) {
+  const te = useTranslations('errors');
+  return error ? (
+    <p role="alert" className="text-caption text-destructive">
+      {te(getErrorCode(error))}
+    </p>
+  ) : null;
 }
 
 function Loading() {
@@ -54,7 +65,9 @@ export function WalletsSection({ spaceId }: { spaceId: string }) {
 
   return (
     <SettingsSection id="wallets" title={t('title')}>
-      {!wallets.data ? (
+      {wallets.isError && !wallets.isFetching ? (
+        <SectionError error={wallets.error} onRetry={() => void wallets.refetch()} />
+      ) : !wallets.data ? (
         <Loading />
       ) : (
         <>
@@ -99,6 +112,7 @@ export function WalletsSection({ spaceId }: { spaceId: string }) {
           ) : null}
         </>
       )}
+      <MutationError error={restore.error} />
       {editing ? (
         <WalletDialog
           key={editing.id}
@@ -122,7 +136,9 @@ export function ArchivedCategoriesSection({ spaceId }: { spaceId: string }) {
 
   return (
     <SettingsSection id="archived-categories" title={t('title')}>
-      {!categories.data ? (
+      {categories.isError && !categories.isFetching ? (
+        <SectionError error={categories.error} onRetry={() => void categories.refetch()} />
+      ) : !categories.data ? (
         <Loading />
       ) : archived.length === 0 ? (
         <p className="text-body text-muted-foreground">{t('none')}</p>
@@ -143,6 +159,7 @@ export function ArchivedCategoriesSection({ spaceId }: { spaceId: string }) {
           ))}
         </ul>
       )}
+      <MutationError error={restore.error} />
     </SettingsSection>
   );
 }

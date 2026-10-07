@@ -5,12 +5,13 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
-import { useSpace, useUpdateSpace } from '@/modules/spaces';
+import { useSpace, useSpaces, useUpdateSpace } from '@/modules/spaces';
 import { SUPPORTED_CURRENCIES, currencyLabel } from '@/shared/constants/currencies';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
+import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useMyRole } from '../lib/use-my-role';
 import { SettingsSection } from './settings-section';
@@ -28,10 +29,20 @@ export function SpaceSection({ spaceId }: { spaceId: string }) {
   const t = useTranslations('settings.space');
   const tc = useTranslations('common');
   const space = useSpace(spaceId);
+  const spaces = useSpaces();
   const role = useMyRole(spaceId);
+  const failed = (space.isError && !space.isFetching) || (spaces.isError && !spaces.isFetching);
   return (
     <SettingsSection id="space" title={t('title')}>
-      {!space.data || !role ? (
+      {failed ? (
+        <SectionError
+          error={space.error ?? spaces.error}
+          onRetry={() => {
+            if (space.isError) void space.refetch();
+            if (spaces.isError) void spaces.refetch();
+          }}
+        />
+      ) : !space.data || !role ? (
         <LoadingRegion label={tc('loading')} className="flex flex-col gap-3">
           <Skeleton className="h-10" />
           <Skeleton className="h-10" />

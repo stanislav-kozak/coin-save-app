@@ -19,6 +19,7 @@ import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
+import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { ConfirmDialog } from './confirm-dialog';
 import { useMyRole } from '../lib/use-my-role';
@@ -59,6 +60,7 @@ function initialsOf(name: string | null, email: string) {
 export function MembersSection({ spaceId }: { spaceId: string }) {
   const t = useTranslations('settings.members');
   const tc = useTranslations('common');
+  const te = useTranslations('errors');
   const locale = useLocale();
   const me = useCurrentUser();
   const members = useMembers(spaceId);
@@ -70,7 +72,9 @@ export function MembersSection({ spaceId }: { spaceId: string }) {
 
   return (
     <SettingsSection id="members" title={t('title')}>
-      {!members.data ? (
+      {members.isError && !members.isFetching ? (
+        <SectionError error={members.error} onRetry={() => void members.refetch()} />
+      ) : !members.data ? (
         <LoadingRegion label={tc('loading')} className="flex flex-col gap-3">
           <Skeleton className="h-10" />
           <Skeleton className="h-10" />
@@ -143,6 +147,12 @@ export function MembersSection({ spaceId }: { spaceId: string }) {
             ))}
           </ul>
         </div>
+      ) : null}
+
+      {revoke.error ? (
+        <p role="alert" className="text-caption text-destructive">
+          {te(getErrorCode(revoke.error))}
+        </p>
       ) : null}
 
       <InviteForm spaceId={spaceId} />

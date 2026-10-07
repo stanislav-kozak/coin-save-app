@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { cn } from '@/shared/lib/utils';
 
 type Option = { value: string; label: string };
@@ -16,12 +17,13 @@ export function PillGroup({
   value: string | undefined;
   onChange: (value: string) => void;
 }) {
+  const labelId = useId(); // labels contain spaces, so they can't double as ids
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <span id={`pills-${label}`} className="text-body text-foreground">
+      <span id={labelId} className="text-body text-foreground">
         {label}
       </span>
-      <div role="radiogroup" aria-labelledby={`pills-${label}`} className="flex gap-2">
+      <div role="radiogroup" aria-labelledby={labelId} className="flex gap-2">
         {options.map((o) => {
           const checked = o.value === value;
           return (
