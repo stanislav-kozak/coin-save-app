@@ -1,13 +1,18 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { SectionError } from '@/shared/ui/section-error';
 import { useWallets } from '../api/wallets-queries';
 import { WalletCard, WalletCircle } from './wallet-card';
+import { WalletDialog, type EditableWallet } from './wallet-dialog';
+
+const ACTION =
+  'flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50';
 
 type Props = {
   spaceId: string;
@@ -24,6 +29,9 @@ type Props = {
 export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
   const t = useTranslations('wallets');
   const ti = useTranslations('expenses.income');
+  const tc = useTranslations('common');
+  const tw = useTranslations('wallets.edit');
+  const [editing, setEditing] = useState<EditableWallet | null>(null);
   const td = useTranslations('dashboard');
   const wallets = useWallets(spaceId);
   if (wallets.isError && !wallets.isFetching) {
@@ -36,7 +44,25 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
       </section>
     );
   }
-  if (!wallets.data) return null;
+  if (!wallets.data) {
+    return (
+      <section aria-labelledby="wallets-title" className="flex flex-col gap-4">
+        <h2 id="wallets-title" className="text-h2">
+          {td('wallets')}
+        </h2>
+        <LoadingRegion label={tc('loading')}>
+          <div className="flex gap-4 p-1 md:hidden">
+            <Skeleton shape="circle" className="size-12" />
+            <Skeleton shape="circle" className="size-12" />
+          </div>
+          <div className="hidden flex-col gap-3 md:flex">
+            <Skeleton shape="card" className="h-20" />
+            <Skeleton shape="card" className="h-20" />
+          </div>
+        </LoadingRegion>
+      </section>
+    );
+  }
 
   const addButton = (
     <Button variant="secondary" size="s" className="w-full" onClick={onAdd}>
@@ -94,21 +120,31 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
             {wallets.data.map((w) => (
               <li key={w.id} className="relative">
                 {wrap ? (
-                  wrap(w.id, <WalletCard wallet={w} withAction={!!onAddIncome} />, true)
+                  wrap(w.id, <WalletCard wallet={w} withAction />, true)
                 ) : (
-                  <WalletCard wallet={w} withAction={!!onAddIncome} />
+                  <WalletCard wallet={w} withAction />
                 )}
-                {onAddIncome ? (
-                  // A sibling of the (draggable) card, not inside it: no nested interactive elements.
+                {/* Siblings of the (draggable) card, not inside it: no nested interactive elements. */}
+                <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center">
                   <button
                     type="button"
-                    aria-label={ti('addFor', { name: w.name })}
-                    onClick={() => onAddIncome(w.id)}
-                    className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                    aria-label={tw('edit', { name: w.name })}
+                    onClick={() => setEditing(w)}
+                    className={ACTION}
                   >
-                    <Plus aria-hidden className="size-4" />
+                    <Pencil aria-hidden className="size-4" />
                   </button>
-                ) : null}
+                  {onAddIncome ? (
+                    <button
+                      type="button"
+                      aria-label={ti('addFor', { name: w.name })}
+                      onClick={() => onAddIncome(w.id)}
+                      className={ACTION}
+                    >
+                      <Plus aria-hidden className="size-4" />
+                    </button>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>
@@ -122,6 +158,15 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
           </button>
         </>
       )}
+      {editing ? (
+        <WalletDialog
+          key={editing.id}
+          spaceId={spaceId}
+          wallet={editing}
+          open
+          onOpenChange={(open) => !open && setEditing(null)}
+        />
+      ) : null}
     </section>
   );
 }

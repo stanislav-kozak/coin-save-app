@@ -71,4 +71,17 @@ describe('CategoriesGrid', () => {
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
     expect((await screen.findAllByText(/88,00\s₴ \/ 60,00\s₴ · 147%/)).length).toBeGreaterThan(0);
   });
+
+  it('renders categories in the given order without waiting for the cache', async () => {
+    renderWithProviders(<CategoriesGrid spaceId="sp1" order={['c2', 'c1']} />);
+    const names = (await screen.findAllByRole('heading', { level: 3 })).map((h) => h.textContent);
+    expect(names.slice(0, 2)).toEqual(['Таксі', 'Кафе']);
+  });
+
+  it('shows a skeleton while categories load', () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(<CategoriesGrid spaceId="sp1" />);
+    const region = screen.getByText('Завантаження…').closest('[aria-busy="true"]')!;
+    expect(region.querySelectorAll('[data-skeleton="card"]')).toHaveLength(6);
+  });
 });

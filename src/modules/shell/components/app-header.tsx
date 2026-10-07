@@ -13,7 +13,7 @@ export function AppHeader({ spaceId }: { spaceId: string }) {
           <ThemeButton />
           <LocaleSwitcher />
         </div>
-        <UserMenu />
+        <UserMenu spaceId={spaceId} />
       </div>
     </header>
   );

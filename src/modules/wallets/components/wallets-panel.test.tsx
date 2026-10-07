@@ -75,4 +75,30 @@ describe('WalletsPanel', () => {
     await userEvent.setup().keyboard('{Enter}');
     expect(onAddIncome).toHaveBeenCalledWith('w1');
   });
+
+  it('shows a skeleton while wallets load, not a blank space', () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
+    const region = screen.getByText('Завантаження…').closest('[aria-busy="true"]')!;
+    expect(region.querySelectorAll('[data-skeleton="card"]')).toHaveLength(2);
+    expect(region.querySelectorAll('[data-skeleton="circle"]')).toHaveLength(2);
+  });
+
+  it('replaces the skeleton with the error when wallets fail', async () => {
+    get.mockResolvedValue({ error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } });
+    renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
+    expect(await screen.findByRole('button', { name: 'Спробувати ще раз' })).toBeInTheDocument();
+    expect(screen.queryByText('Завантаження…')).toBeNull();
+  });
+
+  it('opens the wallet editor from the desktop card', async () => {
+    get.mockResolvedValue({
+      data: [
+        { id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', initialBalance: '0', color: null },
+      ],
+    });
+    renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Редагувати: Mono' }));
+    expect(await screen.findByRole('dialog', { name: 'Гаманець' })).toBeInTheDocument();
+  });
 });

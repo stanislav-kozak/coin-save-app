@@ -45,4 +45,14 @@ describe('SpaceRedirect', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Спробувати ще раз' }));
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/a'));
   });
+
+  it('resumes an invitation accepted before signing in', async () => {
+    localStorage.setItem('coinsave.pendingInvitation', 'tok 1');
+    get.mockResolvedValue({ data: [{ id: 'a' }] });
+    renderWithProviders(<SpaceRedirect />);
+    await vi.waitFor(() =>
+      expect(replace).toHaveBeenCalledWith('/invitations/accept?token=tok%201'),
+    );
+    expect(replace).not.toHaveBeenCalledWith('/s/a');
+  });
 });

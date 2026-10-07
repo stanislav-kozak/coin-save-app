@@ -3,7 +3,8 @@
     "appName": "CoinSave",
     "themeLight": "Light theme",
     "themeDark": "Dark theme",
-    "retry": "Try again"
+    "retry": "Try again",
+    "loading": "Loading…"
   },
   "styleguide": {
     "title": "Styleguide",
@@ -193,6 +194,17 @@
       "nameTooLong": "100 characters at most",
       "amountInvalid": "Enter an amount, e.g. 1250.50",
       "amountTooLarge": "Amount is too large"
+    },
+    "edit": {
+      "title": "Wallet",
+      "save": "Save",
+      "archive": "Archive",
+      "confirmArchive": "Archive “{name}”? It disappears from the main screen; its history stays.",
+      "archiveConfirm": "Archive wallet",
+      "cancel": "Cancel",
+      "edit": "Edit: {name}",
+      "restore": "Restore",
+      "restoreItem": "Restore: {name}"
     }
   },
   "categories": {
@@ -294,6 +306,81 @@
     "emerald": "Emerald",
     "indigo": "Indigo",
     "pink": "Pink",
-    "slate": "Slate"
+    "slate": "Slate",
+    "custom": "Custom color"
+  },
+  "settings": {
+    "title": "Settings",
+    "preferences": {
+      "title": "Language and theme",
+      "language": "Interface language",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "wallets": {
+      "title": "Wallets",
+      "none": "No wallets yet",
+      "archived": "Archived"
+    },
+    "categories": {
+      "title": "Archived categories",
+      "none": "No archived categories"
+    },
+    "close": "Close",
+    "cancel": "Cancel",
+    "space": {
+      "title": "Space",
+      "name": "Name",
+      "currency": "Primary currency",
+      "save": "Save changes",
+      "saved": "Saved",
+      "validation": {
+        "nameRequired": "Enter a space name",
+        "nameTooLong": "Up to 100 characters"
+      },
+      "confirmCurrencyTitle": "Change the primary currency?",
+      "confirmCurrency": "All analytics totals will be re-converted to {currency} at each expense's own day rate, and category limits at today's rate (rounded). This can take a few seconds.",
+      "currencyConfirm": "Change currency",
+      "converting": "Converting…"
+    },
+    "members": {
+      "title": "Members",
+      "you": "(you)",
+      "roles": {
+        "OWNER": "Owner",
+        "MEMBER": "Member"
+      },
+      "remove": "Remove: {name}",
+      "removeTitle": "Remove member",
+      "confirmRemove": "Remove {name} from the space? A new invitation brings them back.",
+      "removeConfirm": "Remove",
+      "invite": "Invite a member",
+      "send": "Send invitation",
+      "sent": "Invitation sent to {email}",
+      "emailInvalid": "Enter a valid email",
+      "pending": "Awaiting acceptance",
+      "expires": "until {date}",
+      "revoke": "Revoke: {email}"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "delete": "Delete space",
+      "deleteHint": "This cannot be undone",
+      "confirmDelete": "Delete “{name}” with all its wallets, categories and expenses? Type the space name to confirm.",
+      "typeName": "Space name",
+      "deleteConfirm": "Delete forever",
+      "leave": "Leave space",
+      "leaveHint": "You lose access until you're invited again",
+      "confirmLeave": "Leave “{name}”?",
+      "leaveConfirm": "Leave"
+    }
+  },
+  "invitations": {
+    "joining": "Accepting the invitation…",
+    "joinedTitle": "You've joined the space",
+    "open": "Open the space",
+    "failedTitle": "Couldn't accept the invitation",
+    "home": "Go home"
   }
 }

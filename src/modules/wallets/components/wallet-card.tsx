@@ -20,8 +20,8 @@ export function WalletCard({ wallet, withAction }: { wallet: WalletView; withAct
     <article
       className={cn(
         'flex items-center gap-3 rounded-card border border-border bg-card p-4 shadow-card',
-        // Room for the "+ income" button the panel lays over the card's right edge.
-        withAction && 'pr-12',
+        // Room for the panel's buttons (edit, + income) laid over the card's right edge.
+        withAction && 'pr-20',
       )}
     >
       <EntityIcon id={wallet.id} color={wallet.color} icon={wallet.icon} size="l" />

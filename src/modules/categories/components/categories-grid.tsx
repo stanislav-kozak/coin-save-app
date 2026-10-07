@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { addMoney, percentOf } from '@/shared/lib/money';
 import { SectionError } from '@/shared/ui/section-error';
+import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useCategories, useMonthAnalytics } from '../api/categories-queries';
 import { pendingByCategory, type PendingSpend } from '../lib/pending-spends';
 import {
@@ -25,11 +26,19 @@ type Props = {
   ) => ReactNode;
   /** Expenses sent but not yet in analytics — shown at once (spec §6.9), replaced by server data. */
   pending?: PendingSpend[];
+  /** An order to show right now (a just-dropped reorder), ahead of the cache catching up. */
+  order?: string[];
 };
 
-export function CategoriesGrid({ spaceId, wrap = (_id, render) => render(), pending = [] }: Props) {
+export function CategoriesGrid({
+  spaceId,
+  wrap = (_id, render) => render(),
+  pending = [],
+  order,
+}: Props) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('categories.manage');
+  const tl = useTranslations('common');
   // null: closed; 'new': creating; a category: editing it.
   const [editing, setEditing] = useState<CategoryView | 'new' | null>(null);
   const categories = useCategories(spaceId);
@@ -51,12 +60,39 @@ export function CategoriesGrid({ spaceId, wrap = (_id, render) => render(), pend
       </section>
     );
   }
-  if (!categories.data || !analytics.data) return null;
+  if (!categories.data || !analytics.data) {
+    return (
+      <section aria-labelledby="categories-title" className="flex flex-col gap-4">
+        <h2 id="categories-title" className="text-h2">
+          {t('categories')}
+        </h2>
+        <LoadingRegion label={tl('loading')}>
+          <div className="grid grid-cols-4 gap-4 md:hidden">
+            {Array.from({ length: 8 }, (_, i) => (
+              <Skeleton key={i} shape="circle" className="mx-auto size-12" />
+            ))}
+          </div>
+          <div className="hidden grid-cols-2 gap-4 md:grid">
+            {Array.from({ length: 6 }, (_, i) => (
+              <Skeleton key={i} shape="card" className="h-30" />
+            ))}
+          </div>
+        </LoadingRegion>
+      </section>
+    );
+  }
 
   const { currency } = analytics.data;
   const byId = new Map(analytics.data.byCategory.map((c) => [c.categoryId, c]));
   const extra = pendingByCategory(pending, analytics.data);
-  const items = categories.data.map((category) => {
+  const rank = (id: string) => {
+    const i = order?.indexOf(id) ?? -1;
+    return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+  };
+  const sorted = order
+    ? [...categories.data].sort((a, b) => rank(a.id) - rank(b.id)) // stable: unknown ids keep cache order
+    : categories.data;
+  const items = sorted.map((category) => {
     // Categories without spending this month are absent from analytics — show them at zero.
     const stats = byId.get(category.id);
     const added = extra.get(category.id);

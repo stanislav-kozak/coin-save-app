@@ -1,0 +1,50 @@
+'use client';
+
+import { useId } from 'react';
+import { cn } from '@/shared/lib/utils';
+
+type Option = { value: string; label: string };
+
+/** Figma's UA/EN and Світла/Темна pills: a single-choice radio group. */
+export function PillGroup({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: Option[];
+  value: string | undefined;
+  onChange: (value: string) => void;
+}) {
+  const labelId = useId(); // labels contain spaces, so they can't double as ids
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <span id={labelId} className="text-body text-foreground">
+        {label}
+      </span>
+      <div role="radiogroup" aria-labelledby={labelId} className="flex gap-2">
+        {options.map((o) => {
+          const checked = o.value === value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              role="radio"
+              aria-checked={checked}
+              onClick={() => onChange(o.value)}
+              className={cn(
+                'h-8 rounded-full border px-4 text-caption font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+                checked
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-card text-foreground',
+              )}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

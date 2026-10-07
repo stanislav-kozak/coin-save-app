@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useCurrentUser } from '@/modules/auth';
+import { Link } from '@/shared/i18n/navigation';
 import { api } from '@/shared/lib/api-client';
 import {
   DropdownMenu,
@@ -17,7 +18,8 @@ import { initials } from '../lib/initials';
 import { LocaleSwitcher } from './locale-switcher';
 import { ThemeButton } from './theme-button';
 
-export function UserMenu() {
+export function UserMenu({ spaceId }: { spaceId: string }) {
+  const tn = useTranslations('nav');
   const t = useTranslations('shell');
   const te = useTranslations('errors');
   const [logoutFailed, setLogoutFailed] = useState(false);
@@ -65,6 +67,9 @@ export function UserMenu() {
             <LocaleSwitcher />
           </div>
           <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href={`/s/${spaceId}/settings`}>{tn('settings')}</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => void logout()}>{t('logout')}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

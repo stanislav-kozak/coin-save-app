@@ -105,4 +105,11 @@ describe('RecentExpenses', () => {
     renderWithProviders(<RecentExpenses spaceId="sp1" />);
     expect(await screen.findByText('Витрат ще немає')).toBeInTheDocument();
   });
+
+  it('shows a skeleton while recent expenses load', () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(<RecentExpenses spaceId="sp1" />);
+    const region = screen.getByText('Завантаження…').closest('[aria-busy="true"]')!;
+    expect(region.querySelectorAll('[data-skeleton="row"]')).toHaveLength(4);
+  });
 });

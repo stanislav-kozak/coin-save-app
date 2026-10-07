@@ -111,3 +111,18 @@ export function useReorderCategories(spaceId: string) {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['categories', spaceId] }),
   });
 }
+
+export function useUnarchiveCategory(spaceId: string) {
+  const invalidate = useInvalidate(spaceId, { history: true });
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await api.PATCH(
+        '/api/spaces/{spaceId}/categories/{categoryId}/unarchive',
+        { params: { path: { spaceId, categoryId: id } } },
+      );
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: invalidate,
+  });
+}

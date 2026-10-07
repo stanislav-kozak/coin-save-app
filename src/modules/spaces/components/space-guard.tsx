@@ -6,12 +6,14 @@ import { useEffect, type ReactNode } from 'react';
 import { StatusPanel } from '@/modules/auth';
 import { Link } from '@/shared/i18n/navigation';
 import { Button } from '@/shared/ui/button';
+import { PageSkeleton } from '@/shared/ui/skeleton';
 import { useSpace } from '../api/spaces-queries';
 import { lastSpace } from '../lib/last-space';
 
 /** Renders a space's pages only when the user can open it; remembers it for the next landing. */
 export function SpaceGuard({ spaceId, children }: { spaceId: string; children: ReactNode }) {
   const t = useTranslations('spaces.unavailable');
+  const tc = useTranslations('common');
   const queryClient = useQueryClient();
   const space = useSpace(spaceId);
 
@@ -41,6 +43,6 @@ export function SpaceGuard({ spaceId, children }: { spaceId: string; children: R
       </main>
     );
   }
-  if (!space.data) return null;
+  if (!space.data) return <PageSkeleton label={tc('loading')} />;
   return <>{children}</>;
 }

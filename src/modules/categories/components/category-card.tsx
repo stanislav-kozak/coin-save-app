@@ -58,15 +58,16 @@ export function CategoryCard(props: Props) {
   const { status, caption, over, overLabel } = useCategoryCaption(props);
 
   return (
-    <article className="flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card">
+    <article className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card">
+      {status === 'over' && over ? (
+        // On the card's top edge, so the header keeps its whole width for the name.
+        <span className="absolute -top-3 right-4 rounded-full border border-destructive bg-card px-2 text-caption font-medium whitespace-nowrap text-destructive shadow-card">
+          {over} <span>{overLabel}</span>
+        </span>
+      ) : null}
       <header className="flex items-center gap-3">
         <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
-        <h3 className="flex-1 truncate text-body font-medium">{category.name}</h3>
-        {status === 'over' && over ? (
-          <span className="rounded-full bg-destructive/12 px-2 text-caption font-medium text-destructive">
-            {over} <span>{overLabel}</span>
-          </span>
-        ) : null}
+        <h3 className="line-clamp-2 flex-1 text-body font-medium break-words">{category.name}</h3>
         {handle ? (
           <button
             type="button"

@@ -21,6 +21,20 @@ beforeEach(() => {
 });
 
 describe('CategoryCard', () => {
+  it('shows the over-limit badge outside the header so the name keeps its width', () => {
+    renderWithProviders(
+      <CategoryCard
+        category={{ ...groceries, name: 'Комунальні платежі' }}
+        spent="2400"
+        pct={120}
+        currency="UAH"
+      />,
+    );
+    const badge = screen.getByText(/понад ліміт/).parentElement!;
+    expect(badge.closest('header')).toBeNull();
+    expect(badge).toHaveClass('absolute');
+  });
+
   it('shows spent of limit with percentage', () => {
     renderWithProviders(<CategoryCard category={groceries} spent="1200" pct={60} currency="UAH" />);
     expect(screen.getByText(/1\s200,00\s₴ \/ 2\s000,00\s₴ · 60%/)).toBeInTheDocument();
