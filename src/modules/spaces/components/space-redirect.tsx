@@ -6,6 +6,7 @@ import { StatusPanel } from '@/modules/auth';
 import { useRouter } from '@/shared/i18n/navigation';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
+import { PageSkeleton, Skeleton } from '@/shared/ui/skeleton';
 import { useSpaces } from '../api/spaces-queries';
 import { lastSpace, pickLandingSpace } from '../lib/last-space';
 
@@ -16,6 +17,7 @@ import { lastSpace, pickLandingSpace } from '../lib/last-space';
 export function SpaceRedirect() {
   const t = useTranslations('spaces');
   const te = useTranslations('errors');
+  const tc = useTranslations('common');
   const router = useRouter();
   const spaces = useSpaces();
 
@@ -42,5 +44,14 @@ export function SpaceRedirect() {
       </main>
     );
   }
-  return null;
+  // Landing takes a request and a redirect: show the app's frame rather than a blank page.
+  return (
+    <div className="flex min-h-dvh flex-col bg-background">
+      <div className="flex h-16 items-center gap-3 border-b border-border bg-card px-4 md:px-16">
+        <Skeleton shape="circle" className="size-10" />
+        <Skeleton className="h-5 w-32" />
+      </div>
+      <PageSkeleton label={tc('loading')} />
+    </div>
+  );
 }

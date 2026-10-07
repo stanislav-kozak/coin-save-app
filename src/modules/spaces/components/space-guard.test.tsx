@@ -70,4 +70,15 @@ describe('SpaceGuard', () => {
     await vi.waitFor(() => expect(listCalls).toBe(2)); // the cached list was refreshed
     expect(localStorage.getItem('coinsave.lastSpaceId')).toBeNull();
   });
+
+  it('shows a page skeleton while the space loads', () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(
+      <SpaceGuard spaceId="sp1">
+        <p>content</p>
+      </SpaceGuard>,
+    );
+    expect(screen.getByText('Завантаження…').closest('[aria-busy="true"]')).not.toBeNull();
+    expect(screen.queryByText('content')).toBeNull();
+  });
 });

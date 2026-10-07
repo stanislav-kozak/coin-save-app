@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { SectionError } from '@/shared/ui/section-error';
 import { useWallets } from '../api/wallets-queries';
 import { WalletCard, WalletCircle } from './wallet-card';
@@ -24,6 +25,7 @@ type Props = {
 export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
   const t = useTranslations('wallets');
   const ti = useTranslations('expenses.income');
+  const tc = useTranslations('common');
   const td = useTranslations('dashboard');
   const wallets = useWallets(spaceId);
   if (wallets.isError && !wallets.isFetching) {
@@ -36,7 +38,25 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
       </section>
     );
   }
-  if (!wallets.data) return null;
+  if (!wallets.data) {
+    return (
+      <section aria-labelledby="wallets-title" className="flex flex-col gap-4">
+        <h2 id="wallets-title" className="text-h2">
+          {td('wallets')}
+        </h2>
+        <LoadingRegion label={tc('loading')}>
+          <div className="flex gap-4 p-1 md:hidden">
+            <Skeleton shape="circle" className="size-12" />
+            <Skeleton shape="circle" className="size-12" />
+          </div>
+          <div className="hidden flex-col gap-3 md:flex">
+            <Skeleton shape="card" className="h-20" />
+            <Skeleton shape="card" className="h-20" />
+          </div>
+        </LoadingRegion>
+      </section>
+    );
+  }
 
   const addButton = (
     <Button variant="secondary" size="s" className="w-full" onClick={onAdd}>

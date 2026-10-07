@@ -77,4 +77,11 @@ describe('CategoriesGrid', () => {
     const names = (await screen.findAllByRole('heading', { level: 3 })).map((h) => h.textContent);
     expect(names.slice(0, 2)).toEqual(['Таксі', 'Кафе']);
   });
+
+  it('shows a skeleton while categories load', () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(<CategoriesGrid spaceId="sp1" />);
+    const region = screen.getByText('Завантаження…').closest('[aria-busy="true"]')!;
+    expect(region.querySelectorAll('[data-skeleton="card"]')).toHaveLength(6);
+  });
 });

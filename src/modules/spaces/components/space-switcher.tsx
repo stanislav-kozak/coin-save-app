@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import { useSpaces } from '../api/spaces-queries';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { SpaceAvatar } from './space-avatar';
 
 /** Header space switcher (Figma 16:720 / 16:721). */
@@ -26,12 +27,16 @@ export function SpaceSwitcher({ currentSpaceId }: { currentSpaceId: string }) {
         {current ? (
           <SpaceAvatar space={current} />
         ) : (
-          <span className="size-10 shrink-0 rounded-full bg-border" />
+          <Skeleton shape="circle" className="size-10 shrink-0" />
         )}
-        <span className="truncate text-h2">
-          {/* Unknown space (no access / deleted): still a usable way out, not a blank button. */}
-          {current?.name ?? (spaces.data ? t('switcher.label') : null)}
-        </span>
+        {spaces.data ? (
+          <span className="truncate text-h2">
+            {/* Unknown space (no access / deleted): still a usable way out, not a blank button. */}
+            {current?.name ?? t('switcher.label')}
+          </span>
+        ) : (
+          <Skeleton className="h-5 w-32" />
+        )}
         <ChevronDown aria-hidden className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-80">

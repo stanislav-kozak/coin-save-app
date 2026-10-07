@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { addMoney, percentOf } from '@/shared/lib/money';
 import { SectionError } from '@/shared/ui/section-error';
+import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useCategories, useMonthAnalytics } from '../api/categories-queries';
 import { pendingByCategory, type PendingSpend } from '../lib/pending-spends';
 import {
@@ -37,6 +38,7 @@ export function CategoriesGrid({
 }: Props) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('categories.manage');
+  const tl = useTranslations('common');
   // null: closed; 'new': creating; a category: editing it.
   const [editing, setEditing] = useState<CategoryView | 'new' | null>(null);
   const categories = useCategories(spaceId);
@@ -58,7 +60,27 @@ export function CategoriesGrid({
       </section>
     );
   }
-  if (!categories.data || !analytics.data) return null;
+  if (!categories.data || !analytics.data) {
+    return (
+      <section aria-labelledby="categories-title" className="flex flex-col gap-4">
+        <h2 id="categories-title" className="text-h2">
+          {t('categories')}
+        </h2>
+        <LoadingRegion label={tl('loading')}>
+          <div className="grid grid-cols-4 gap-4 md:hidden">
+            {Array.from({ length: 8 }, (_, i) => (
+              <Skeleton key={i} shape="circle" className="mx-auto size-12" />
+            ))}
+          </div>
+          <div className="hidden grid-cols-2 gap-4 md:grid">
+            {Array.from({ length: 6 }, (_, i) => (
+              <Skeleton key={i} shape="card" className="h-30" />
+            ))}
+          </div>
+        </LoadingRegion>
+      </section>
+    );
+  }
 
   const { currency } = analytics.data;
   const byId = new Map(analytics.data.byCategory.map((c) => [c.categoryId, c]));
