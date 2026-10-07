@@ -67,7 +67,7 @@ export function CategoryCard(props: Props) {
       ) : null}
       <header className="flex items-center gap-3">
         <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
-        <h3 className="flex-1 truncate text-body font-medium">{category.name}</h3>
+        <h3 className="line-clamp-2 flex-1 text-body font-medium break-words">{category.name}</h3>
         {handle ? (
           <button
             type="button"
