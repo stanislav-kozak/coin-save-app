@@ -53,7 +53,7 @@ export function ForgotPasswordForm() {
               {te(getErrorCode(request.error))}
             </p>
           ) : null}
-          <Button type="submit" disabled={request.isPending}>
+          <Button type="submit" loading={request.isPending} loadingText={t('forgot.submitting')}>
             {t('forgot.submit')}
           </Button>
         </form>

@@ -28,5 +28,6 @@ function withoutBrowserLanguage(request: NextRequest): NextRequest {
 }
 
 export const config = {
-  matcher: '/((?!api|_next|_vercel|.*\\..*).*)',
+  // File-based icons (/icon.svg, /apple-icon) are public assets: never send them to /login.
+  matcher: '/((?!api|_next|_vercel|icon|apple-icon|.*\\..*).*)',
 };

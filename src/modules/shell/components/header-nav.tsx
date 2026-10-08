@@ -18,7 +18,7 @@ export function HeaderNav({ spaceId }: { spaceId: string }) {
     { href: `${base}/analytics`, label: t('analytics') },
   ];
   return (
-    <nav aria-label={t('label')} className="hidden md:flex">
+    <nav aria-label={t('label')} className="hidden md:ml-3 md:flex">
       <ul className="flex items-center gap-1">
         {items.map(({ href, label }) => {
           const active = pathname === href;

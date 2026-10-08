@@ -12,6 +12,7 @@ import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
+import { PasswordInput } from '@/shared/ui/password-input';
 import { useLogin } from '../api/auth-mutations';
 import { currentUserQuery } from '../api/use-current-user';
 import { useValidationMessage } from '../hooks/use-validation-message';
@@ -83,9 +84,8 @@ export function LoginForm() {
           />
         </FormField>
         <FormField id="password" label={t('fields.password')} error={vm(errors.password?.message)}>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             autoComplete="current-password"
             aria-invalid={!!errors.password}
             aria-describedby={errors.password ? 'password-error' : undefined}
@@ -98,9 +98,21 @@ export function LoginForm() {
         {apiError && apiError !== 'EMAIL_NOT_VERIFIED' ? (
           <p role="alert" className="text-caption text-destructive">
             {te(apiError)}
+            {apiError === 'INVALID_CREDENTIALS' ? (
+              <>
+                {' '}
+                <Link href="/forgot-password" className="font-medium text-primary underline">
+                  {t('login.recover')}
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : null}
-        <Button type="submit" disabled={login.isPending || entering}>
+        <Button
+          type="submit"
+          loading={login.isPending || entering}
+          loadingText={t('login.submitting')}
+        >
           {t('login.submit')}
         </Button>
       </form>

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -79,7 +79,14 @@ describe('LoginForm', () => {
     renderWithProviders(<LoginForm />);
     await fillAndSubmit('a@b.co', 'secret');
     await vi.waitFor(() => expect(get).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: 'Увійти' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Входимо…' })).toBeDisabled();
+  });
+
+  it('says it is signing in while the request runs', async () => {
+    post.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(<LoginForm />);
+    await fillAndSubmit('a@b.co', 'secret');
+    expect(await screen.findByRole('button', { name: 'Входимо…' })).toBeDisabled();
   });
 
   it('shows wrong credentials in the current language', async () => {
@@ -88,7 +95,16 @@ describe('LoginForm', () => {
     });
     renderWithProviders(<LoginForm />);
     await fillAndSubmit('a@b.co', 'bad');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Невірний email або пароль');
+    const alert = await screen.findByRole('alert');
+    // The way out is the link itself; the sentence doesn't say it a second time.
+    expect(alert).toHaveTextContent(
+      /^Email або пароль не підходять\. Перевірте розкладку клавіатури\.\s+Відновити пароль$/,
+    );
+    // The way out sits right under the error.
+    expect(within(alert).getByRole('link', { name: 'Відновити пароль' })).toHaveAttribute(
+      'href',
+      '/forgot-password',
+    );
   });
 
   it('sends an unverified user to check their email', async () => {

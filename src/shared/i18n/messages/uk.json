@@ -1,12 +1,14 @@
 {
   "common": {
-    "appName": "CoinSave",
+    "appName": "CoinSaveKeeper",
     "themeLight": "Світла тема",
     "themeDark": "Темна тема",
     "retry": "Спробувати ще раз",
     "loading": "Завантаження…",
     "cancel": "Скасувати",
-    "close": "Закрити"
+    "close": "Закрити",
+    "showPassword": "Показати пароль",
+    "hidePassword": "Сховати пароль"
   },
   "styleguide": {
     "title": "Стайлгайд",
@@ -18,13 +20,13 @@
     "surfaces": "Поверхні"
   },
   "errors": {
-    "UNKNOWN_ERROR": "Щось пішло не так. Спробуйте ще раз.",
+    "UNKNOWN_ERROR": "Щось пішло не так. Спробуйте ще раз за мить.",
     "VALIDATION_ERROR": "Перевірте правильність заповнених полів",
     "HTTP_ERROR": "Запит не виконано. Спробуйте ще раз",
     "INTERNAL_ERROR": "Помилка сервера. Спробуйте пізніше",
-    "TOO_MANY_REQUESTS": "Забагато спроб. Зачекайте хвилину і спробуйте знову",
-    "EMAIL_ALREADY_EXISTS": "Користувач з таким email вже існує",
-    "INVALID_CREDENTIALS": "Невірний email або пароль",
+    "TOO_MANY_REQUESTS": "Забагато спроб поспіль. Зачекайте хвилинку — і спробуйте ще раз.",
+    "EMAIL_ALREADY_EXISTS": "Цей email уже зареєстровано. Можливо, ви хотіли увійти?",
+    "INVALID_CREDENTIALS": "Email або пароль не підходять. Перевірте розкладку клавіатури.",
     "EMAIL_NOT_VERIFIED": "Підтвердіть email, щоб увійти",
     "EMAIL_DELIVERY_FAILED": "Не вдалося надіслати лист для підтвердження. Спробуйте зареєструватися ще раз трохи пізніше",
     "INVALID_VERIFICATION_TOKEN": "Посилання для підтвердження недійсне або застаріло",
@@ -85,7 +87,9 @@
       "forgot": "Забули пароль?",
       "submit": "Увійти",
       "noAccount": "Немає акаунту?",
-      "signupLink": "Зареєструватися"
+      "signupLink": "Зареєструватися",
+      "submitting": "Входимо…",
+      "recover": "Відновити пароль"
     },
     "signup": {
       "title": "Створити акаунт",
@@ -93,7 +97,9 @@
       "verifyNote": "Ми надішлемо лист для підтвердження email — вхід буде доступний після підтвердження",
       "submit": "Зареєструватися",
       "haveAccount": "Вже є акаунт?",
-      "loginLink": "Увійти"
+      "loginLink": "Увійти",
+      "submitting": "Створюємо акаунт…",
+      "goLogin": "Увійти"
     },
     "checkEmail": {
       "title": "Перевірте пошту",
@@ -110,7 +116,8 @@
       "submit": "Надіслати посилання",
       "remembered": "Згадали пароль?",
       "loginLink": "Увійти",
-      "sent": "Якщо акаунт з таким email існує, ми надіслали на нього посилання для скидання паролю"
+      "sent": "Якщо акаунт з таким email існує, ми надіслали на нього посилання для скидання паролю",
+      "submitting": "Надсилаємо…"
     },
     "reset": {
       "title": "Новий пароль",
@@ -120,12 +127,13 @@
       "requestNew": "Запросити нове посилання",
       "successTitle": "Пароль змінено",
       "successText": "Тепер увійдіть з новим паролем",
-      "toLogin": "Увійти"
+      "toLogin": "Увійти",
+      "submitting": "Зберігаємо…"
     },
     "verify": {
       "pending": "Підтверджуємо email…",
       "successTitle": "Email підтверджено",
-      "successText": "Тепер ви можете увійти в CoinSave",
+      "successText": "Тепер ви можете увійти в CoinSaveKeeper",
       "errorTitle": "Не вдалося підтвердити email",
       "toLogin": "Увійти"
     }
@@ -171,7 +179,8 @@
     "languages": {
       "uk": "Українська",
       "en": "English"
-    }
+    },
+    "brandHome": "CoinSaveKeeper — на головну"
   },
   "dashboard": {
     "wallets": "Гаманці",

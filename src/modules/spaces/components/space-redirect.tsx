@@ -6,7 +6,7 @@ import { StatusPanel } from '@/modules/auth';
 import { useRouter } from '@/shared/i18n/navigation';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
-import { PageSkeleton, Skeleton } from '@/shared/ui/skeleton';
+import { BrandLoader } from '@/shared/ui/brand-loader';
 import { useSpaces } from '../api/spaces-queries';
 import { lastSpace, pickLandingSpace } from '../lib/last-space';
 import { pendingInvitation } from '../lib/pending-invitation';
@@ -52,14 +52,10 @@ export function SpaceRedirect() {
       </main>
     );
   }
-  // Landing takes a request and a redirect: show the app's frame rather than a blank page.
+  // Landing takes a request and a redirect: the brand loader rather than a blank page.
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <div className="flex h-16 items-center gap-3 border-b border-border bg-card px-4 md:px-16">
-        <Skeleton shape="circle" className="size-10" />
-        <Skeleton className="h-5 w-32" />
-      </div>
-      <PageSkeleton label={tc('loading')} />
+      <BrandLoader label={tc('loading')} />
     </div>
   );
 }

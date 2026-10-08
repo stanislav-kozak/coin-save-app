@@ -1,12 +1,14 @@
 {
   "common": {
-    "appName": "CoinSave",
+    "appName": "CoinSaveKeeper",
     "themeLight": "Light theme",
     "themeDark": "Dark theme",
     "retry": "Try again",
     "loading": "Loading…",
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "styleguide": {
     "title": "Styleguide",
@@ -18,13 +20,13 @@
     "surfaces": "Surfaces"
   },
   "errors": {
-    "UNKNOWN_ERROR": "Something went wrong. Please try again.",
+    "UNKNOWN_ERROR": "Something went wrong. Try again in a moment.",
     "VALIDATION_ERROR": "Please check the fields you filled in",
     "HTTP_ERROR": "The request failed. Please try again",
     "INTERNAL_ERROR": "Server error. Please try again later",
-    "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute and try again",
-    "EMAIL_ALREADY_EXISTS": "A user with this email already exists",
-    "INVALID_CREDENTIALS": "Wrong email or password",
+    "TOO_MANY_REQUESTS": "Too many tries in a row. Wait a minute and try again.",
+    "EMAIL_ALREADY_EXISTS": "This email is already registered. Did you mean to sign in?",
+    "INVALID_CREDENTIALS": "That email and password don't match. Check your keyboard layout.",
     "EMAIL_NOT_VERIFIED": "Verify your email to sign in",
     "EMAIL_DELIVERY_FAILED": "We couldn't send the confirmation email. Please try signing up again a bit later",
     "INVALID_VERIFICATION_TOKEN": "The verification link is invalid or expired",
@@ -85,7 +87,9 @@
       "forgot": "Forgot password?",
       "submit": "Sign in",
       "noAccount": "No account?",
-      "signupLink": "Sign up"
+      "signupLink": "Sign up",
+      "submitting": "Signing in…",
+      "recover": "Reset your password"
     },
     "signup": {
       "title": "Create an account",
@@ -93,7 +97,9 @@
       "verifyNote": "We'll send you an email to confirm your address — you can sign in after confirming",
       "submit": "Sign up",
       "haveAccount": "Already have an account?",
-      "loginLink": "Sign in"
+      "loginLink": "Sign in",
+      "submitting": "Creating your account…",
+      "goLogin": "Sign in"
     },
     "checkEmail": {
       "title": "Check your email",
@@ -110,7 +116,8 @@
       "submit": "Send link",
       "remembered": "Remembered it?",
       "loginLink": "Sign in",
-      "sent": "If an account with this email exists, we've sent it a password reset link"
+      "sent": "If an account with this email exists, we've sent it a password reset link",
+      "submitting": "Sending…"
     },
     "reset": {
       "title": "New password",
@@ -120,12 +127,13 @@
       "requestNew": "Request a new link",
       "successTitle": "Password changed",
       "successText": "Now sign in with your new password",
-      "toLogin": "Sign in"
+      "toLogin": "Sign in",
+      "submitting": "Saving…"
     },
     "verify": {
       "pending": "Confirming your email…",
       "successTitle": "Email confirmed",
-      "successText": "You can now sign in to CoinSave",
+      "successText": "You can now sign in to CoinSaveKeeper",
       "errorTitle": "Couldn't confirm your email",
       "toLogin": "Sign in"
     }
@@ -171,7 +179,8 @@
     "languages": {
       "uk": "Українська",
       "en": "English"
-    }
+    },
+    "brandHome": "CoinSaveKeeper — home"
   },
   "dashboard": {
     "wallets": "Wallets",

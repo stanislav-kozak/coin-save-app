@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -70,9 +70,9 @@ describe('SignupForm', () => {
     });
     renderWithProviders(<SignupForm />);
     await fill();
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Користувач з таким email вже існує',
-    );
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Цей email уже зареєстровано');
+    expect(within(alert).getByRole('link', { name: 'Увійти' })).toHaveAttribute('href', '/login');
   });
 
   it('explains a failed confirmation email and lets the user retry', async () => {
