@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { hasLocale, useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import { Link, useRouter } from '@/shared/i18n/navigation';
@@ -28,6 +29,8 @@ export function LoginForm() {
   const login = useLogin();
   const locale = useLocale();
   const queryClient = useQueryClient();
+  // Busy from the click until the app opens: signing in is followed by reading the saved language.
+  const [entering, setEntering] = useState(false);
   const { register, handleSubmit, formState } = useForm<
     z.input<typeof loginSchema>,
     unknown,
@@ -41,9 +44,10 @@ export function LoginForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
+      setEntering(true);
       await login.mutateAsync(values);
       // Spec §11: the account's saved language wins over the login page's.
-      const saved = await queryClient.fetchQuery(currentUserQuery).then(
+      const saved = await queryClient.fetchQuery({ ...currentUserQuery, retry: false }).then(
         (me) => me.locale,
         () => null, // not worth blocking the sign-in
       );
@@ -53,6 +57,7 @@ export function LoginForm() {
         router.replace('/');
       }
     } catch (error) {
+      setEntering(false);
       if (getErrorCode(error) === 'EMAIL_NOT_VERIFIED') {
         pendingEmail.set(values.email);
         router.push('/check-email');
@@ -95,7 +100,7 @@ export function LoginForm() {
             {te(apiError)}
           </p>
         ) : null}
-        <Button type="submit" disabled={login.isPending}>
+        <Button type="submit" disabled={login.isPending || entering}>
           {t('login.submit')}
         </Button>
       </form>

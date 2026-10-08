@@ -325,7 +325,6 @@
     "custom": "Свій колір"
   },
   "settings": {
-    "title": "Налаштування",
     "preferences": {
       "title": "Мова та тема",
       "language": "Мова інтерфейсу",
@@ -511,7 +510,8 @@
       "name": "Ім'я",
       "save": "Зберегти",
       "nameRequired": "Вкажіть ім'я",
-      "nameTooLong": "Не довше 100 символів"
+      "nameTooLong": "Не довше 100 символів",
+      "saved": "Збережено"
     },
     "security": {
       "title": "Безпека",

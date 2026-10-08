@@ -111,6 +111,42 @@ describe('ProfilePage', () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
+  it('locks the language choice while it is being saved, and ignores the current one', async () => {
+    patch.mockReturnValue(new Promise(() => {})); // never answers
+    renderWithProviders(<ProfilePage />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('radio', { name: 'UA' }));
+    expect(patch).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('radio', { name: 'EN' }));
+    expect(screen.getByRole('radiogroup', { name: 'Мова інтерфейсу' })).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
+    expect(screen.getByRole('radio', { name: 'EN' })).toBeDisabled();
+  });
+
+  it('confirms a saved name and shows it as saved (trimmed, nothing left to save)', async () => {
+    renderWithProviders(<ProfilePage />);
+    const user = userEvent.setup();
+    const name = await screen.findByLabelText("Ім'я");
+    await user.type(name, ' ');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Збережено');
+    expect(name).toHaveValue('Станіслав Козак');
+    expect(screen.getByRole('button', { name: 'Зберегти' })).toBeDisabled();
+  });
+
+  it('says so when the account could not be loaded', async () => {
+    get.mockResolvedValue({ error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } });
+    renderWithProviders(<ProfilePage />);
+    const account = (
+      await screen.findByRole('heading', { level: 2, name: 'Особисті дані' })
+    ).closest('section')!;
+    expect(await within(account).findByRole('alert', {}, { timeout: 4000 })).not.toHaveTextContent(
+      /^$/,
+    );
+  });
+
   it('sends a password change link to the own email', async () => {
     renderWithProviders(<ProfilePage />);
     const user = userEvent.setup();

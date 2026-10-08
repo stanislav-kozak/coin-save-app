@@ -325,7 +325,6 @@
     "custom": "Custom color"
   },
   "settings": {
-    "title": "Settings",
     "preferences": {
       "title": "Language and theme",
       "language": "Interface language",
@@ -511,7 +510,8 @@
       "name": "Name",
       "save": "Save",
       "nameRequired": "Enter a name",
-      "nameTooLong": "100 characters at most"
+      "nameTooLong": "100 characters at most",
+      "saved": "Saved"
     },
     "security": {
       "title": "Security",

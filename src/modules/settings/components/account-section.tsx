@@ -23,6 +23,7 @@ type NameValues = z.output<typeof nameSchema>;
 export function AccountSection() {
   const t = useTranslations('profile.account');
   const tc = useTranslations('common');
+  const te = useTranslations('errors');
   const me = useCurrentUser();
 
   return (
@@ -39,8 +40,11 @@ export function AccountSection() {
         </div>
       ) : null}
       {me.data ? (
-        // Remount when the saved name changes, so the form starts from it (and isn't dirty).
-        <NameForm key={me.data.name ?? ''} name={me.data.name ?? ''} />
+        <NameForm name={me.data.name ?? ''} />
+      ) : me.isError ? (
+        <p role="alert" className="text-caption text-destructive">
+          {te(getErrorCode(me.error))}
+        </p>
       ) : (
         <LoadingRegion label={tc('loading')} className="flex items-center gap-4">
           <Skeleton shape="circle" className="size-14" />
@@ -55,7 +59,7 @@ function NameForm({ name }: { name: string }) {
   const t = useTranslations('profile.account');
   const te = useTranslations('errors');
   const updateMe = useUpdateMe();
-  const { register, handleSubmit, formState } = useForm<NameInput, unknown, NameValues>({
+  const { register, handleSubmit, formState, reset } = useForm<NameInput, unknown, NameValues>({
     resolver: zodResolver(nameSchema),
     defaultValues: { name },
   });
@@ -64,7 +68,12 @@ function NameForm({ name }: { name: string }) {
   return (
     <form
       noValidate
-      onSubmit={(e) => void handleSubmit((values) => updateMe.mutate(values))(e)}
+      onSubmit={(e) =>
+        void handleSubmit((values) =>
+          // The saved (trimmed) name becomes the form's new starting point: nothing left to save.
+          updateMe.mutate(values, { onSuccess: (me) => reset({ name: me.name ?? '' }) }),
+        )(e)
+      }
       className="flex flex-col gap-3"
     >
       <FormField id="profile-name" label={t('name')} error={error ? t(error) : undefined}>
@@ -81,6 +90,11 @@ function NameForm({ name }: { name: string }) {
           </Button>
         </div>
       </FormField>
+      {updateMe.isSuccess && !formState.isDirty ? (
+        <p role="status" className="text-caption text-success">
+          {t('saved')}
+        </p>
+      ) : null}
       {updateMe.isError ? (
         <p role="alert" className="text-caption text-destructive">
           {te(getErrorCode(updateMe.error))}

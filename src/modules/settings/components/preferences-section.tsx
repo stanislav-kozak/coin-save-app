@@ -40,8 +40,9 @@ export function PreferencesSection() {
           { value: 'en', label: 'EN' },
         ]}
         value={locale}
+        busy={updateMe.isPending}
         onChange={(next) => {
-          if (updateMe.isPending) return;
+          if (next === locale || updateMe.isPending) return;
           updateMe.mutate(
             { locale: next as Locale },
             { onSuccess: () => router.replace(pathname, { locale: next as Locale }) },

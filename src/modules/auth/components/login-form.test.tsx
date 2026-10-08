@@ -64,6 +64,24 @@ describe('LoginForm', () => {
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/', { locale: 'en' }));
   });
 
+  it('enters the app when the saved language cannot be read', async () => {
+    post.mockResolvedValue({ data: { user: { id: 'u1', email: 'a@b.co' } } });
+    get.mockResolvedValue({ error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } });
+    renderWithProviders(<LoginForm />);
+    await fillAndSubmit('a@b.co', 'secret');
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/'));
+    expect(get).toHaveBeenCalledTimes(1); // no retry delay before entering
+  });
+
+  it('stays busy until it has moved on, so a second click signs in only once', async () => {
+    post.mockResolvedValue({ data: { user: { id: 'u1', email: 'a@b.co' } } });
+    get.mockReturnValue(new Promise(() => {})); // the saved language is still loading
+    renderWithProviders(<LoginForm />);
+    await fillAndSubmit('a@b.co', 'secret');
+    await vi.waitFor(() => expect(get).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: 'Увійти' })).toBeDisabled();
+  });
+
   it('shows wrong credentials in the current language', async () => {
     post.mockResolvedValue({
       error: { statusCode: 401, code: 'INVALID_CREDENTIALS', message: 'x' },
