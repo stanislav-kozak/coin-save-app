@@ -389,7 +389,8 @@
       "leaveHint": "You lose access until you're invited again",
       "confirmLeave": "Leave “{name}”?",
       "leaveConfirm": "Leave"
-    }
+    },
+    "spaceTitle": "Space settings"
   },
   "invitations": {
     "joining": "Accepting the invitation…",
@@ -502,5 +503,17 @@
     },
     "emptyTitle": "No records in this period",
     "emptyText": "Pick another period or add an expense on the main screen"
+  },
+  "profile": {
+    "title": "Profile",
+    "account": {
+      "title": "Personal details"
+    },
+    "security": {
+      "title": "Security",
+      "hint": "We'll email you a link to set a new password.",
+      "changePassword": "Change password",
+      "sent": "We sent a link to change your password to {email}"
+    }
   }
 }

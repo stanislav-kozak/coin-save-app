@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
-import { initials } from '../lib/initials';
+import { initials } from '@/shared/lib/initials';
 import { LocaleSwitcher } from './locale-switcher';
 import { ThemeButton } from './theme-button';
 
