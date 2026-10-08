@@ -209,6 +209,11 @@
       "edit": "Редагувати: {name}",
       "restore": "Відновити",
       "restoreItem": "Відновити: {name}"
+    },
+    "currency": {
+      "label": "Валюта",
+      "preview": "Баланс: {from} → ≈ {to}",
+      "rate": "Курс на сьогодні: {one} = {rate}"
     }
   },
   "categories": {

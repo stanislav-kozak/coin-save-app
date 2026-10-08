@@ -209,6 +209,11 @@
       "edit": "Edit: {name}",
       "restore": "Restore",
       "restoreItem": "Restore: {name}"
+    },
+    "currency": {
+      "label": "Currency",
+      "preview": "Balance: {from} → ≈ {to}",
+      "rate": "Today's rate: {one} = {rate}"
     }
   },
   "categories": {

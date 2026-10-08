@@ -44,6 +44,9 @@ describe('money', () => {
     expect(multiplyMoney('5', '41.2345')).toBe('206.1725');
     expect(multiplyMoney('0.3333', '0.5')).toBe('0.1667');
     expect(multiplyMoney('10', '1')).toBe('10.00');
+    // FX rates come with more places than amounts: they must not be cut to 4 first.
+    expect(multiplyMoney('1000', '0.024134')).toBe('24.134');
+    expect(multiplyMoney('-1000', '0.02413456')).toBe('-24.1346');
   });
   it('computes a rounded percentage like the server', () => {
     expect(percentOf('1995', '2000')).toBe(100);
