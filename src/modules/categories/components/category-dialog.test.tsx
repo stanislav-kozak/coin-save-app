@@ -83,6 +83,9 @@ describe('CategoryDialog', () => {
     await user.selectOptions(await screen.findByLabelText('Валюта ліміту'), 'EUR');
     // 1000 ₴ × 0.0241, rounded to whole units like the server
     expect(await screen.findByText(/≈\s?24,00\s€/)).toBeInTheDocument();
+    // The field still holds the old limit, so its badge keeps the old currency until it's typed over.
+    expect(screen.getByText('UAH')).toBeInTheDocument();
+    expect(screen.queryByText('EUR')).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     await vi.waitFor(() => expect(patch).toHaveBeenCalled());
     expect(patch.mock.calls[0][1].body).toEqual({ currency: 'EUR' });
@@ -96,6 +99,7 @@ describe('CategoryDialog', () => {
     await user.clear(screen.getByLabelText('Місячний ліміт'));
     await user.type(screen.getByLabelText('Місячний ліміт'), '500');
     expect(screen.queryByText(/≈/)).toBeNull();
+    expect(screen.getByText('EUR')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     await vi.waitFor(() => expect(patch).toHaveBeenCalled());
     expect(patch.mock.calls[0][1].body).toEqual({ currency: 'EUR', monthlyLimit: 500 });

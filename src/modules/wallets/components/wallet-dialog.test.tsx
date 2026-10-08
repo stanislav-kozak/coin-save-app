@@ -56,12 +56,16 @@ describe('WalletDialog', () => {
   });
 
   it('previews a currency change and locks the initial balance', async () => {
+    const consoleError = vi.spyOn(console, 'error');
     renderDialog();
     const user = userEvent.setup();
     await user.selectOptions(screen.getByLabelText('Валюта'), 'USD');
     expect(await screen.findByText(/≈\s?24,10\s\$/)).toBeInTheDocument();
     expect(screen.getByLabelText('Початковий баланс')).toBeDisabled();
     expect(screen.getByLabelText('Початковий баланс')).toHaveValue('8240.5');
+    // Two different inputs, not one switching from uncontrolled to controlled.
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
   });
 
   it('changes the currency only after confirming, then refreshes everything it touched', async () => {

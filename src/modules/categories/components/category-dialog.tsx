@@ -260,7 +260,10 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
                   aria-describedby={errors.monthlyLimit ? 'category-limit-error' : undefined}
                   {...register('monthlyLimit')}
                 />
-                {currency ? <Badge tone="neutral">{currency}</Badge> : null}
+                {/* An untouched limit is still in the saved currency until the server converts it. */}
+                {(converts ? savedCurrency : currency) ? (
+                  <Badge tone="neutral">{converts ? savedCurrency : currency}</Badge>
+                ) : null}
               </div>
             </FormField>
             {convertedLimit && currency ? (

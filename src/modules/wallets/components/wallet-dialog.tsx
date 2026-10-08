@@ -205,6 +205,7 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
                 {changing ? (
                   // Converted with the rest of the wallet: shown as stored, not editable.
                   <Input
+                    key="locked"
                     id="wallet-edit-balance"
                     disabled
                     value={wallet.initialBalance}
@@ -213,6 +214,7 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
                   />
                 ) : (
                   <Input
+                    key="editable"
                     id="wallet-edit-balance"
                     inputMode="decimal"
                     autoComplete="off"
