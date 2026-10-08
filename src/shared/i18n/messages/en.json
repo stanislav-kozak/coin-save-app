@@ -246,7 +246,10 @@
       "archiveConfirm": "Archive category",
       "deleteConfirm": "Delete category",
       "cancel": "Cancel",
-      "close": "Close"
+      "close": "Close",
+      "currency": "Limit currency",
+      "currencyAsSpace": "As the space ({currency})",
+      "limitConverted": "Converted at today's rate: ≈ {amount}"
     },
     "validation": {
       "nameRequired": "Enter a name",

@@ -5,7 +5,7 @@ import type { components } from '@/generated/api';
 import { CategoryLimitRow } from '@/modules/categories';
 import { isNegative, percentOf, subtractMoney } from '@/shared/lib/money';
 
-type Analytics = Pick<components['schemas']['AnalyticsResponseDto'], 'currency' | 'byCategory'>;
+type Analytics = Pick<components['schemas']['AnalyticsResponseDto'], 'byCategory'>;
 
 /** «Ліміти категорій» (spec §10.4): shown by the page for month periods only. */
 export function LimitBars({ analytics }: { analytics: Analytics }) {
@@ -31,9 +31,10 @@ export function LimitBars({ analytics }: { analytics: Analytics }) {
               color: c.color,
               monthlyLimit: c.limit,
             }}
-            spent={c.spent}
-            pct={c.limit ? percentOf(c.spent, c.limit) : 0}
-            currency={analytics.currency}
+            // Limits and their spending are in the category's own currency (the space's by default).
+            spent={c.spentInCurrency}
+            pct={c.limit ? percentOf(c.spentInCurrency, c.limit) : 0}
+            currency={c.currency}
           />
         ))}
       </ul>

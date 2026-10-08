@@ -100,7 +100,16 @@ describe('CategoriesGrid', () => {
         : {
             data: {
               currency: 'UAH',
-              byCategory: [{ categoryId: 'c1', spent: '100', limit: '2000', pct: 5 }],
+              byCategory: [
+                {
+                  categoryId: 'c1',
+                  spent: '100',
+                  currency: 'UAH' as const,
+                  spentInCurrency: '100',
+                  limit: '2000',
+                  pct: 5,
+                },
+              ],
             },
           },
     );

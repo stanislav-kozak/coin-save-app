@@ -24,6 +24,7 @@ const cafe = {
   color: '#ec4999',
   monthlyLimit: '1000',
   sortOrder: 2,
+  currency: null as 'EUR' | null,
 };
 
 beforeEach(() => {
@@ -31,7 +32,9 @@ beforeEach(() => {
   get.mockImplementation(async (path: string) =>
     path.endsWith('/analytics')
       ? { data: { currency: 'UAH', byCategory: [], expenses: [] } }
-      : { data: [{ ...cafe, color: '#3b82f6' }] },
+      : path === '/api/currencies/rate'
+        ? { data: { from: 'UAH', to: 'EUR', rate: '0.0241', date: '2026-10-08' } }
+        : { data: [{ ...cafe, color: '#3b82f6' }] },
   );
 });
 
@@ -58,6 +61,57 @@ describe('CategoryDialog', () => {
       color: '#6366f1',
       monthlyLimit: 500,
     });
+  });
+
+  it('creates a category with its own currency', async () => {
+    post.mockResolvedValue({ data: { id: 'c10' } });
+    renderDialog();
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('Назва'), 'Подорож');
+    await user.selectOptions(await screen.findByLabelText('Валюта ліміту'), 'EUR');
+    expect(screen.getByText('EUR')).toBeInTheDocument(); // the limit badge follows
+    await user.type(screen.getByLabelText('Місячний ліміт'), '500');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalled());
+    expect(post.mock.calls[0][1].body).toMatchObject({ currency: 'EUR', monthlyLimit: 500 });
+  });
+
+  it("converts an untouched limit to the new currency at today's rate", async () => {
+    patch.mockResolvedValue({ data: { ...cafe, currency: 'EUR', monthlyLimit: '24' } });
+    renderDialog({ category: cafe });
+    const user = userEvent.setup();
+    await user.selectOptions(await screen.findByLabelText('Валюта ліміту'), 'EUR');
+    // 1000 ₴ × 0.0241, rounded to whole units like the server
+    expect(await screen.findByText(/≈\s?24,00\s€/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ currency: 'EUR' });
+  });
+
+  it('takes a limit typed together with a new currency as is', async () => {
+    patch.mockResolvedValue({ data: { ...cafe, currency: 'EUR', monthlyLimit: '500' } });
+    renderDialog({ category: cafe });
+    const user = userEvent.setup();
+    await user.selectOptions(await screen.findByLabelText('Валюта ліміту'), 'EUR');
+    await user.clear(screen.getByLabelText('Місячний ліміт'));
+    await user.type(screen.getByLabelText('Місячний ліміт'), '500');
+    expect(screen.queryByText(/≈/)).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ currency: 'EUR', monthlyLimit: 500 });
+  });
+
+  it('goes back to the space currency', async () => {
+    patch.mockResolvedValue({ data: cafe });
+    renderDialog({ category: { ...cafe, currency: 'EUR' } });
+    const user = userEvent.setup();
+    const select = await screen.findByLabelText('Валюта ліміту');
+    expect(select).toHaveValue('EUR');
+    await screen.findByRole('option', { name: 'Як у простору (UAH)' }); // once the space currency is known
+    await user.selectOptions(select, 'Як у простору (UAH)');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ currency: null });
   });
 
   it('shows the limit in the space currency', async () => {

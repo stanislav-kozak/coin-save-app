@@ -1,12 +1,20 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import {
+  DEFAULT_CURRENCY,
+  SUPPORTED_CURRENCIES,
+  currencyLabel,
+  type Currency,
+} from '@/shared/constants/currencies';
 import { firstUnusedColor } from '@/shared/constants/entity-colors';
+import { useRate } from '@/shared/hooks/use-rate';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { changedFields } from '@/shared/lib/changed-fields';
+import { formatMoney, multiplyMoney } from '@/shared/lib/money';
 import { cn } from '@/shared/lib/utils';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -39,8 +47,9 @@ type Props = {
 export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props) {
   const t = useTranslations('categories');
   const te = useTranslations('errors');
-  // Limits are in the space's primary currency (spec §4.3) — the same one analytics reports in.
-  const currency = useMonthAnalytics(spaceId).data?.currency;
+  const locale = useLocale();
+  // A limit is in the category's own currency, or the space's primary one (spec §4.3) by default.
+  const spaceCurrency = useMonthAnalytics(spaceId).data?.currency as Currency | undefined;
   const categories = useCategories(spaceId);
   const create = useCreateCategory(spaceId);
   const update = useUpdateCategory(spaceId);
@@ -57,6 +66,7 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
       ? (category.color ?? '')
       : firstUnusedColor(categories.data?.map((c) => c.color) ?? []),
     monthlyLimit: category?.monthlyLimit ?? '',
+    currency: (category?.currency as Currency | null | undefined) ?? '',
   });
   // State starts fresh per opening: the grid remounts this dialog (`key`) for each target.
   const { register, handleSubmit, formState, control } = useForm<
@@ -66,6 +76,23 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
   >({ resolver: zodResolver(categoryFormSchema), defaultValues: defaults() });
 
   const errors = formState.errors;
+  const chosen = useWatch({ control, name: 'currency' });
+  const savedCurrency = (category?.currency as Currency | null | undefined) ?? spaceCurrency;
+  const currency = chosen || spaceCurrency;
+  // An untouched limit is converted by the server at today's rate, in whole units (min 1).
+  const converts =
+    !!category?.monthlyLimit &&
+    !!savedCurrency &&
+    !!currency &&
+    currency !== savedCurrency &&
+    !formState.dirtyFields.monthlyLimit;
+  // Same pair (nothing fetched) unless the limit is about to be converted.
+  const from = savedCurrency ?? DEFAULT_CURRENCY;
+  const rate = useRate(from, converts && currency ? currency : from);
+  const convertedLimit =
+    converts && rate.data && category?.monthlyLimit
+      ? wholeUnits(multiplyMoney(category.monthlyLimit, rate.data.rate))
+      : null;
   // Read during render: react-hook-form only tracks the formState fields a component subscribes to.
   const { dirtyFields } = formState;
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
@@ -90,13 +117,18 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
   const save = (values: CategoryFormValues) =>
     run(() => {
       if (category) {
+        const { currency: next, ...body } = changedFields(values, dirtyFields);
         return update.mutateAsync({
           id: category.id,
-          body: changedFields(values, dirtyFields),
+          body: { ...body, ...(dirtyFields.currency ? { currency: next || null } : {}) },
         });
       }
-      const { monthlyLimit, ...rest } = values;
-      return create.mutateAsync({ ...rest, ...(monthlyLimit === null ? {} : { monthlyLimit }) });
+      const { monthlyLimit, currency: own, ...rest } = values;
+      return create.mutateAsync({
+        ...rest,
+        ...(monthlyLimit === null ? {} : { monthlyLimit }),
+        ...(own ? { currency: own } : {}),
+      });
     });
 
   const alert = error ? (
@@ -231,6 +263,29 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
                 {currency ? <Badge tone="neutral">{currency}</Badge> : null}
               </div>
             </FormField>
+            {convertedLimit && currency ? (
+              <p className="-mt-2 text-caption text-muted-foreground">
+                {t('manage.limitConverted', {
+                  amount: formatMoney(convertedLimit, currency, locale),
+                })}
+              </p>
+            ) : null}
+            <FormField id="category-currency" label={t('manage.currency')}>
+              <select
+                id="category-currency"
+                className="h-10 w-full rounded-control border border-input bg-card px-3 text-field md:text-body text-foreground outline-none focus-visible:border-primary"
+                {...register('currency')}
+              >
+                <option value="">
+                  {t('manage.currencyAsSpace', { currency: spaceCurrency ?? '' })}
+                </option>
+                {SUPPORTED_CURRENCIES.map((code) => (
+                  <option key={code} value={code}>
+                    {currencyLabel(code, locale)}
+                  </option>
+                ))}
+              </select>
+            </FormField>
             {alert}
             <Button type="submit" disabled={busy}>
               {t('manage.save')}
@@ -255,4 +310,11 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
       </DialogContent>
     </Dialog>
   );
+}
+
+/** Rounded half-up to whole units, at least 1 — as the server converts a limit. */
+function wholeUnits(amount: string): string {
+  const [int = '0', frac = ''] = amount.replace('-', '').split('.');
+  const rounded = BigInt(int) + (frac[0] !== undefined && frac[0] >= '5' ? BigInt(1) : BigInt(0));
+  return (rounded < BigInt(1) ? BigInt(1) : rounded).toString();
 }

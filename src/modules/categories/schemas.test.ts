@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { categoryFormSchema } from './schemas';
 
-const ok = { name: 'Кафе', icon: '☕', color: '#ec4999' };
+const ok = { name: 'Кафе', icon: '☕', color: '#ec4999', currency: '' as const };
 
 describe('categoryFormSchema', () => {
   it('treats an empty limit as no limit and parses "1 000,50"', () => {

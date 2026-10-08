@@ -20,7 +20,16 @@ beforeEach(() => {
       : {
           data: {
             currency: 'UAH',
-            byCategory: [{ categoryId: 'c1', spent: '700', limit: '1000', pct: 70 }],
+            byCategory: [
+              {
+                categoryId: 'c1',
+                spent: '700',
+                currency: 'UAH' as const,
+                spentInCurrency: '700',
+                limit: '1000',
+                pct: 70,
+              },
+            ],
             expenses: [],
           },
         },
@@ -63,13 +72,58 @@ describe('CategoriesGrid', () => {
         : {
             data: {
               currency: 'UAH',
-              byCategory: [{ categoryId: 'c1', spent: '88', limit: '50', pct: 176 }],
+              byCategory: [
+                {
+                  categoryId: 'c1',
+                  spent: '88',
+                  currency: 'UAH' as const,
+                  spentInCurrency: '88',
+                  limit: '50',
+                  pct: 176,
+                },
+              ],
               expenses: [],
             },
           },
     );
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
     expect((await screen.findAllByText(/88,00\s₴ \/ 60,00\s₴ · 147%/)).length).toBeGreaterThan(0);
+  });
+
+  it('shows a category with its own currency in that currency', async () => {
+    get.mockImplementation(async (path: string) =>
+      path.endsWith('/categories')
+        ? {
+            data: [
+              {
+                id: 'c1',
+                name: 'Подорож',
+                icon: '✈️',
+                color: null,
+                monthlyLimit: '500',
+                currency: 'EUR',
+              },
+            ],
+          }
+        : {
+            data: {
+              currency: 'UAH',
+              byCategory: [
+                {
+                  categoryId: 'c1',
+                  spent: '14108',
+                  currency: 'EUR',
+                  spentInCurrency: '340',
+                  limit: '500',
+                  pct: 68,
+                },
+              ],
+              expenses: [],
+            },
+          },
+    );
+    renderWithProviders(<CategoriesGrid spaceId="sp1" />);
+    expect((await screen.findAllByText(/340,00\s€ \/ 500,00\s€ · 68%/)).length).toBeGreaterThan(0);
   });
 
   it('renders categories in the given order without waiting for the cache', async () => {

@@ -52,6 +52,31 @@ describe('SummaryCards', () => {
   });
 });
 
+describe('LimitBars', () => {
+  it("shows each limit in its category's currency", () => {
+    renderWithProviders(
+      <LimitBars
+        analytics={{
+          byCategory: [
+            {
+              categoryId: 'c3',
+              name: 'Подорож',
+              icon: '✈️',
+              color: null,
+              spent: '14108',
+              currency: 'EUR',
+              spentInCurrency: '340',
+              limit: '500',
+              pct: 68,
+            },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getByText(/340,00\s€ \/ 500,00\s€ · 68%/)).toBeInTheDocument();
+  });
+});
+
 describe('CategorySplit', () => {
   it('splits spending by category with shares that add up', () => {
     renderWithProviders(<CategorySplit analytics={analytics} />);

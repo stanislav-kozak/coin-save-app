@@ -246,7 +246,10 @@
       "archiveConfirm": "Архівувати категорію",
       "deleteConfirm": "Видалити категорію",
       "cancel": "Скасувати",
-      "close": "Закрити"
+      "close": "Закрити",
+      "currency": "Валюта ліміту",
+      "currencyAsSpace": "Як у простору ({currency})",
+      "limitConverted": "Буде конвертовано за сьогоднішнім курсом: ≈ {amount}"
     },
     "validation": {
       "nameRequired": "Введіть назву",

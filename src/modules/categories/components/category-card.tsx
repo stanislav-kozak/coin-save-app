@@ -15,6 +15,8 @@ export type CategoryView = {
   icon?: string | null;
   color?: string | null;
   monthlyLimit: string | null;
+  /** The limit's own currency; null/absent = the space's. */
+  currency?: string | null;
 };
 type Props = {
   category: CategoryView;

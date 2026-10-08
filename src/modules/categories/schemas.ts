@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SUPPORTED_CURRENCIES } from '@/shared/constants/currencies';
 
 const LIMIT = /^\d+([.,]\d{1,4})?$/; // positive, ≤ 4 dp (server Decimal(19, 4))
 
@@ -16,6 +17,8 @@ export const categoryFormSchema = z.object({
     .transform((v) => (v === '' ? null : Number(v)))
     .refine((v) => v === null || v > 0, { error: 'limitPositive' })
     .refine((v) => v === null || v <= 1_000_000_000, { error: 'limitTooLarge' }),
+  // '' = as the space (null on the wire).
+  currency: z.union([z.enum(SUPPORTED_CURRENCIES), z.literal('')]),
 });
 
 export type CategoryFormValues = z.output<typeof categoryFormSchema>;
