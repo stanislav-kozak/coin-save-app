@@ -68,7 +68,11 @@ export function UserMenu({ spaceId }: { spaceId: string }) {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href={`/s/${spaceId}/settings`}>{tn('settings')}</Link>
+            <Link href={`/s/${spaceId}/profile`}>{tn('profile')}</Link>
+          </DropdownMenuItem>
+          {/* On mobile the space settings are the bottom-nav tab. */}
+          <DropdownMenuItem asChild className="hidden md:flex">
+            <Link href={`/s/${spaceId}/settings`}>{tn('spaceSettings')}</Link>
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => void logout()}>{t('logout')}</DropdownMenuItem>
         </DropdownMenuContent>

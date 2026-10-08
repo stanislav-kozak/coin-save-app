@@ -298,8 +298,9 @@
     "home": "Home",
     "recurring": "Recurring",
     "analytics": "Analytics",
-    "settings": "Settings",
-    "label": "Navigation"
+    "label": "Navigation",
+    "profile": "Profile",
+    "spaceSettings": "Space settings"
   },
   "dnd": {
     "instructions": "To drag a wallet or a category, press space, move with the arrow keys and press space again: a wallet on a category adds an expense, a category moves to its new place",

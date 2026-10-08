@@ -3,7 +3,6 @@
 import { ChartPie, Home, Repeat, Settings, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NewExpenseButton } from '@/modules/expenses';
-import { useFitsParent } from '@/shared/hooks/use-fits-parent';
 import { Link, usePathname } from '@/shared/i18n/navigation';
 import { cn } from '@/shared/lib/utils';
 
@@ -17,7 +16,7 @@ export function BottomNav({ spaceId }: { spaceId: string }) {
     { href: `${base}/recurring`, label: t('recurring'), Icon: Repeat },
     null, // the "+" button
     { href: `${base}/analytics`, label: t('analytics'), Icon: ChartPie },
-    { href: `${base}/settings`, label: t('settings'), Icon: Settings },
+    { href: `${base}/settings`, label: t('spaceSettings'), Icon: Settings },
   ];
   return (
     <nav
@@ -46,22 +45,20 @@ export function BottomNav({ spaceId }: { spaceId: string }) {
 
 type ItemProps = { href: string; label: string; Icon: LucideIcon; active: boolean };
 
-/** A long label ("Налаштування" on a narrow phone) leaves just the icon, centred; readers still get it. */
+/** Icon only; the name is the link's accessible name and its tooltip. */
 function NavItem({ href, label, Icon, active }: ItemProps) {
-  const [labelRef, fits] = useFitsParent<HTMLSpanElement>();
   return (
     <Link
       href={href}
+      aria-label={label}
+      title={label}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'flex h-full flex-col items-center justify-center gap-1 px-1 py-2 text-caption',
+        'flex h-full items-center justify-center px-1 py-4',
         active ? 'text-primary' : 'text-muted-foreground',
       )}
     >
-      <Icon aria-hidden className="size-5" />
-      <span ref={labelRef} className={fits ? 'whitespace-nowrap' : 'sr-only'}>
-        {label}
-      </span>
+      <Icon aria-hidden className="size-6" />
     </Link>
   );
 }
