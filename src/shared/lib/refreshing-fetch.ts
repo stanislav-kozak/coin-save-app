@@ -15,6 +15,18 @@ const NO_REFRESH_PATHS = ['/api/auth/login', '/api/auth/refresh', '/api/auth/log
 
 const LOCK_NAME = 'coinsave-auth-refresh';
 
+/**
+ * A refresh that doesn't answer by then is given up (e.g. the database is asleep). Without a limit it
+ * would hold the lock forever and every other request would wait behind it: endless loading.
+ */
+export const REFRESH_TIMEOUT_MS = 10_000;
+
+/**
+ * `rejected`: the server ended the session (401/403), so sign out. `unavailable`: no answer, a
+ * network error or a 5xx; the server keeps the cookies then, so /login would just bounce back.
+ */
+type RefreshOutcome = 'refreshed' | 'rejected' | 'unavailable';
+
 /** In-memory FIFO lock: serialises callers within one JS realm (one tab). */
 export function createLocalLock(): Lock {
   let tail: Promise<unknown> = Promise.resolve();
@@ -44,12 +56,23 @@ export function createRefreshingFetch({
   fetchImpl = (input) => fetch(input),
   lock = defaultLock,
 }: Options): FetchLike {
-  async function refresh(): Promise<boolean> {
+  // When the last refresh came back unavailable. Requests that were already waiting then share that
+  // outcome instead of each waiting out another timeout; a later request (a retry) tries again.
+  let unavailableAt = -Infinity;
+
+  async function refresh(): Promise<RefreshOutcome> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REFRESH_TIMEOUT_MS);
     try {
-      const res = await fetchImpl(new Request(refreshUrl, { method: 'POST' }));
-      return res.ok;
+      const res = await fetchImpl(
+        new Request(refreshUrl, { method: 'POST', signal: controller.signal }),
+      );
+      if (res.ok) return 'refreshed';
+      return res.status === 401 || res.status === 403 ? 'rejected' : 'unavailable';
     } catch {
-      return false;
+      return 'unavailable';
+    } finally {
+      clearTimeout(timer);
     }
   }
 
@@ -57,6 +80,7 @@ export function createRefreshingFetch({
     // A Request body can be read once — keep copies for both possible retries.
     const retryAfterWait = input.clone();
     const retryAfterRefresh = input.clone();
+    const startedAt = performance.now();
     const response = await fetchImpl(input);
 
     if (response.status !== 401 || NO_REFRESH_PATHS.includes(new URL(input.url).pathname)) {
@@ -68,11 +92,13 @@ export function createRefreshingFetch({
       const again = await fetchImpl(retryAfterWait);
       if (again.status !== 401) return again;
 
-      if (!(await refresh())) {
-        onAuthFailure();
-        return again;
-      }
-      return fetchImpl(retryAfterRefresh);
+      if (unavailableAt > startedAt) return again;
+      const outcome = await refresh();
+      if (outcome === 'unavailable') unavailableAt = performance.now();
+      if (outcome === 'refreshed') return fetchImpl(retryAfterRefresh);
+      if (outcome === 'rejected') onAuthFailure();
+      // Unavailable: keep the session; the 401 reaches the page, which offers a retry.
+      return again;
     });
   };
 }
