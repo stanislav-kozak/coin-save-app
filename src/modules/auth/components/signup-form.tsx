@@ -1,10 +1,11 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import { Link, useRouter } from '@/shared/i18n/navigation';
+import type { Locale } from '@/shared/i18n/routing';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
@@ -19,6 +20,7 @@ import { OrDivider } from './or-divider';
 
 export function SignupForm() {
   const t = useTranslations('auth');
+  const locale = useLocale() as Locale;
   const te = useTranslations('errors');
   const vm = useValidationMessage();
   const router = useRouter();
@@ -35,7 +37,8 @@ export function SignupForm() {
 
   const onSubmit = handleSubmit(async ({ name, email, password }) => {
     try {
-      await signup.mutateAsync({ email, password, ...(name ? { name } : {}) });
+      // The account's (and its emails') language: the one the user is signing up in.
+      await signup.mutateAsync({ email, password, locale, ...(name ? { name } : {}) });
       pendingEmail.set(email);
       router.push('/check-email');
     } catch {
