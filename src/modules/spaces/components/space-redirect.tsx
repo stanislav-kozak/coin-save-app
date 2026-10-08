@@ -12,10 +12,11 @@ import { lastSpace, pickLandingSpace } from '../lib/last-space';
 import { pendingInvitation } from '../lib/pending-invitation';
 
 /**
- * `/[locale]`: opens the last (or first) space, or onboarding when there is none.
+ * `/[locale]`: opens the last (or first) space, or onboarding when there is none. With `section`
+ * (e.g. an email's `/recurring` link, which can't know the space) it opens that page of the space.
  * Its authenticated request also catches a dead session (→ refresh fails → login).
  */
-export function SpaceRedirect() {
+export function SpaceRedirect({ section }: { section?: 'recurring' } = {}) {
   const t = useTranslations('spaces');
   const te = useTranslations('errors');
   const tc = useTranslations('common');
@@ -33,8 +34,8 @@ export function SpaceRedirect() {
       return;
     }
     const id = pickLandingSpace(spaces.data, lastSpace.get());
-    router.replace(id ? `/s/${id}` : '/onboarding');
-  }, [spaces.data, spaces.isFetching, router]);
+    router.replace(id ? `/s/${id}${section ? `/${section}` : ''}` : '/onboarding');
+  }, [spaces.data, spaces.isFetching, router, section]);
 
   if (spaces.isError && !spaces.isFetching) {
     return (

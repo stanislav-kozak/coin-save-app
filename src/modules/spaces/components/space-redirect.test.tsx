@@ -22,6 +22,13 @@ describe('SpaceRedirect', () => {
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/onboarding'));
   });
 
+  it("opens a section of the remembered space (an email's /recurring link)", async () => {
+    localStorage.setItem('coinsave.lastSpaceId', 'b');
+    get.mockResolvedValue({ data: [{ id: 'a' }, { id: 'b' }] });
+    renderWithProviders(<SpaceRedirect section="recurring" />);
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/b/recurring'));
+  });
+
   it('opens the remembered space if it still exists', async () => {
     localStorage.setItem('coinsave.lastSpaceId', 'b');
     get.mockResolvedValue({ data: [{ id: 'a' }, { id: 'b' }] });
