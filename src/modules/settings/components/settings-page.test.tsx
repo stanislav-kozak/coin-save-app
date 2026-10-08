@@ -79,23 +79,15 @@ beforeEach(() => {
 });
 
 describe('SettingsPage', () => {
-  it('has the wallets, archived categories and preferences sections', async () => {
+  it('is about the space only: wallets and archived categories, no language or theme', async () => {
     renderWithProviders(<SettingsPage spaceId="sp1" />);
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Налаштування' }),
+      await screen.findByRole('heading', { level: 1, name: 'Налаштування простору' }),
     ).toBeInTheDocument();
-    for (const name of ['Гаманці', 'Архівовані категорії', 'Мова та тема']) {
+    for (const name of ['Гаманці', 'Архівовані категорії']) {
       expect(screen.getByRole('heading', { level: 2, name })).toBeInTheDocument();
     }
-  });
-
-  it('switches the language on the same page and the theme', async () => {
-    renderWithProviders(<SettingsPage spaceId="sp1" />);
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole('radio', { name: 'EN' }));
-    expect(replace).toHaveBeenCalledWith('/s/sp1/settings', { locale: 'en' });
-    await user.click(screen.getByRole('radio', { name: 'Темна' }));
-    expect(setTheme).toHaveBeenCalledWith('dark');
+    expect(screen.queryByRole('heading', { level: 2, name: 'Мова та тема' })).toBeNull();
   });
 
   it('restores an archived category and an archived wallet', async () => {

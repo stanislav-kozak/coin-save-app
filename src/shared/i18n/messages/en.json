@@ -298,8 +298,9 @@
     "home": "Home",
     "recurring": "Recurring",
     "analytics": "Analytics",
-    "settings": "Settings",
-    "label": "Navigation"
+    "label": "Navigation",
+    "profile": "Profile",
+    "spaceSettings": "Space settings"
   },
   "dnd": {
     "instructions": "To drag a wallet or a category, press space, move with the arrow keys and press space again: a wallet on a category adds an expense, a category moves to its new place",
@@ -324,7 +325,6 @@
     "custom": "Custom color"
   },
   "settings": {
-    "title": "Settings",
     "preferences": {
       "title": "Language and theme",
       "language": "Interface language",
@@ -388,7 +388,8 @@
       "leaveHint": "You lose access until you're invited again",
       "confirmLeave": "Leave “{name}”?",
       "leaveConfirm": "Leave"
-    }
+    },
+    "spaceTitle": "Space settings"
   },
   "invitations": {
     "joining": "Accepting the invitation…",
@@ -501,5 +502,22 @@
     },
     "emptyTitle": "No records in this period",
     "emptyText": "Pick another period or add an expense on the main screen"
+  },
+  "profile": {
+    "title": "Profile",
+    "account": {
+      "title": "Personal details",
+      "name": "Name",
+      "save": "Save",
+      "nameRequired": "Enter a name",
+      "nameTooLong": "100 characters at most",
+      "saved": "Saved"
+    },
+    "security": {
+      "title": "Security",
+      "hint": "We'll email you a link to set a new password.",
+      "changePassword": "Change password",
+      "sent": "We sent a link to change your password to {email}"
+    }
   }
 }

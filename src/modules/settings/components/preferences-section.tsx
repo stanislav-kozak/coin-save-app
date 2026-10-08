@@ -3,16 +3,23 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useSyncExternalStore } from 'react';
+import { useUpdateMe } from '@/modules/auth';
 import { usePathname, useRouter } from '@/shared/i18n/navigation';
+import { getErrorCode } from '@/shared/lib/api-error';
 import type { Locale } from '@/shared/i18n/routing';
 import { PillGroup } from './pill-group';
 import { SettingsSection } from './settings-section';
 
 const noopSubscribe = () => () => {};
 
-/** «Мова та тема»: the same switches as the header, as explicit choices. */
+/**
+ * «Мова та тема»: the same switches as the header, as explicit choices. The language is saved to the
+ * account first and switched after: switching remounts the page, which would lose an error message.
+ */
 export function PreferencesSection() {
   const t = useTranslations('settings.preferences');
+  const te = useTranslations('errors');
+  const updateMe = useUpdateMe();
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
@@ -33,8 +40,20 @@ export function PreferencesSection() {
           { value: 'en', label: 'EN' },
         ]}
         value={locale}
-        onChange={(next) => router.replace(pathname, { locale: next as Locale })}
+        busy={updateMe.isPending}
+        onChange={(next) => {
+          if (next === locale || updateMe.isPending) return;
+          updateMe.mutate(
+            { locale: next as Locale },
+            { onSuccess: () => router.replace(pathname, { locale: next as Locale }) },
+          );
+        }}
       />
+      {updateMe.isError ? (
+        <p role="alert" className="text-caption text-destructive">
+          {te(getErrorCode(updateMe.error))}
+        </p>
+      ) : null}
       <PillGroup
         label={t('theme')}
         options={[

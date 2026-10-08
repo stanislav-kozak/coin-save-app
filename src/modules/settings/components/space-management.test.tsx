@@ -59,7 +59,6 @@ describe('Settings — space management', () => {
       'Учасники',
       'Гаманці',
       'Архівовані категорії',
-      'Мова та тема',
       'Небезпечна зона',
     ]);
   });
@@ -224,12 +223,5 @@ describe('Settings — space management', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Відкликати: olek@x.y' }));
     expect(await within(section('Учасники')).findByRole('alert')).toBeInTheDocument();
-  });
-
-  it('names the language and theme choices for screen readers', async () => {
-    serve('OWNER');
-    renderWithProviders(<SettingsPage spaceId="sp1" />);
-    expect(await screen.findByRole('radiogroup', { name: 'Мова інтерфейсу' })).toBeInTheDocument();
-    expect(screen.getByRole('radiogroup', { name: 'Тема' })).toBeInTheDocument();
   });
 });
