@@ -9,7 +9,7 @@ import '../globals.css';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'], variable: '--font-inter' });
 
-export const metadata: Metadata = { title: 'CoinSave' };
+export const metadata: Metadata = { title: 'CoinSaveKeeper' };
 
 // Edge-to-edge on phones; the header and bottom nav pad themselves by the safe-area insets.
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };

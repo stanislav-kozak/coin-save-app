@@ -125,7 +125,7 @@
     "verify": {
       "pending": "Confirming your email…",
       "successTitle": "Email confirmed",
-      "successText": "You can now sign in to CoinSave",
+      "successText": "You can now sign in to CoinSaveKeeper",
       "errorTitle": "Couldn't confirm your email",
       "toLogin": "Sign in"
     }

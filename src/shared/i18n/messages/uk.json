@@ -125,7 +125,7 @@
     "verify": {
       "pending": "Підтверджуємо email…",
       "successTitle": "Email підтверджено",
-      "successText": "Тепер ви можете увійти в CoinSave",
+      "successText": "Тепер ви можете увійти в CoinSaveKeeper",
       "errorTitle": "Не вдалося підтвердити email",
       "toLogin": "Увійти"
     }
