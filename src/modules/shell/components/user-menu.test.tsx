@@ -77,16 +77,13 @@ describe('UserMenu', () => {
     expect(assign).not.toHaveBeenCalled();
   });
 
-  it('links to the profile everywhere and to the space settings on desktop only', async () => {
+  it('links to the profile; the space settings live in the space switcher', async () => {
     renderWithProviders(<UserMenu spaceId="a" />);
     await openMenu();
     expect(screen.getByRole('menuitem', { name: 'Профіль' })).toHaveAttribute(
       'href',
       '/s/a/profile',
     );
-    // On mobile the space settings are the bottom-nav tab.
-    const space = screen.getByRole('menuitem', { name: 'Налаштування простору' });
-    expect(space).toHaveAttribute('href', '/s/a/settings');
-    expect(space).toHaveClass('hidden', 'md:flex');
+    expect(screen.queryByRole('menuitem', { name: 'Налаштування простору' })).toBeNull();
   });
 });
