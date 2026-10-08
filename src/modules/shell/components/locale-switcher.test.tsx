@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { LocaleSwitcher } from './locale-switcher';
 
@@ -13,6 +13,11 @@ vi.mock('@/shared/i18n/navigation', () => ({
 }));
 
 describe('LocaleSwitcher', () => {
+  beforeEach(() => {
+    replace.mockReset();
+    patch.mockReset();
+  });
+
   it('switches to the other language on the same page', async () => {
     renderWithProviders(<LocaleSwitcher />);
     expect(screen.getByRole('button', { name: 'English' })).toHaveTextContent('UA');
@@ -27,5 +32,12 @@ describe('LocaleSwitcher', () => {
     await vi.waitFor(() =>
       expect(patch).toHaveBeenCalledWith('/api/users/me', { body: { locale: 'en' } }),
     );
+  });
+
+  it('only switches the page when told not to save (signed-out pages)', async () => {
+    renderWithProviders(<LocaleSwitcher saveToAccount={false} />);
+    await userEvent.setup().click(screen.getByRole('button', { name: 'English' }));
+    expect(replace).toHaveBeenCalledWith('/s/a', { locale: 'en' });
+    expect(patch).not.toHaveBeenCalled();
   });
 });

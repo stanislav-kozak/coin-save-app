@@ -21,3 +21,12 @@ it('shows the animated logo, the tagline and decorative coins that hide for redu
   }
   expect(screen.getByText('form')).toBeInTheDocument();
 });
+
+it('shows the page actions (language, theme) next to the form', () => {
+  renderWithProviders(
+    <AuthLayout actions={<button type="button">UA</button>}>
+      <p>form</p>
+    </AuthLayout>,
+  );
+  expect(screen.getByRole('button', { name: 'UA' })).toBeInTheDocument();
+});

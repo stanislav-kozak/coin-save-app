@@ -10,7 +10,8 @@ const COINS = [
   { key: 'd', className: 'left-[82%] size-3.5 [animation-delay:6.5s]' },
 ];
 
-export function AuthLayout({ children }: { children: ReactNode }) {
+/** `actions`: page-level controls (language, theme) shown top-right of the form column. */
+export function AuthLayout({ children, actions }: { children: ReactNode; actions?: ReactNode }) {
   const t = useTranslations('auth.brand');
   return (
     <div className="flex min-h-dvh flex-col bg-background md:flex-row">
@@ -26,8 +27,15 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         <Logo motion="intro" tone="on-primary" size="auth" />
         <p className="mt-4 hidden text-body text-primary-foreground/85 md:block">{t('tagline')}</p>
       </aside>
-      <main className="flex flex-1 justify-center px-4 py-8 md:items-center md:px-16">
-        <div className="w-full max-w-100">{children}</div>
+      <main className="relative flex flex-1 justify-center px-4 py-8 md:items-center md:px-16">
+        {actions ? (
+          <div className="absolute top-3 right-4 flex items-center gap-2 md:top-6 md:right-6">
+            {actions}
+          </div>
+        ) : null}
+        <div className={actions ? 'w-full max-w-100 pt-8 md:pt-0' : 'w-full max-w-100'}>
+          {children}
+        </div>
       </main>
     </div>
   );

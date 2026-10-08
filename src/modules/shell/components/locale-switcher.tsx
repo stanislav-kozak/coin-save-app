@@ -11,7 +11,8 @@ const SHORT: Record<Locale, string> = { uk: 'UA', en: 'EN' };
  * Header "UA"/"EN" pill: switches to the other language on the same page right away, and saves it to
  * the account in the background (spec §11); the NEXT_LOCALE cookie remembers it in this browser anyway.
  */
-export function LocaleSwitcher() {
+/** `saveToAccount={false}` on signed-out pages: there is no account to save to (only the address/cookie). */
+export function LocaleSwitcher({ saveToAccount = true }: { saveToAccount?: boolean } = {}) {
   const t = useTranslations('shell.languages');
   const locale = useLocale() as Locale;
   const router = useRouter();
@@ -24,7 +25,7 @@ export function LocaleSwitcher() {
       type="button"
       aria-label={t(next)}
       onClick={() => {
-        updateMe.mutate({ locale: next });
+        if (saveToAccount) updateMe.mutate({ locale: next });
         router.replace(pathname, { locale: next });
       }}
       className="h-8 rounded-full border border-border bg-card px-3 text-caption font-medium"
