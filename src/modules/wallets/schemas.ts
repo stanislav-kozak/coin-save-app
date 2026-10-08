@@ -25,9 +25,8 @@ export const createWalletSchema = z.object({
 
 export type CreateWalletValues = z.output<typeof createWalletSchema>;
 
-/** Editing a wallet: everything but the currency (its history is in that currency). */
+/** Editing a wallet; a new currency converts it on the server at today's rate. */
 export const updateWalletSchema = createWalletSchema
-  .omit({ currency: true })
   // A wallet may have no color yet; empty means "leave it so".
   .extend({ color: z.union([z.string().regex(/^#[0-9a-f]{6}$/i), z.literal('')]) });
 export type UpdateWalletValues = z.output<typeof updateWalletSchema>;

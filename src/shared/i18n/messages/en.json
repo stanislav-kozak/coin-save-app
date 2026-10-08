@@ -208,12 +208,15 @@
       "cancel": "Cancel",
       "edit": "Edit: {name}",
       "restore": "Restore",
-      "restoreItem": "Restore: {name}"
+      "restoreItem": "Restore: {name}",
+      "confirmCurrency": "The balance and every record of «{name}» will be converted at today's rate: {from} → ≈ {to}. The space's analytics won't change.",
+      "currencyConfirm": "Change currency"
     },
     "currency": {
       "label": "Currency",
       "preview": "Balance: {from} → ≈ {to}",
-      "rate": "Today's rate: {one} = {rate}"
+      "rate": "Today's rate: {one} = {rate}",
+      "balanceLocked": "Converted together with the whole wallet"
     }
   },
   "categories": {

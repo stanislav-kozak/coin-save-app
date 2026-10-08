@@ -41,6 +41,7 @@ function useInvalidateWallets(spaceId: string) {
 }
 
 export function useUpdateWallet(spaceId: string) {
+  const queryClient = useQueryClient();
   const invalidate = useInvalidateWallets(spaceId);
   return useMutation({
     mutationFn: async ({ id, body }: { id: string; body: Partial<UpdateWalletValues> }) => {
@@ -51,7 +52,15 @@ export function useUpdateWallet(spaceId: string) {
       if (error) throw error;
       return data;
     },
-    onSuccess: invalidate,
+    onSuccess: (_data, { body }) => {
+      // A currency change converts the wallet's records and recurring rules too.
+      if (body.currency) {
+        for (const name of ['expenses', 'analytics', 'recurring']) {
+          void queryClient.invalidateQueries({ queryKey: [name, spaceId] });
+        }
+      }
+      return invalidate();
+    },
   });
 }
 
