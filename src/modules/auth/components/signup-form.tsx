@@ -85,6 +85,14 @@ export function SignupForm() {
         {signup.error ? (
           <p role="alert" className="text-caption text-destructive">
             {te(getErrorCode(signup.error))}
+            {getErrorCode(signup.error) === 'EMAIL_ALREADY_EXISTS' ? (
+              <>
+                {' '}
+                <Link href="/login" className="font-medium text-primary underline">
+                  {t('signup.goLogin')}
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : null}
         <Button type="submit" loading={signup.isPending} loadingText={t('signup.submitting')}>

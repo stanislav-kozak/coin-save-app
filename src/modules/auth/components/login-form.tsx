@@ -98,6 +98,14 @@ export function LoginForm() {
         {apiError && apiError !== 'EMAIL_NOT_VERIFIED' ? (
           <p role="alert" className="text-caption text-destructive">
             {te(apiError)}
+            {apiError === 'INVALID_CREDENTIALS' ? (
+              <>
+                {' '}
+                <Link href="/forgot-password" className="font-medium text-primary underline">
+                  {t('login.recover')}
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : null}
         <Button

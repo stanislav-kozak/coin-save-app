@@ -20,13 +20,13 @@
     "surfaces": "Surfaces"
   },
   "errors": {
-    "UNKNOWN_ERROR": "Something went wrong. Please try again.",
+    "UNKNOWN_ERROR": "Something went wrong. Try again in a moment.",
     "VALIDATION_ERROR": "Please check the fields you filled in",
     "HTTP_ERROR": "The request failed. Please try again",
     "INTERNAL_ERROR": "Server error. Please try again later",
-    "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute and try again",
-    "EMAIL_ALREADY_EXISTS": "A user with this email already exists",
-    "INVALID_CREDENTIALS": "Wrong email or password",
+    "TOO_MANY_REQUESTS": "Too many tries in a row. Wait a minute and try again.",
+    "EMAIL_ALREADY_EXISTS": "This email is already registered. Did you mean to sign in?",
+    "INVALID_CREDENTIALS": "That email and password don't match. Check your keyboard layout — or reset your password.",
     "EMAIL_NOT_VERIFIED": "Verify your email to sign in",
     "EMAIL_DELIVERY_FAILED": "We couldn't send the confirmation email. Please try signing up again a bit later",
     "INVALID_VERIFICATION_TOKEN": "The verification link is invalid or expired",
@@ -88,7 +88,8 @@
       "submit": "Sign in",
       "noAccount": "No account?",
       "signupLink": "Sign up",
-      "submitting": "Signing in…"
+      "submitting": "Signing in…",
+      "recover": "Reset your password"
     },
     "signup": {
       "title": "Create an account",
@@ -97,7 +98,8 @@
       "submit": "Sign up",
       "haveAccount": "Already have an account?",
       "loginLink": "Sign in",
-      "submitting": "Creating your account…"
+      "submitting": "Creating your account…",
+      "goLogin": "Sign in"
     },
     "checkEmail": {
       "title": "Check your email",

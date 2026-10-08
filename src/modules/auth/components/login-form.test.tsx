@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -95,7 +95,13 @@ describe('LoginForm', () => {
     });
     renderWithProviders(<LoginForm />);
     await fillAndSubmit('a@b.co', 'bad');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Невірний email або пароль');
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Email або пароль не підходять');
+    // The way out sits right under the error.
+    expect(within(alert).getByRole('link', { name: 'Відновити пароль' })).toHaveAttribute(
+      'href',
+      '/forgot-password',
+    );
   });
 
   it('sends an unverified user to check their email', async () => {
