@@ -41,7 +41,7 @@ describe('SignupForm', () => {
     await fill();
     await vi.waitFor(() => expect(push).toHaveBeenCalledWith('/check-email'));
     expect(post).toHaveBeenCalledWith('/api/auth/signup', {
-      body: { email: 'a@b.co', password: '12345678' },
+      body: { email: 'a@b.co', password: '12345678', locale: 'uk' }, // emails follow the UI language
     });
     expect(pendingEmail.get()).toBe('a@b.co');
   });
@@ -52,7 +52,7 @@ describe('SignupForm', () => {
     await fill({ name: '  Тарас ', email: ' a@b.co ' });
     await vi.waitFor(() =>
       expect(post).toHaveBeenCalledWith('/api/auth/signup', {
-        body: { name: 'Тарас', email: 'a@b.co', password: '12345678' },
+        body: { name: 'Тарас', email: 'a@b.co', password: '12345678', locale: 'uk' },
       }),
     );
   });
@@ -62,6 +62,17 @@ describe('SignupForm', () => {
     await fill({ password: '1234567' });
     expect(await screen.findByText('Мінімум 8 символів')).toBeInTheDocument();
     expect(post).not.toHaveBeenCalled();
+  });
+
+  it('signs up in English from the English page', async () => {
+    post.mockResolvedValue({ data: { message: 'ok' } });
+    renderWithProviders(<SignupForm />, { locale: 'en' });
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('Email'), 'a@b.co');
+    await user.type(screen.getByLabelText('Password'), '12345678');
+    await user.click(screen.getByRole('button', { name: 'Sign up' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalled());
+    expect(post.mock.calls[0][1].body).toMatchObject({ locale: 'en' });
   });
 
   it('reports an existing account', async () => {

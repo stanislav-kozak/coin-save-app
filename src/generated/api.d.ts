@@ -681,6 +681,8 @@ export interface components {
             updatedAt: string;
         };
         SignupDto: {
+            /** @default en */
+            locale: components["schemas"]["UserLocale"];
             /** Format: email */
             email: string;
             password: string;
