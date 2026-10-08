@@ -34,16 +34,30 @@ describe('SpaceSwitcher', () => {
   it('lists spaces with roles, marks the current one and links to each', async () => {
     renderWithProviders(<SpaceSwitcher currentSpaceId="a" />);
     await userEvent.setup().click(await screen.findByRole('button', { name: /Family/ }));
-    const family = await screen.findByRole('menuitem', { name: /Family/ });
+    const family = await screen.findByRole('menuitem', { name: /^Family/ });
     expect(family).toHaveAttribute('aria-current', 'true');
-    expect(family).toHaveTextContent('Owner');
-    const startup = screen.getByRole('menuitem', { name: /Startup/ });
+    expect(family).toHaveTextContent('Власник');
+    const startup = screen.getByRole('menuitem', { name: /^Startup/ });
     expect(startup).toHaveAttribute('href', '/s/b');
-    expect(startup).toHaveTextContent('Member');
+    expect(startup).toHaveTextContent('Учасник');
     expect(screen.getByRole('menuitem', { name: /Створити новий простір/ })).toHaveAttribute(
       'href',
       '/onboarding',
     );
+  });
+
+  it("links to each space's settings with a gear next to it", async () => {
+    renderWithProviders(<SpaceSwitcher currentSpaceId="a" />);
+    await userEvent.setup().click(await screen.findByRole('button', { name: /Family/ }));
+    for (const [name, id] of [
+      ['Family', 'a'],
+      ['Startup', 'b'],
+    ]) {
+      const gear = await screen.findByRole('menuitem', { name: `Налаштування простору ${name}` });
+      expect(gear).toHaveAttribute('href', `/s/${id}/settings`);
+      expect(gear).toHaveAttribute('title', 'Налаштування простору');
+      expect(gear.querySelector('svg')).toBeInTheDocument();
+    }
   });
 
   it('offers to switch instead of a blank trigger when the current space is not yours', async () => {

@@ -146,11 +146,13 @@
     },
     "switcher": {
       "label": "Перемкнути простір",
-      "create": "Створити новий простір"
+      "create": "Створити новий простір",
+      "settings": "Налаштування простору",
+      "settingsOf": "Налаштування простору {name}"
     },
     "roles": {
-      "OWNER": "Owner",
-      "MEMBER": "Member"
+      "OWNER": "Власник",
+      "MEMBER": "Учасник"
     },
     "unavailable": {
       "title": "Простір недоступний",

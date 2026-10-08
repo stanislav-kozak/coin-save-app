@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ChevronDown, Plus } from 'lucide-react';
+import { Check, ChevronDown, Plus, Settings } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/shared/i18n/navigation';
 import { Badge } from '@/shared/ui/badge';
@@ -42,20 +42,36 @@ export function SpaceSwitcher({ currentSpaceId }: { currentSpaceId: string }) {
       <DropdownMenuContent align="start" className="w-80">
         {spaces.data?.map((space) => {
           const isCurrent = space.id === currentSpaceId;
+          // Two menu items per row (a link can't hold another link): the space, then its settings gear.
           return (
-            <DropdownMenuItem key={space.id} asChild aria-current={isCurrent ? 'true' : undefined}>
-              <Link href={`/s/${space.id}`}>
-                <SpaceAvatar space={space} size="s" />
-                <span className="flex-1 truncate font-medium">{space.name}</span>
-                <Badge tone={space.role === 'OWNER' ? 'accent' : 'neutral'}>
-                  {t(`roles.${space.role}`)}
-                </Badge>
-                <Check
-                  aria-hidden
-                  className={isCurrent ? 'size-4 text-primary' : 'invisible size-4'}
-                />
-              </Link>
-            </DropdownMenuItem>
+            <div key={space.id} className="flex items-center gap-1">
+              <DropdownMenuItem
+                asChild
+                aria-current={isCurrent ? 'true' : undefined}
+                className="min-w-0 flex-1"
+              >
+                <Link href={`/s/${space.id}`}>
+                  <SpaceAvatar space={space} size="s" />
+                  <span className="flex-1 truncate font-medium">{space.name}</span>
+                  <Badge tone={space.role === 'OWNER' ? 'accent' : 'neutral'}>
+                    {t(`roles.${space.role}`)}
+                  </Badge>
+                  <Check
+                    aria-hidden
+                    className={isCurrent ? 'size-4 text-primary' : 'invisible size-4'}
+                  />
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="shrink-0 text-muted-foreground">
+                <Link
+                  href={`/s/${space.id}/settings`}
+                  aria-label={t('switcher.settingsOf', { name: space.name })}
+                  title={t('switcher.settings')}
+                >
+                  <Settings aria-hidden className="size-4" />
+                </Link>
+              </DropdownMenuItem>
+            </div>
           );
         })}
         <DropdownMenuSeparator />

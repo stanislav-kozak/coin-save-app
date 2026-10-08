@@ -146,7 +146,9 @@
     },
     "switcher": {
       "label": "Switch space",
-      "create": "Create a new space"
+      "create": "Create a new space",
+      "settings": "Space settings",
+      "settingsOf": "Space settings: {name}"
     },
     "roles": {
       "OWNER": "Owner",
