@@ -6,7 +6,9 @@
     "retry": "Try again",
     "loading": "Loading…",
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "styleguide": {
     "title": "Styleguide",

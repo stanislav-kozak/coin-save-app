@@ -6,7 +6,9 @@
     "retry": "Спробувати ще раз",
     "loading": "Завантаження…",
     "cancel": "Скасувати",
-    "close": "Закрити"
+    "close": "Закрити",
+    "showPassword": "Показати пароль",
+    "hidePassword": "Сховати пароль"
   },
   "styleguide": {
     "title": "Стайлгайд",

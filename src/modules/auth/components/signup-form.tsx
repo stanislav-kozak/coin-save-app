@@ -9,6 +9,7 @@ import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
+import { PasswordInput } from '@/shared/ui/password-input';
 import { useSignup } from '../api/auth-mutations';
 import { useValidationMessage } from '../hooks/use-validation-message';
 import { pendingEmail } from '../lib/pending-email';
@@ -71,9 +72,8 @@ export function SignupForm() {
           />
         </FormField>
         <FormField id="password" label={t('fields.password')} error={vm(errors.password?.message)}>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             autoComplete="new-password"
             placeholder={t('placeholders.passwordMin')}
             aria-invalid={!!errors.password}

@@ -8,7 +8,7 @@ import { Link } from '@/shared/i18n/navigation';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
-import { Input } from '@/shared/ui/input';
+import { PasswordInput } from '@/shared/ui/password-input';
 import { useResetPassword } from '../api/auth-mutations';
 import { useValidationMessage } from '../hooks/use-validation-message';
 import { resetPasswordSchema, type ResetPasswordValues } from '../schemas';
@@ -64,9 +64,8 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
           label={t('fields.newPassword')}
           error={vm(errors.newPassword?.message)}
         >
-          <Input
+          <PasswordInput
             id="newPassword"
-            type="password"
             autoComplete="new-password"
             placeholder={t('placeholders.passwordMin')}
             aria-invalid={!!errors.newPassword}
@@ -79,9 +78,8 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
           label={t('fields.confirmPassword')}
           error={vm(errors.confirmPassword?.message)}
         >
-          <Input
+          <PasswordInput
             id="confirmPassword"
-            type="password"
             autoComplete="new-password"
             aria-invalid={!!errors.confirmPassword}
             aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
