@@ -117,6 +117,69 @@
   --text-field--line-height: 22px;
   --text-caption: 13px;
   --text-caption--line-height: 18px;
+
+  /* Brand motion (only behind motion-safe:, so reduced motion shows the final frame). */
+  --animate-brand-draw: brand-draw 0.7s cubic-bezier(0.3, 0.7, 0.3, 1) both;
+  --animate-brand-pop: brand-pop 0.45s 0.45s ease-out both;
+  --animate-brand-draw-loop: brand-draw-loop 1.6s cubic-bezier(0.3, 0.7, 0.3, 1) infinite;
+  --animate-brand-pop-loop: brand-pop-loop 1.6s ease-out infinite;
+  --animate-coin-rise: coin-rise 8s linear infinite;
+
+  @keyframes brand-draw {
+    from {
+      stroke-dashoffset: 176;
+    }
+    to {
+      stroke-dashoffset: 38;
+    }
+  }
+  @keyframes brand-pop {
+    0% {
+      transform: scale(0);
+    }
+    70% {
+      transform: scale(1.25);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes brand-draw-loop {
+    0% {
+      stroke-dashoffset: 176;
+    }
+    45%,
+    100% {
+      stroke-dashoffset: 38;
+    }
+  }
+  @keyframes brand-pop-loop {
+    0%,
+    35% {
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1.25);
+    }
+    60%,
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes coin-rise {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    15%,
+    85% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-110vh);
+      opacity: 0;
+    }
+  }
 }
 
 @utility text-money {
