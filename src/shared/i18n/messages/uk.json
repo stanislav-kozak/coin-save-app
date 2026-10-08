@@ -171,7 +171,8 @@
     "languages": {
       "uk": "Українська",
       "en": "English"
-    }
+    },
+    "brandHome": "CoinSaveKeeper — на головну"
   },
   "dashboard": {
     "wallets": "Гаманці",

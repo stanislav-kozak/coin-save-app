@@ -1,4 +1,5 @@
 import { SpaceSwitcher } from '@/modules/spaces';
+import { HeaderBrand } from './header-brand';
 import { HeaderNav } from './header-nav';
 import { LocaleSwitcher } from './locale-switcher';
 import { ThemeButton } from './theme-button';
@@ -8,7 +9,8 @@ import { UserMenu } from './user-menu';
 export function AppHeader({ spaceId }: { spaceId: string }) {
   return (
     <header className="pt-safe box-content flex h-16 items-center justify-between gap-4 border-b border-border bg-card px-4 md:px-16">
-      <div className="flex min-w-0 items-center gap-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <HeaderBrand spaceId={spaceId} />
         <SpaceSwitcher currentSpaceId={spaceId} />
         <HeaderNav spaceId={spaceId} />
       </div>
