@@ -1,15 +1,18 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
+import { useQueryClient } from '@tanstack/react-query';
+import { hasLocale, useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import { Link, useRouter } from '@/shared/i18n/navigation';
+import { routing } from '@/shared/i18n/routing';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
 import { useLogin } from '../api/auth-mutations';
+import { currentUserQuery } from '../api/use-current-user';
 import { useValidationMessage } from '../hooks/use-validation-message';
 import { pendingEmail } from '../lib/pending-email';
 import { loginSchema, type LoginValues } from '../schemas';
@@ -23,6 +26,8 @@ export function LoginForm() {
   const vm = useValidationMessage();
   const router = useRouter();
   const login = useLogin();
+  const locale = useLocale();
+  const queryClient = useQueryClient();
   const { register, handleSubmit, formState } = useForm<
     z.input<typeof loginSchema>,
     unknown,
@@ -37,7 +42,16 @@ export function LoginForm() {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await login.mutateAsync(values);
-      router.replace('/');
+      // Spec §11: the account's saved language wins over the login page's.
+      const saved = await queryClient.fetchQuery(currentUserQuery).then(
+        (me) => me.locale,
+        () => null, // not worth blocking the sign-in
+      );
+      if (saved !== locale && hasLocale(routing.locales, saved)) {
+        router.replace('/', { locale: saved });
+      } else {
+        router.replace('/');
+      }
     } catch (error) {
       if (getErrorCode(error) === 'EMAIL_NOT_VERIFIED') {
         pendingEmail.set(values.email);

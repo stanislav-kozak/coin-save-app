@@ -507,7 +507,11 @@
   "profile": {
     "title": "Профіль",
     "account": {
-      "title": "Особисті дані"
+      "title": "Особисті дані",
+      "name": "Ім'я",
+      "save": "Зберегти",
+      "nameRequired": "Вкажіть ім'я",
+      "nameTooLong": "Не довше 100 символів"
     },
     "security": {
       "title": "Безпека",

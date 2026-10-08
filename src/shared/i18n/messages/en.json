@@ -507,7 +507,11 @@
   "profile": {
     "title": "Profile",
     "account": {
-      "title": "Personal details"
+      "title": "Personal details",
+      "name": "Name",
+      "save": "Save",
+      "nameRequired": "Enter a name",
+      "nameTooLong": "100 characters at most"
     },
     "security": {
       "title": "Security",

@@ -8,3 +8,4 @@ export { CheckEmailClient } from './components/check-email-client';
 export { StatusPanel } from './components/status-panel';
 export { useCurrentUser } from './api/use-current-user';
 export { useRequestPasswordReset } from './api/auth-mutations';
+export { useUpdateMe } from './api/use-update-me';

@@ -15,6 +15,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["UsersController_updateMe"];
+        trace?: never;
+    };
     "/api/auth/signup": {
         parameters: {
             query?: never;
@@ -611,15 +627,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        SignupDto: {
-            /** Format: email */
-            email: string;
-            password: string;
-            name?: string;
-        };
-        MessageResponseDto: {
-            message: string;
-        };
         /**
          * @description Stable machine-readable code; localize on the client
          * @enum {string}
@@ -635,6 +642,36 @@ export interface components {
             details?: {
                 [key: string]: unknown;
             };
+        };
+        /** @enum {string} */
+        UserLocale: "uk" | "en";
+        UpdateMeDto: {
+            /** @description Display name, trimmed; null removes it */
+            name?: string | null;
+            locale?: components["schemas"]["UserLocale"];
+        };
+        UserResponseDto: {
+            id: string;
+            email: string;
+            /** Format: date-time */
+            emailVerified: string | null;
+            name: string | null;
+            avatarUrl: string | null;
+            /** @example uk */
+            locale: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        SignupDto: {
+            /** Format: email */
+            email: string;
+            password: string;
+            name?: string;
+        };
+        MessageResponseDto: {
+            message: string;
         };
         VerifyEmailDto: {
             token: string;
@@ -654,20 +691,6 @@ export interface components {
         };
         LoginResponseDto: {
             user: components["schemas"]["AuthenticatedUserDto"];
-        };
-        UserResponseDto: {
-            id: string;
-            email: string;
-            /** Format: date-time */
-            emailVerified: string | null;
-            name: string | null;
-            avatarUrl: string | null;
-            /** @example uk */
-            locale: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
         };
         RequestPasswordResetDto: {
             /** Format: email */
@@ -1090,6 +1113,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": string;
+                };
+            };
+        };
+    };
+    UsersController_updateMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
+            /** @description Codes: VALIDATION_ERROR */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: HTTP_ERROR */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
                 };
             };
         };

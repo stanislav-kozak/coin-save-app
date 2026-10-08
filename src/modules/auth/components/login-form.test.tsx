@@ -7,7 +7,10 @@ import { pendingEmail } from '../lib/pending-email';
 import { LoginForm } from './login-form';
 
 const post = vi.fn();
-vi.mock('@/shared/lib/api-client', () => ({ api: { POST: (...a: unknown[]) => post(...a) } }));
+const get = vi.fn();
+vi.mock('@/shared/lib/api-client', () => ({
+  api: { POST: (...a: unknown[]) => post(...a), GET: (...a: unknown[]) => get(...a) },
+}));
 const replace = vi.fn();
 const push = vi.fn();
 vi.mock('@/shared/i18n/navigation', () => ({
@@ -29,6 +32,8 @@ async function fillAndSubmit(email: string, password: string) {
 describe('LoginForm', () => {
   beforeEach(() => {
     post.mockReset();
+    get.mockReset();
+    get.mockResolvedValue({ data: { id: 'u1', email: 'a@b.co', locale: 'uk' } });
     replace.mockReset();
     push.mockReset();
     sessionStorage.clear();
@@ -49,6 +54,14 @@ describe('LoginForm', () => {
     expect(post).toHaveBeenCalledWith('/api/auth/login', {
       body: { email: 'a@b.co', password: 'secret' },
     });
+  });
+
+  it("opens the app in the account's saved language", async () => {
+    post.mockResolvedValue({ data: { user: { id: 'u1', email: 'a@b.co' } } });
+    get.mockResolvedValue({ data: { id: 'u1', email: 'a@b.co', locale: 'en' } });
+    renderWithProviders(<LoginForm />);
+    await fillAndSubmit('a@b.co', 'secret');
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/', { locale: 'en' }));
   });
 
   it('shows wrong credentials in the current language', async () => {
