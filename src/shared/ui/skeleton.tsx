@@ -37,33 +37,3 @@ export function LoadingRegion({
     </div>
   );
 }
-
-/** The main screen's three columns as placeholders, for pages still resolving their space. */
-export function PageSkeleton({ label }: { label: string }) {
-  return (
-    <LoadingRegion
-      label={label}
-      className="grid flex-1 gap-8 px-4 py-6 md:grid-cols-[1fr_2fr_1fr] md:px-16"
-    >
-      <div className="flex flex-col gap-3">
-        <Skeleton className="h-6 w-24" />
-        <Skeleton shape="card" className="h-20" />
-        <Skeleton shape="card" className="h-20" />
-      </div>
-      <div className="flex flex-col gap-3">
-        <Skeleton className="h-6 w-28" />
-        <div className="grid grid-cols-2 gap-4">
-          {Array.from({ length: 4 }, (_, i) => (
-            <Skeleton key={i} shape="card" className="h-30" />
-          ))}
-        </div>
-      </div>
-      <div className="flex flex-col gap-3">
-        <Skeleton className="h-6 w-32" />
-        {Array.from({ length: 4 }, (_, i) => (
-          <Skeleton key={i} className="h-10" />
-        ))}
-      </div>
-    </LoadingRegion>
-  );
-}

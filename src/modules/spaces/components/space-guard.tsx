@@ -6,7 +6,7 @@ import { useEffect, type ReactNode } from 'react';
 import { StatusPanel } from '@/modules/auth';
 import { Link } from '@/shared/i18n/navigation';
 import { Button } from '@/shared/ui/button';
-import { PageSkeleton } from '@/shared/ui/skeleton';
+import { BrandLoader } from '@/shared/ui/brand-loader';
 import { useSpace } from '../api/spaces-queries';
 import { lastSpace } from '../lib/last-space';
 
@@ -43,6 +43,6 @@ export function SpaceGuard({ spaceId, children }: { spaceId: string; children: R
       </main>
     );
   }
-  if (!space.data) return <PageSkeleton label={tc('loading')} />;
+  if (!space.data) return <BrandLoader label={tc('loading')} />;
   return <>{children}</>;
 }
