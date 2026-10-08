@@ -36,10 +36,10 @@ describe('SpaceSwitcher', () => {
     await userEvent.setup().click(await screen.findByRole('button', { name: /Family/ }));
     const family = await screen.findByRole('menuitem', { name: /^Family/ });
     expect(family).toHaveAttribute('aria-current', 'true');
-    expect(family).toHaveTextContent('Owner');
+    expect(family).toHaveTextContent('Власник');
     const startup = screen.getByRole('menuitem', { name: /^Startup/ });
     expect(startup).toHaveAttribute('href', '/s/b');
-    expect(startup).toHaveTextContent('Member');
+    expect(startup).toHaveTextContent('Учасник');
     expect(screen.getByRole('menuitem', { name: /Створити новий простір/ })).toHaveAttribute(
       'href',
       '/onboarding',

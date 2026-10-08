@@ -151,8 +151,8 @@
       "settingsOf": "Налаштування простору {name}"
     },
     "roles": {
-      "OWNER": "Owner",
-      "MEMBER": "Member"
+      "OWNER": "Власник",
+      "MEMBER": "Учасник"
     },
     "unavailable": {
       "title": "Простір недоступний",
