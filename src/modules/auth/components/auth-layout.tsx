@@ -1,13 +1,13 @@
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
+import { Logo } from '@/shared/ui/logo';
 
-// Brand panel decor (Figma 10:336–10:340): palette colors at 35%, positions on a 600×900 panel.
-const DECOR = [
-  'left-15 top-20 size-12 bg-palette-blue/35',
-  'left-120 top-35 size-16 bg-palette-teal/35',
-  'left-105 top-170 size-10 bg-palette-amber/35',
-  'left-22 top-185 size-14 bg-palette-violet/35',
-  'left-130 top-105 size-6 bg-palette-emerald/35',
+// Gold coins drifting up the brand panel (desktop only), staggered so it never looks synchronised.
+const COINS = [
+  { key: 'a', className: 'left-[14%] size-4 [animation-delay:0s]' },
+  { key: 'b', className: 'left-[68%] size-3 [animation-delay:2.5s]' },
+  { key: 'c', className: 'left-[40%] size-2.5 [animation-delay:5s]' },
+  { key: 'd', className: 'left-[82%] size-3.5 [animation-delay:6.5s]' },
 ];
 
 export function AuthLayout({ children }: { children: ReactNode }) {
@@ -15,11 +15,16 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-background md:flex-row">
       <aside className="relative flex h-30 shrink-0 flex-col items-center justify-center overflow-hidden bg-primary md:h-auto md:w-150">
-        {DECOR.map((cls) => (
-          <span key={cls} aria-hidden className={`absolute hidden rounded-full md:block ${cls}`} />
+        {COINS.map((c) => (
+          <span
+            key={c.key}
+            data-coin
+            aria-hidden
+            className={`absolute -bottom-6 hidden rounded-full bg-palette-amber/60 md:block motion-safe:animate-coin-rise motion-reduce:hidden ${c.className}`}
+          />
         ))}
-        <p className="text-h1 text-primary-foreground md:text-display">CoinSave</p>
-        <p className="mt-3 hidden text-body text-primary-foreground/85 md:block">{t('tagline')}</p>
+        <Logo motion="intro" tone="on-primary" size="auth" />
+        <p className="mt-4 hidden text-body text-primary-foreground/85 md:block">{t('tagline')}</p>
       </aside>
       <main className="flex flex-1 justify-center px-4 py-8 md:items-center md:px-16">
         <div className="w-full max-w-100">{children}</div>
