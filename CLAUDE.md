@@ -22,7 +22,7 @@ API: Swagger UI — https://app.coinsavekeeper.com/api/docs, контракт �
 - Серверний стан: TanStack Query v5; локальний — `useState`/`useReducer` (Zustand — тільки якщо з'явиться реальний cross-tree client-only стан)
 - API-клієнт: `openapi-typescript` + `openapi-fetch`, типи генеруються в `src/generated/` і комітяться в git (spec §12.6)
 - Realtime: `socket.io-client` (invalidation events)
-- i18n: `next-intl` (`uk` — дефолт, `en`), URL-префікс `/{locale}/...`
+- i18n: `next-intl` (`en` — дефолт, `uk` — лише за вибором користувача; мова браузера не враховується), URL-префікс `/{locale}/...`
 - Форми: `react-hook-form` + `zod`
 - Drag-and-drop: `@dnd-kit`
 - Графіки: `recharts`

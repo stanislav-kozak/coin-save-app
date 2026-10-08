@@ -10,5 +10,7 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}'],
     // Run in the target market's zone so date/midnight tests can't pass trivially in UTC CI.
     env: { TZ: 'Europe/Kyiv' },
+    // next-intl's middleware imports `next/server` without an extension; let Vite resolve it.
+    server: { deps: { inline: ['next-intl'] } },
   },
 });

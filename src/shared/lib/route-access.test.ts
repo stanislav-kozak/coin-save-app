@@ -24,7 +24,7 @@ describe('getLoginRedirect', () => {
   });
 
   it('falls back to the default locale when the path has none', () => {
-    expect(getLoginRedirect('/analytics', false)).toBe('/uk/login');
+    expect(getLoginRedirect('/analytics', false)).toBe('/en/login'); // English unless chosen
     expect(getLoginRedirect('/login', false)).toBeNull();
   });
 });
