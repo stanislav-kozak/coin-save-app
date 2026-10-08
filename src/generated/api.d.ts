@@ -335,6 +335,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/currencies/rate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CurrenciesController_rate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/spaces/{spaceId}/wallets": {
         parameters: {
             query?: never;
@@ -778,6 +794,23 @@ export interface components {
         AcceptInvitationDto: {
             token: string;
         };
+        /** @enum {string} */
+        Currency: "USD" | "EUR" | "GBP" | "PLN" | "CZK" | "CHF" | "CAD" | "AUD" | "JPY" | "TRY" | "RON" | "UAH" | "RUB";
+        CurrencyRateResponseDto: {
+            from: components["schemas"]["Currency"];
+            to: components["schemas"]["Currency"];
+            /**
+             * Format: decimal
+             * @description 1 unit of `from` in `to`
+             * @example 0.0241
+             */
+            rate: string;
+            /**
+             * @description Day (Kyiv) the rate applies to
+             * @example 2026-10-08
+             */
+            date: string;
+        };
         CreateWalletDto: {
             /**
              * @description Up to 4 decimal places; may be negative (e.g. a credit card)
@@ -821,6 +854,8 @@ export interface components {
              * @example 1250.5
              */
             initialBalance?: number;
+            /** @description Converts initialBalance, every transaction's amount and every recurring rule's amount at today's rate (4 dp); amounts in the space currency stay. Cannot be combined with initialBalance. */
+            currency?: components["schemas"]["Currency"];
             name?: string;
             icon?: string;
             color?: string;
@@ -828,6 +863,8 @@ export interface components {
         CreateCategoryDto: {
             /** @example 12.5 */
             monthlyLimit?: number;
+            /** @description Currency of this category's budget; null follows the space. Changing it converts monthlyLimit at today's rate (whole units) unless monthlyLimit is sent too, taken as given in the new currency. */
+            currency?: components["schemas"]["Currency"] | null;
             name: string;
             icon?: string;
             color?: string;
@@ -840,10 +877,12 @@ export interface components {
             color: string | null;
             /**
              * Format: decimal
-             * @description In the space's primary currency
+             * @description In `currency`, or the space currency when that is null
              * @example 1250.5
              */
             monthlyLimit: string | null;
+            /** @description Own budget currency; null follows the space */
+            currency: components["schemas"]["Currency"] | null;
             archived: boolean;
             sortOrder: number;
             /** Format: date-time */
@@ -860,6 +899,8 @@ export interface components {
              * @example 12.5
              */
             monthlyLimit?: number | null;
+            /** @description Currency of this category's budget; null follows the space. Changing it converts monthlyLimit at today's rate (whole units) unless monthlyLimit is sent too, taken as given in the new currency. */
+            currency?: components["schemas"]["Currency"] | null;
             name?: string;
             icon?: string;
             color?: string;
@@ -990,11 +1031,21 @@ export interface components {
             color: string | null;
             /**
              * Format: decimal
+             * @description In the space currency
              * @example 1250.5
              */
             spent: string;
+            /** @description The category's budget currency (the space's if it has none) */
+            currency: components["schemas"]["Currency"];
             /**
              * Format: decimal
+             * @description Spent in `currency`: each expense converted at its own day's rate (equals `spent` when `currency` is the space currency)
+             * @example 1250.5
+             */
+            spentInCurrency: string;
+            /**
+             * Format: decimal
+             * @description In `currency`
              * @example 1250.5
              */
             limit: string | null;
@@ -2123,6 +2174,55 @@ export interface operations {
             };
         };
     };
+    CurrenciesController_rate: {
+        parameters: {
+            query: {
+                from: components["schemas"]["Currency"];
+                to: components["schemas"]["Currency"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrencyRateResponseDto"];
+                };
+            };
+            /** @description Codes: VALIDATION_ERROR */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: HTTP_ERROR */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: CURRENCY_API_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
     WalletsController_list: {
         parameters: {
             query?: {
@@ -2327,6 +2427,24 @@ export interface operations {
             };
             /** @description Codes: WALLET_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: WALLET_ARCHIVED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: CURRENCY_API_UNAVAILABLE */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2749,6 +2867,15 @@ export interface operations {
             };
             /** @description Codes: CATEGORY_NAME_TAKEN */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: CURRENCY_API_UNAVAILABLE */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3585,6 +3712,15 @@ export interface operations {
             };
             /** @description Codes: FORBIDDEN_NOT_MEMBER */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: CURRENCY_API_UNAVAILABLE */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
