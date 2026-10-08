@@ -1,5 +1,5 @@
 import createMiddleware from 'next-intl/middleware';
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { routing } from '@/shared/i18n/routing';
 import { getLoginRedirect, getSignedInRedirect } from '@/shared/lib/route-access';
 
@@ -13,7 +13,18 @@ export default function proxy(request: NextRequest) {
   const target =
     getLoginRedirect(pathname, hasSession) ?? getSignedInRedirect(pathname, hasSession);
   if (target) return NextResponse.redirect(new URL(target, request.url));
-  return intl(request);
+  return intl(withoutBrowserLanguage(request));
+}
+
+/**
+ * The browser's language is not a choice: drop it so next-intl falls back to the user's cookie
+ * (set by the language switcher) or English, instead of guessing from Accept-Language.
+ */
+function withoutBrowserLanguage(request: NextRequest): NextRequest {
+  if (!request.headers.has('accept-language')) return request;
+  const headers = new Headers(request.headers);
+  headers.delete('accept-language');
+  return new NextRequest(request, { headers });
 }
 
 export const config = {
