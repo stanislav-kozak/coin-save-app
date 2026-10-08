@@ -155,12 +155,16 @@ describe('createRefreshingFetch', () => {
     expect(onAuthFailure).toHaveBeenCalledTimes(1);
   });
 
-  it('treats a network error during refresh as a failed refresh', async () => {
+  // The backend keeps the cookies when it can't decide (5xx): sending the user to /login would only
+  // bounce back through the proxy. They get the 401, so the page shows an error with a retry.
+  it.each([
+    ['a network error', () => Promise.reject(new TypeError('Failed to fetch'))],
+    ['a server error', () => Promise.resolve(respond(503, { code: 'SERVICE_UNAVAILABLE' }))],
+  ])('does not sign out when refresh fails with %s', async (_label, refreshOutcome) => {
     const onAuthFailure = vi.fn();
-    const fetchImpl = vi.fn(async (r: Request) => {
-      if (r.url === REFRESH) throw new TypeError('Failed to fetch');
-      return respond(401);
-    });
+    const fetchImpl = vi.fn(async (r: Request) =>
+      r.url === REFRESH ? refreshOutcome() : respond(401),
+    );
     const f = createRefreshingFetch({
       refreshUrl: REFRESH,
       onAuthFailure,
@@ -171,7 +175,67 @@ describe('createRefreshingFetch', () => {
     const res = await f(new Request(`${BASE}/api/spaces`));
 
     expect(res.status).toBe(401);
-    expect(onAuthFailure).toHaveBeenCalledTimes(1);
+    expect(onAuthFailure).not.toHaveBeenCalled();
+  });
+
+  it('gives up on a refresh that never answers, once for all waiting requests', async () => {
+    vi.useFakeTimers();
+    try {
+      const onAuthFailure = vi.fn();
+      // A sleeping database: the refresh hangs until it is aborted.
+      const fetchImpl = vi.fn(
+        (r: Request) =>
+          new Promise<Response>((resolve, reject) => {
+            if (r.url !== REFRESH) return resolve(respond(401));
+            r.signal.addEventListener('abort', () => reject(r.signal.reason));
+          }),
+      );
+      const f = createRefreshingFetch({
+        refreshUrl: REFRESH,
+        onAuthFailure,
+        fetchImpl,
+        lock: createLocalLock(),
+      });
+
+      const first = f(new Request(`${BASE}/api/spaces`));
+      const second = f(new Request(`${BASE}/api/spaces/s1/wallets`));
+      let settled = 0;
+      void Promise.all([first, second]).then(() => (settled = 2));
+      // One wait for everyone: the queued request doesn't start its own 10 s refresh.
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(settled).toBe(2);
+      expect((await first).status).toBe(401);
+      expect((await second).status).toBe(401);
+      expect(fetchImpl.mock.calls.filter(([r]) => r.url === REFRESH)).toHaveLength(1);
+      expect(onAuthFailure).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('tries again for a request made after a refresh was unavailable (the user pressed retry)', async () => {
+    const onAuthFailure = vi.fn();
+    let databaseAwake = false;
+    let accessValid = false; // only a successful refresh issues a new access token
+    const fetchImpl = vi.fn(async (r: Request) => {
+      if (r.url !== REFRESH) return accessValid ? respond(200) : respond(401);
+      if (!databaseAwake) return respond(503);
+      accessValid = true;
+      return respond(200);
+    });
+    const f = createRefreshingFetch({
+      refreshUrl: REFRESH,
+      onAuthFailure,
+      fetchImpl,
+      lock: createLocalLock(),
+    });
+
+    expect((await f(new Request(`${BASE}/api/spaces`))).status).toBe(401);
+    databaseAwake = true;
+    const retried = await f(new Request(`${BASE}/api/spaces`));
+
+    expect(retried.status).toBe(200);
+    expect(fetchImpl.mock.calls.filter(([r]) => r.url === REFRESH)).toHaveLength(2);
   });
 
   it.each(['/api/auth/login', '/api/auth/refresh', '/api/auth/logout'])(
