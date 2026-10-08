@@ -98,12 +98,17 @@ export function CategoriesGrid({
   const items = sorted.map((category) => {
     // Categories without spending this month are absent from analytics — show them at zero.
     const stats = byId.get(category.id);
-    const added = extra.get(category.id);
-    const spent = added ? addMoney(stats?.spent ?? '0', added) : (stats?.spent ?? '0');
+    // A category with its own currency shows its spending and limit in it (the space's by default).
+    const own = stats?.currency ?? category.currency ?? currency;
+    // Pending spends are in the space currency: added only where that's the category's currency;
+    // an own-currency category waits for the server's value (a moment later).
+    const added = own === currency ? extra.get(category.id) : undefined;
+    const base = stats?.spentInCurrency ?? '0';
+    const spent = added ? addMoney(base, added) : base;
     // Computed like the server (Math.round(spent / limit × 100)) from the limit shown next to it:
     // right after a limit edit the category list is fresh while analytics' pct is not yet.
     const pct = category.monthlyLimit ? percentOf(spent, category.monthlyLimit) : 0;
-    return { category, spent, pct, currency };
+    return { category, spent, pct, currency: own };
   });
 
   return (

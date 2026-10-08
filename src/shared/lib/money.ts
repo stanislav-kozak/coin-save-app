@@ -29,9 +29,16 @@ export function addMoney(a: string, b: string): string {
   return fromMinor(toMinor(a) + toMinor(b));
 }
 
-/** amount × rate (e.g. an FX rate), rounded half-up to the server's 4 places. */
+/**
+ * amount × rate (e.g. an FX rate), rounded half-up to the server's 4 places. The rate keeps all its
+ * places (FX rates have more than 4).
+ */
 export function multiplyMoney(amount: string, rate: string): string {
-  return fromMinor(roundDiv(toMinor(amount) * toMinor(rate), FACTOR));
+  const trimmed = rate.trim();
+  const negative = trimmed.startsWith('-');
+  const [int, frac = ''] = trimmed.replace(/^[-+]/, '').split('.');
+  const scaled = BigInt((int || '0') + frac) * (negative ? BigInt(-1) : BigInt(1));
+  return fromMinor(roundDiv(toMinor(amount) * scaled, BigInt(10) ** BigInt(frac.length)));
 }
 
 /** Math.round(spent / limit × 100) without floats, as the server computes `pct`; 0 when no limit. */

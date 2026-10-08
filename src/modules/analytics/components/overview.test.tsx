@@ -16,6 +16,8 @@ const analytics = {
       icon: '🛒',
       color: '#15bba3',
       spent: '600',
+      currency: 'UAH' as const,
+      spentInCurrency: '600',
       limit: '700',
       pct: 86,
     },
@@ -25,6 +27,8 @@ const analytics = {
       icon: '☕',
       color: '#ec4999',
       spent: '400',
+      currency: 'UAH' as const,
+      spentInCurrency: '400',
       limit: null,
       pct: 0,
     },
@@ -45,6 +49,31 @@ describe('SummaryCards', () => {
     expect(screen.getByText('—')).toBeInTheDocument(); // no income last month
     expect(screen.getByText(/\+2\s500,00\s₴/)).toHaveClass('text-success');
     expect(screen.getAllByText('vs минулий місяць')).toHaveLength(2);
+  });
+});
+
+describe('LimitBars', () => {
+  it("shows each limit in its category's currency", () => {
+    renderWithProviders(
+      <LimitBars
+        analytics={{
+          byCategory: [
+            {
+              categoryId: 'c3',
+              name: 'Подорож',
+              icon: '✈️',
+              color: null,
+              spent: '14108',
+              currency: 'EUR',
+              spentInCurrency: '340',
+              limit: '500',
+              pct: 68,
+            },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getByText(/340,00\s€ \/ 500,00\s€ · 68%/)).toBeInTheDocument();
   });
 });
 

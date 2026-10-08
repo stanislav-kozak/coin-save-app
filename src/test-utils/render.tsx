@@ -9,7 +9,7 @@ export function renderWithProviders(ui: ReactElement, { locale = 'uk' as 'uk' | 
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  return render(
+  const result = render(
     <NextIntlClientProvider
       locale={locale}
       messages={locale === 'uk' ? uk : en}
@@ -18,4 +18,5 @@ export function renderWithProviders(ui: ReactElement, { locale = 'uk' as 'uk' | 
       <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
     </NextIntlClientProvider>,
   );
+  return { ...result, queryClient };
 }
