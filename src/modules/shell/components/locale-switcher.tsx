@@ -26,7 +26,8 @@ export function LocaleSwitcher({ saveToAccount = true }: { saveToAccount?: boole
       aria-label={t(next)}
       onClick={() => {
         if (saveToAccount) updateMe.mutate({ locale: next });
-        router.replace(pathname, { locale: next });
+        // Keep the query: email links (reset password, verify email) carry their token in it.
+        router.replace(`${pathname}${window.location.search}`, { locale: next });
       }}
       className="h-8 rounded-full border border-border bg-card px-3 text-caption font-medium"
     >

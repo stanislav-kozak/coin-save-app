@@ -96,7 +96,10 @@ describe('LoginForm', () => {
     renderWithProviders(<LoginForm />);
     await fillAndSubmit('a@b.co', 'bad');
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Email або пароль не підходять');
+    // The way out is the link itself; the sentence doesn't say it a second time.
+    expect(alert).toHaveTextContent(
+      /^Email або пароль не підходять\. Перевірте розкладку клавіатури\.\s+Відновити пароль$/,
+    );
     // The way out sits right under the error.
     expect(within(alert).getByRole('link', { name: 'Відновити пароль' })).toHaveAttribute(
       'href',

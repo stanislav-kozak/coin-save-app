@@ -26,7 +26,7 @@
     "INTERNAL_ERROR": "Server error. Please try again later",
     "TOO_MANY_REQUESTS": "Too many tries in a row. Wait a minute and try again.",
     "EMAIL_ALREADY_EXISTS": "This email is already registered. Did you mean to sign in?",
-    "INVALID_CREDENTIALS": "That email and password don't match. Check your keyboard layout — or reset your password.",
+    "INVALID_CREDENTIALS": "That email and password don't match. Check your keyboard layout.",
     "EMAIL_NOT_VERIFIED": "Verify your email to sign in",
     "EMAIL_DELIVERY_FAILED": "We couldn't send the confirmation email. Please try signing up again a bit later",
     "INVALID_VERIFICATION_TOKEN": "The verification link is invalid or expired",
