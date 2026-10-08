@@ -98,6 +98,17 @@ describe('WalletDialog', () => {
     }
   });
 
+  it('a half-typed initial balance does not block a currency change', async () => {
+    renderDialog();
+    const user = userEvent.setup();
+    await user.clear(screen.getByLabelText('Початковий баланс'));
+    await user.type(screen.getByLabelText('Початковий баланс'), 'abc');
+    await user.selectOptions(screen.getByLabelText('Валюта'), 'USD');
+    await screen.findByText(/≈/);
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(await screen.findByRole('button', { name: 'Змінити валюту' })).toBeInTheDocument();
+  });
+
   it('goes back to the form with its values when the change is cancelled', async () => {
     renderDialog();
     const user = userEvent.setup();

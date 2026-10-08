@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 import { SUPPORTED_CURRENCIES, currencyLabel, type Currency } from '@/shared/constants/currencies';
@@ -58,7 +58,7 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
   const [error, setError] = useState<unknown>(null);
   const busy = update.isPending || archive.isPending;
 
-  const { register, handleSubmit, formState, control } = useForm<
+  const { register, handleSubmit, formState, control, resetField } = useForm<
     z.input<typeof updateWalletSchema>,
     unknown,
     UpdateWalletValues
@@ -73,6 +73,10 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
   });
   const currency = useWatch({ control, name: 'currency' });
   const changing = currency !== walletCurrency;
+  // The balance is locked while the currency changes: a half-typed value must not block saving.
+  useEffect(() => {
+    if (changing) resetField('initialBalance');
+  }, [changing, resetField]);
   const rate = useRate(walletCurrency, currency);
   const converted = rate.data ? multiplyMoney(wallet.balance, rate.data.rate) : null;
   const errors = formState.errors;

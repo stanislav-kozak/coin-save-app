@@ -20,6 +20,26 @@ describe('CurrencyPreview', () => {
     expect(screen.getByText(/1\s₴ = 0,0241\s\$/)).toBeInTheDocument();
   });
 
+  it('works where Intl needs a minimum fraction with a 0 maximum (Safari < 15.4)', async () => {
+    const Original = Intl.NumberFormat;
+    // Older engines throw when maximumFractionDigits drops below a currency's default minimum.
+    const strict = vi.spyOn(Intl, 'NumberFormat').mockImplementation(function (
+      locale?: string | string[],
+      opts?: Intl.NumberFormatOptions,
+    ) {
+      if (opts?.maximumFractionDigits === 0 && opts.minimumFractionDigits === undefined) {
+        throw new RangeError('maximumFractionDigits value is out of range');
+      }
+      return new Original(locale, opts);
+    } as unknown as typeof Intl.NumberFormat);
+    try {
+      renderWithProviders(<CurrencyPreview balance="1000" from="UAH" to="USD" />);
+      expect(await screen.findByText(/1\s₴ = 0,0241\s\$/)).toBeInTheDocument();
+    } finally {
+      strict.mockRestore();
+    }
+  });
+
   it('keeps the sign of a negative balance', async () => {
     renderWithProviders(<CurrencyPreview balance="-1000" from="UAH" to="USD" />);
     expect(await screen.findByText(/≈\s?-24,10\s\$/)).toBeInTheDocument();

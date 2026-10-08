@@ -39,7 +39,10 @@ export function CurrencyPreview({
       style: 'currency',
       currency: c,
       currencyDisplay: 'narrowSymbol',
-      ...(digits ? { maximumSignificantDigits: digits } : { maximumFractionDigits: 0 }),
+      // minimumFractionDigits too: older engines (Safari < 15.4) throw on a max below the default min.
+      ...(digits
+        ? { maximumSignificantDigits: digits }
+        : { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
     }).format(amount as Intl.StringNumericLiteral);
   return (
     <div className="flex flex-col gap-1 text-caption">
