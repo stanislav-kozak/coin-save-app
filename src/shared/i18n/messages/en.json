@@ -87,7 +87,8 @@
       "forgot": "Forgot password?",
       "submit": "Sign in",
       "noAccount": "No account?",
-      "signupLink": "Sign up"
+      "signupLink": "Sign up",
+      "submitting": "Signing in…"
     },
     "signup": {
       "title": "Create an account",
@@ -95,7 +96,8 @@
       "verifyNote": "We'll send you an email to confirm your address — you can sign in after confirming",
       "submit": "Sign up",
       "haveAccount": "Already have an account?",
-      "loginLink": "Sign in"
+      "loginLink": "Sign in",
+      "submitting": "Creating your account…"
     },
     "checkEmail": {
       "title": "Check your email",
@@ -112,7 +114,8 @@
       "submit": "Send link",
       "remembered": "Remembered it?",
       "loginLink": "Sign in",
-      "sent": "If an account with this email exists, we've sent it a password reset link"
+      "sent": "If an account with this email exists, we've sent it a password reset link",
+      "submitting": "Sending…"
     },
     "reset": {
       "title": "New password",
@@ -122,7 +125,8 @@
       "requestNew": "Request a new link",
       "successTitle": "Password changed",
       "successText": "Now sign in with your new password",
-      "toLogin": "Sign in"
+      "toLogin": "Sign in",
+      "submitting": "Saving…"
     },
     "verify": {
       "pending": "Confirming your email…",

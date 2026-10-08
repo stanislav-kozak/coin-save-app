@@ -79,7 +79,14 @@ describe('LoginForm', () => {
     renderWithProviders(<LoginForm />);
     await fillAndSubmit('a@b.co', 'secret');
     await vi.waitFor(() => expect(get).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: 'Увійти' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Входимо…' })).toBeDisabled();
+  });
+
+  it('says it is signing in while the request runs', async () => {
+    post.mockReturnValue(new Promise(() => {}));
+    renderWithProviders(<LoginForm />);
+    await fillAndSubmit('a@b.co', 'secret');
+    expect(await screen.findByRole('button', { name: 'Входимо…' })).toBeDisabled();
   });
 
   it('shows wrong credentials in the current language', async () => {

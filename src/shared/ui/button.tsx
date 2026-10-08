@@ -2,6 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { Slot } from 'radix-ui';
 import type { ComponentProps } from 'react';
 import { cn } from '@/shared/lib/utils';
+import { BrandMark } from './brand-mark';
 
 // Design system §5: Primary / Secondary (outline) / Ghost / Danger; M = 40px, S = 32px.
 export const buttonVariants = cva(
@@ -24,9 +25,41 @@ export const buttonVariants = cva(
 );
 
 type ButtonProps = ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & { asChild?: boolean };
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+    /** Busy: disabled, with the looping mark and `loadingText` (not combined with `asChild`). */
+    loading?: boolean;
+    loadingText?: string;
+  };
 
-export function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
+export function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  loading = false,
+  loadingText,
+  disabled,
+  children,
+  ...props
+}: ButtonProps) {
   const Comp = asChild ? Slot.Root : 'button';
-  return <Comp className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+  const onPrimary = variant !== 'secondary' && variant !== 'ghost';
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size }), className)}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
+      {loading ? (
+        <>
+          <BrandMark size={16} motion="loop" tone={onPrimary ? 'on-primary' : 'default'} />
+          {loadingText ?? children}
+        </>
+      ) : (
+        children
+      )}
+    </Comp>
+  );
 }

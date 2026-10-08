@@ -100,7 +100,11 @@ export function LoginForm() {
             {te(apiError)}
           </p>
         ) : null}
-        <Button type="submit" disabled={login.isPending || entering}>
+        <Button
+          type="submit"
+          loading={login.isPending || entering}
+          loadingText={t('login.submitting')}
+        >
           {t('login.submit')}
         </Button>
       </form>

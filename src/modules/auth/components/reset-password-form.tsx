@@ -94,7 +94,7 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
             </Link>
           </p>
         ) : null}
-        <Button type="submit" disabled={reset.isPending}>
+        <Button type="submit" loading={reset.isPending} loadingText={t('reset.submitting')}>
           {t('reset.submit')}
         </Button>
       </form>

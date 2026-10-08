@@ -87,7 +87,7 @@ export function SignupForm() {
             {te(getErrorCode(signup.error))}
           </p>
         ) : null}
-        <Button type="submit" disabled={signup.isPending}>
+        <Button type="submit" loading={signup.isPending} loadingText={t('signup.submitting')}>
           {t('signup.submit')}
         </Button>
       </form>
