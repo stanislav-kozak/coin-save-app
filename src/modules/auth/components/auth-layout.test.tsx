@@ -17,8 +17,13 @@ it('shows the animated logo, the tagline and decorative coins that hide for redu
   expect(coins.length).toBeGreaterThanOrEqual(3);
   for (const c of coins) {
     expect(c).toHaveAttribute('aria-hidden');
-    expect(c.getAttribute('class')).toContain('motion-reduce:hidden');
+    // Shown only on desktop with motion allowed; a hide-on-reduce class loses to md:block.
+    expect(c.getAttribute('class')).toContain('md:motion-safe:block');
+    expect(c.getAttribute('class')).not.toContain('md:block ');
   }
+  // Staggered inline (the animate-* shorthand would reset a delay set by a class): never in step.
+  const delays = [...coins].map((c) => (c as HTMLElement).style.animationDelay);
+  expect(new Set(delays).size).toBe(coins.length);
   expect(screen.getByText('form')).toBeInTheDocument();
 });
 

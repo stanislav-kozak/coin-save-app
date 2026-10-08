@@ -2,12 +2,13 @@ import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { Logo } from '@/shared/ui/logo';
 
-// Gold coins drifting up the brand panel (desktop only), staggered so it never looks synchronised.
+// Gold coins drifting up the brand panel (desktop only). Delays and durations are inline: the
+// animate-* utility is an `animation` shorthand and would reset a delay set by a class.
 const COINS = [
-  { key: 'a', className: 'left-[14%] size-4 [animation-delay:0s]' },
-  { key: 'b', className: 'left-[68%] size-3 [animation-delay:2.5s]' },
-  { key: 'c', className: 'left-[40%] size-2.5 [animation-delay:5s]' },
-  { key: 'd', className: 'left-[82%] size-3.5 [animation-delay:6.5s]' },
+  { key: 'a', className: 'left-[14%] size-4', delay: '0s', duration: '8s' },
+  { key: 'b', className: 'left-[68%] size-3', delay: '-3s', duration: '9.5s' },
+  { key: 'c', className: 'left-[40%] size-2.5', delay: '-5.5s', duration: '7.5s' },
+  { key: 'd', className: 'left-[82%] size-3.5', delay: '-1.5s', duration: '10s' },
 ];
 
 /** `actions`: page-level controls (language, theme) shown top-right of the form column. */
@@ -21,7 +22,8 @@ export function AuthLayout({ children, actions }: { children: ReactNode; actions
             key={c.key}
             data-coin
             aria-hidden
-            className={`absolute -bottom-6 hidden rounded-full bg-palette-amber/60 md:block motion-safe:animate-coin-rise motion-reduce:hidden ${c.className}`}
+            style={{ animationDelay: c.delay, animationDuration: c.duration }}
+            className={`absolute -bottom-6 hidden rounded-full bg-palette-amber/60 md:motion-safe:block motion-safe:animate-coin-rise ${c.className}`}
           />
         ))}
         <Logo motion="intro" tone="on-primary" size="auth" />
