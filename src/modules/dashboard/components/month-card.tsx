@@ -42,8 +42,10 @@ export function MonthCard({ spaceId }: { spaceId: string }) {
         .map((c) => c.currency as Currency),
     ),
   ];
-  const rates = useRates(own, space ?? 'UAH');
+  const rates = useRates(space ? own : [], space ?? 'UAH');
 
+  // A failed load steps aside: the categories grid below shows the same error with a retry.
+  if (analytics.isError || categories.isError) return null;
   if (!analytics.data || !categories.data || !space) {
     return <Skeleton shape="card" className="h-36 md:col-span-3" />;
   }
@@ -96,6 +98,9 @@ export function MonthCard({ spaceId }: { spaceId: string }) {
             <p className="text-caption text-muted-foreground">{t('excluded')}</p>
           ) : null}
         </div>
+      ) : limits.excluded ? (
+        // Limits exist, only in a currency whose rate is unavailable right now.
+        <p className="text-caption text-muted-foreground">{t('excluded')}</p>
       ) : (
         <p className="text-body text-muted-foreground">
           <span>{t('noLimits')}</span> ·{' '}

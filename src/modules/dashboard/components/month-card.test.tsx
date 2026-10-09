@@ -93,4 +93,23 @@ describe('MonthCard', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Задати' }));
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
+
+  it('with only a foreign-currency limit and its rate down, says limits were left out (not «none set»)', async () => {
+    serve([{ id: 'c2', name: 'Подорож', monthlyLimit: '50', currency: 'EUR' }], { eurRate: null });
+    renderWithProviders(<MonthCard spaceId="s1" />);
+    expect(await screen.findByText(/Частину лімітів не враховано/)).toBeInTheDocument();
+    expect(screen.queryByText('Ліміти не задано')).toBeNull();
+  });
+
+  it('steps aside when the month cannot be loaded (the grid shows the error and the retry)', async () => {
+    get.mockImplementation(async (path: string) =>
+      path.endsWith('/analytics')
+        ? { error: { statusCode: 500, code: 'INTERNAL_ERROR', message: 'x' } }
+        : { data: [] },
+    );
+    const { container } = renderWithProviders(<MonthCard spaceId="s1" />);
+    await vi.waitFor(() => expect(get).toHaveBeenCalled());
+    await vi.waitFor(() => expect(container.querySelector('[data-skeleton]')).toBeNull());
+    expect(container).toBeEmptyDOMElement();
+  });
 });
