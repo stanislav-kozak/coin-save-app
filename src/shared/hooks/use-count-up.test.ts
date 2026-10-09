@@ -52,3 +52,33 @@ describe('useCountUp', () => {
     expect(result.current).toBe('200');
   });
 });
+
+describe('useCountUp — no flashes', () => {
+  it('keeps showing the old value until the first frame, then counts', () => {
+    const { result, rerender } = renderHook(({ v }) => useCountUp(v), {
+      initialProps: { v: '100' },
+    });
+    rerender({ v: '200' });
+    expect(result.current).toBe('100'); // never the target first, then a jump back
+  });
+
+  it('never goes below where it started', () => {
+    const { result, rerender } = renderHook(({ v }) => useCountUp(v), {
+      initialProps: { v: '0' },
+    });
+    rerender({ v: '50' });
+    for (let i = 0; i < 30; i++) {
+      act(() => vi.advanceTimersByTime(16));
+      expect(Number(result.current)).toBeGreaterThanOrEqual(0);
+    }
+    expect(result.current).toBe('50');
+  });
+
+  it('jumps without counting when the currency (key) changes', () => {
+    const { result, rerender } = renderHook(({ v, k }) => useCountUp(v, k), {
+      initialProps: { v: '1000', k: 'UAH' },
+    });
+    rerender({ v: '24.10', k: 'USD' });
+    expect(result.current).toBe('24.10');
+  });
+});

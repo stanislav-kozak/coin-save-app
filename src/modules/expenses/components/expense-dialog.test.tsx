@@ -85,7 +85,10 @@ describe('ExpenseDialog', () => {
       body: expect.objectContaining({ walletId: 'w1', categoryId: 'c9', amount: 340 }),
     });
     resolve({ data: { id: 'e1' } });
-    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Витрату додано'));
+    // A drag spend's feedback is the category's glow, not a toast (spec §3).
+    await vi.waitFor(() => expect(post).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 0));
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('reopens with the same values and the reason when the server refuses', async () => {
@@ -136,6 +139,7 @@ describe('ExpenseDialog', () => {
     const body = post.mock.calls[0][1].body;
     expect(body).toMatchObject({ walletId: 'w2', amount: 5 });
     expect(body.categoryId).toBeUndefined();
+    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Витрату додано'));
   });
 
   it('accepts a new drop while the previous save is pending and still reports its failure', async () => {

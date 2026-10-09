@@ -117,7 +117,8 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingS
       try {
         // A promise, not per-call callbacks: those are dropped once a newer open resets the observer.
         await create.mutateAsync({ ...draft, categoryId: draft.categoryId || undefined });
-        notify(tt('expenseAdded'));
+        // A drop's feedback is the category's glow; the toast is for the free «+» dialog (spec §3).
+        if (!prefill) notify(tt('expenseAdded'));
       } catch (error) {
         // Show the failed expense again — even over a newer, unsent one — so it isn't lost silently.
         restoring.current = !isOpen.current;

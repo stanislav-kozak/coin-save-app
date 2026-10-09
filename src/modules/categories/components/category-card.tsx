@@ -50,7 +50,7 @@ export function useCategoryCaption({ category, spent, pct, currency }: Props) {
   const limit = category.monthlyLimit;
   const excess = overLimit(spent, limit);
   // The amount counts to its new value; status and percentage use the real one.
-  const shownSpent = useCountUp(spent);
+  const shownSpent = useCountUp(spent, currency);
   return {
     status: limitStatus(spent, limit, pct),
     caption: limit
@@ -66,7 +66,7 @@ export function CategoryCard(props: Props) {
   const { category, pct, onEdit, handle } = props;
   const t = useTranslations('categories');
   const { status, caption, over, overLabel } = useCategoryCaption(props);
-  const pulse = usePulseOnIncrease(props.spent);
+  const pulse = usePulseOnIncrease(props.spent, props.currency);
   const justOver = useBecameTrue(status === 'over');
 
   return (
@@ -156,14 +156,14 @@ export function CategoryTile(props: Props) {
   const t = useTranslations('categories');
   const { status, caption } = useCategoryCaption(props);
   const fill = limitFill(spent, category.monthlyLimit);
-  const pulse = usePulseOnIncrease(spent);
+  const pulse = usePulseOnIncrease(spent, currency);
   const content = (
     <>
       {pulse > 0 ? (
         <span
           key={pulse}
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-card motion-safe:animate-entity-pulse"
+          className="pointer-events-none absolute inset-0 rounded-card motion-safe:animate-entity-pulse-inset"
         />
       ) : null}
       {fill ? (

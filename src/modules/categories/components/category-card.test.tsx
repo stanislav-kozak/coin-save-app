@@ -233,3 +233,17 @@ describe('CategoryCard — hover', () => {
     );
   });
 });
+
+describe('CategoryTile — reaction', () => {
+  it('glows inside the tile (an outer glow would be clipped by its rounded overflow)', () => {
+    const props = {
+      category: { id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: null },
+      spent: '100',
+      pct: 0,
+      currency: 'UAH',
+    };
+    const { container, rerender } = renderWithProviders(<CategoryTile {...props} />);
+    rerender(<CategoryTile {...props} spent="150" />);
+    expect(container.querySelector('.motion-safe\\:animate-entity-pulse-inset')).not.toBeNull();
+  });
+});

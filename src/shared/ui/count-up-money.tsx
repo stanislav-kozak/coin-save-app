@@ -17,7 +17,7 @@ export function CountUpMoney({
   className?: string;
 }) {
   const locale = useLocale();
-  const frame = useCountUp(value);
+  const frame = useCountUp(value, currency);
   return (
     <span className={className}>
       <span aria-hidden="true">{formatMoney(frame, currency, locale, { sign })}</span>

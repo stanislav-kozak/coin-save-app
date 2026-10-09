@@ -14,3 +14,11 @@ it('pulses only when the amount grows after mount', () => {
   rerender({ v: '200' });
   expect(result.current).toBe(2);
 });
+
+it('does not pulse when the amount changes currency', () => {
+  const { result, rerender } = renderHook(({ v, k }) => usePulseOnIncrease(v, k), {
+    initialProps: { v: '24', k: 'EUR' },
+  });
+  rerender({ v: '1000', k: 'UAH' });
+  expect(result.current).toBe(0);
+});
