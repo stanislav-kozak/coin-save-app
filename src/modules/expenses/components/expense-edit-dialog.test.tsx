@@ -14,6 +14,9 @@ vi.mock('@/shared/lib/api-client', () => ({
     DELETE: (...a: unknown[]) => api.DELETE(...a),
   },
 }));
+const notify = vi.fn();
+vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
+beforeEach(() => notify.mockReset());
 
 const expense = {
   id: 'e1',
@@ -82,6 +85,7 @@ describe('ExpenseEditDialog', () => {
         ['analytics', 's1'],
       ]),
     );
+    expect(notify).toHaveBeenCalledWith('Збережено');
   });
 
   it('can make an expense uncategorized and remove its note', async () => {
@@ -120,6 +124,7 @@ describe('ExpenseEditDialog', () => {
         params: { path: { spaceId: 's1', expenseId: 'e1' } },
       }),
     );
+    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Запис видалено'));
   });
 
   it('shows a server refusal in place', async () => {
@@ -131,5 +136,6 @@ describe('ExpenseEditDialog', () => {
     await user.type(await screen.findByLabelText('Нотатка'), '!');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(notify).not.toHaveBeenCalled();
   });
 });

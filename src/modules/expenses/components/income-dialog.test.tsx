@@ -10,6 +10,9 @@ const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({
   api: { POST: (...a: unknown[]) => post(...a), GET: (...a: unknown[]) => get(...a) },
 }));
+const notify = vi.fn();
+vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
+beforeEach(() => notify.mockReset());
 
 beforeEach(() => {
   post.mockReset();
@@ -91,6 +94,7 @@ describe('IncomeDialog', () => {
     expect(screen.queryByLabelText('Назва')).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Додати' }));
     await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Дохід додано'));
   });
 
   it('retries only the monthly rule when it failed after the income was added', async () => {
@@ -122,6 +126,7 @@ describe('IncomeDialog', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
     expect(screen.getByLabelText('Сума')).toHaveValue('250');
     expect(post).toHaveBeenCalledTimes(1);
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('asks for a name before creating a monthly rule', async () => {

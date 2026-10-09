@@ -12,6 +12,9 @@ vi.mock('@/shared/lib/api-client', () => ({
     PATCH: (...a: unknown[]) => api.PATCH(...a),
   },
 }));
+const notify = vi.fn();
+vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
+beforeEach(() => notify.mockReset());
 
 const netflix = {
   id: 'r1',
@@ -84,6 +87,7 @@ describe('RecurringDialog', () => {
         },
       },
     ]);
+    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Регулярний платіж збережено'));
   });
 
   it('has no category for an income', async () => {
@@ -147,6 +151,7 @@ describe('RecurringDialog', () => {
     await user.type(screen.getByLabelText('Назва'), ' HD');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('explains short months for days 29–31', async () => {

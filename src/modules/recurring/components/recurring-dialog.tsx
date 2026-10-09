@@ -19,6 +19,7 @@ import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useCreateRecurring, useUpdateRecurring } from '../api/recurring-mutations';
 import { firstPaymentDate } from '../lib/first-payment-date';
 import { recurringFormSchema, type RecurringFormInput, type RecurringFormValues } from '../schemas';
+import { notify } from '@/shared/ui/toaster';
 
 type Rule = components['schemas']['RecurringTransactionResponseDto'];
 type ValidationKey =
@@ -59,6 +60,7 @@ const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 /** Create/edit a monthly rule (spec §7.6). Not optimistic: nothing is on screen until it's saved. */
 export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }: Props) {
   const t = useTranslations('recurring');
+  const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const tc = useTranslations('common');
   const locale = useLocale();
@@ -135,6 +137,7 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
           ...(note ? { note } : {}),
         });
       }
+      notify(tt('recurringSaved'));
       onOpenChange(false);
     } catch (e) {
       setError(e);

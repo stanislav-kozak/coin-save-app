@@ -15,6 +15,7 @@ import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
 import { useCreateExpense } from '../api/expenses-mutations';
 import { incomeSchema, type IncomeDraft, type IncomeFormInput } from '../income-schema';
+import { notify } from '@/shared/ui/toaster';
 
 type CreateRecurring = components['schemas']['CreateRecurringTransactionDto'];
 type ValidationKey =
@@ -40,6 +41,7 @@ const EMPTY: IncomeFormInput = { amount: '', note: '', monthly: false, name: '' 
  */
 export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
   const t = useTranslations('expenses');
+  const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const wallets = useWallets(spaceId);
   const create = useCreateExpense(spaceId);
@@ -141,6 +143,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
       reopen(error, values, 'form', target);
       return;
     }
+    notify(tt('incomeAdded'));
     if (!draft.monthly) return;
     const now = openedAt;
     await saveRule(

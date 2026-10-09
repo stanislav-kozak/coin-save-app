@@ -19,6 +19,7 @@ import { Input } from '@/shared/ui/input';
 import { useArchiveWallet, useUpdateWallet } from '../api/wallets-queries';
 import { updateWalletSchema, type UpdateWalletValues } from '../schemas';
 import { CurrencyPreview } from './currency-preview';
+import { notify } from '@/shared/ui/toaster';
 
 type ValidationKey = 'nameRequired' | 'nameTooLong' | 'amountInvalid' | 'amountTooLarge';
 export type EditableWallet = {
@@ -47,6 +48,7 @@ const SELECT =
  */
 export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
   const t = useTranslations('wallets');
+  const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const locale = useLocale();
   // The response types the code as a plain string; it's always one of the supported ones.
@@ -85,11 +87,13 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 
   // Not optimistic: rare, and a refusal must show in place.
-  const run = async (action: () => Promise<unknown>) => {
+  // `done`: the confirmation toast for a save (none for archive/delete here).
+  const run = async (action: () => Promise<unknown>, done?: string) => {
     if (busy) return;
     setError(null);
     try {
       await action();
+      if (done) notify(done);
       onOpenChange(false);
     } catch (e) {
       setError(e);
@@ -127,7 +131,12 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
               </Button>
               <Button
                 disabled={busy}
-                onClick={() => void run(() => update.mutateAsync({ id: wallet.id, body: confirm }))}
+                onClick={() =>
+                  void run(
+                    () => update.mutateAsync({ id: wallet.id, body: confirm }),
+                    tt('walletSaved'),
+                  )
+                }
               >
                 {t('edit.currencyConfirm')}
               </Button>
@@ -165,7 +174,7 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
                 const body: Body = changedFields(values, dirtyFields);
                 if (!changing) {
                   delete body.currency;
-                  return run(() => update.mutateAsync({ id: wallet.id, body }));
+                  return run(() => update.mutateAsync({ id: wallet.id, body }), tt('walletSaved'));
                 }
                 // The server converts the balance; the API refuses both at once.
                 delete body.initialBalance;

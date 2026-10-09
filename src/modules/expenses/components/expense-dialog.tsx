@@ -14,6 +14,7 @@ import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
 import { useCreateExpense } from '../api/expenses-mutations';
 import { createExpenseSchema, type ExpenseDraft, type ExpenseFormInput } from '../schemas';
+import { notify } from '@/shared/ui/toaster';
 
 type ValidationKey =
   | 'walletRequired'
@@ -38,6 +39,7 @@ const SELECT =
 /** "Нова витрата" (Figma 10:176). Closes on submit; reopens with the same values if the server refuses. */
 export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingSpend }: Props) {
   const t = useTranslations('expenses');
+  const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
@@ -115,6 +117,7 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingS
       try {
         // A promise, not per-call callbacks: those are dropped once a newer open resets the observer.
         await create.mutateAsync({ ...draft, categoryId: draft.categoryId || undefined });
+        notify(tt('expenseAdded'));
       } catch (error) {
         // Show the failed expense again — even over a newer, unsent one — so it isn't lost silently.
         restoring.current = !isOpen.current;

@@ -3,6 +3,7 @@ import { ExpenseLauncherProvider } from '@/modules/expenses';
 import { ConnectionBanner, RealtimeProvider } from '@/modules/realtime';
 import { SpaceGuard } from '@/modules/spaces';
 import { AppHeader } from './app-header';
+import { Toaster } from '@/shared/ui/toaster';
 import { BottomNav } from './bottom-nav';
 
 export function AppShell({ spaceId, children }: { spaceId: string; children: ReactNode }) {
@@ -17,6 +18,7 @@ export function AppShell({ spaceId, children }: { spaceId: string; children: Rea
           </div>
           <SpaceGuard spaceId={spaceId}>{children}</SpaceGuard>
           <BottomNav spaceId={spaceId} />
+          <Toaster />
         </div>
       </ExpenseLauncherProvider>
     </RealtimeProvider>

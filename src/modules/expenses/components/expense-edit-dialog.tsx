@@ -18,6 +18,7 @@ import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useDeleteExpense, useUpdateExpense } from '../api/expenses-mutations';
+import { notify } from '@/shared/ui/toaster';
 
 /** The fields both record shapes share (ExpenseResponseDto, AnalyticsExpenseItemDto). */
 export type EditableExpense = {
@@ -81,6 +82,7 @@ export function ExpenseEditDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const t = useTranslations('expenses');
+  const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const tc = useTranslations('common');
   const wallets = useWallets(spaceId, { includeArchived: true });
@@ -118,6 +120,7 @@ export function ExpenseEditDialog({
     };
     try {
       await update.mutateAsync({ id: expense.id, body });
+      notify(tt('saved'));
       onOpenChange(false);
     } catch (e) {
       setError(e);
@@ -133,6 +136,7 @@ export function ExpenseEditDialog({
         tone="danger"
         onConfirm={async () => {
           await remove.mutateAsync(expense.id);
+          notify(tt('deleted'));
           onOpenChange(false);
         }}
         onClose={() => setConfirm(false)}

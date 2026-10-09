@@ -9,6 +9,9 @@ const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({
   api: { PATCH: (...a: unknown[]) => patch(...a), GET: (...a: unknown[]) => get(...a) },
 }));
+const notify = vi.fn();
+vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
+beforeEach(() => notify.mockReset());
 
 const mono = {
   id: 'w1',
@@ -53,6 +56,7 @@ describe('WalletDialog', () => {
       params: { path: { spaceId: 'sp1', walletId: 'w1' } },
       body: { name: 'Monobank', color: '#f59e0b', initialBalance: 1250.5 },
     });
+    expect(notify).toHaveBeenCalledWith('Гаманець збережено');
   });
 
   it('previews a currency change and locks the initial balance', async () => {
@@ -168,6 +172,7 @@ describe('WalletDialog', () => {
     renderDialog();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('sends only what changed, so a wallet without a color keeps none', async () => {
