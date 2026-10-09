@@ -16,7 +16,9 @@ vi.mock('@/shared/lib/api-client', () => ({
 }));
 const notify = vi.fn();
 vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
-beforeEach(() => notify.mockReset());
+beforeEach(() => {
+  notify.mockReset();
+});
 
 const expense = {
   id: 'e1',
