@@ -5,6 +5,7 @@ import type { ComponentPropsWithRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/shared/lib/money';
 import { useCountUp } from '@/shared/hooks/use-count-up';
+import { useBecameTrue } from '@/shared/hooks/use-became-true';
 import { usePulseOnIncrease } from '@/shared/hooks/use-pulse-on-increase';
 import { entityStyle } from '@/shared/lib/entity-color';
 import { cn } from '@/shared/lib/utils';
@@ -66,6 +67,7 @@ export function CategoryCard(props: Props) {
   const t = useTranslations('categories');
   const { status, caption, over, overLabel } = useCategoryCaption(props);
   const pulse = usePulseOnIncrease(props.spent);
+  const justOver = useBecameTrue(status === 'over');
 
   return (
     <article
@@ -82,7 +84,12 @@ export function CategoryCard(props: Props) {
       ) : null}
       {status === 'over' && over ? (
         // On the card's top edge, so the header keeps its whole width for the name.
-        <span className="absolute -top-3 right-4 rounded-full border border-destructive bg-card px-2 text-caption font-medium whitespace-nowrap text-destructive shadow-card">
+        <span
+          className={cn(
+            'absolute -top-3 right-4 rounded-full border border-destructive bg-card px-2 text-caption font-medium whitespace-nowrap text-destructive shadow-card',
+            justOver && 'motion-safe:animate-badge-pop',
+          )}
+        >
           {over} <span>{overLabel}</span>
         </span>
       ) : null}
@@ -120,7 +127,10 @@ export function CategoryCard(props: Props) {
       >
         {/* Width is data (percentage), the only other inline style besides entity colors. */}
         <div
-          className={cn('h-full rounded-full', BAR[status])}
+          className={cn(
+            'h-full rounded-full motion-safe:transition-[width,background-color] motion-safe:duration-500 motion-safe:ease-out',
+            BAR[status],
+          )}
           style={{ width: `${status === 'none' ? 0 : Math.min(pct, 100)}%` }}
         />
       </div>
@@ -206,6 +216,7 @@ export function CategoryTile(props: Props) {
 export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
   const { category, pct } = props;
   const { status, caption, over, overLabel } = useCategoryCaption(props);
+  const justOver = useBecameTrue(status === 'over');
   return (
     <li className="flex items-center gap-3 py-2">
       <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
@@ -213,7 +224,12 @@ export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
         <div className="flex items-center justify-between gap-2">
           <span className="truncate text-body font-medium">{category.name}</span>
           {status === 'over' && over ? (
-            <span className="shrink-0 rounded-full border border-destructive px-2 text-caption font-medium text-destructive">
+            <span
+              className={cn(
+                'shrink-0 rounded-full border border-destructive px-2 text-caption font-medium text-destructive',
+                justOver && 'motion-safe:animate-badge-pop',
+              )}
+            >
               {over} <span>{overLabel}</span>
             </span>
           ) : null}
@@ -227,7 +243,10 @@ export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
           className="mt-1 h-2 overflow-hidden rounded-full bg-border"
         >
           <div
-            className={cn('h-full rounded-full', BAR[status])}
+            className={cn(
+              'h-full rounded-full motion-safe:transition-[width,background-color] motion-safe:duration-500 motion-safe:ease-out',
+              BAR[status],
+            )}
             style={{ width: `${status === 'none' ? 0 : Math.min(pct, 100)}%` }}
           />
         </div>

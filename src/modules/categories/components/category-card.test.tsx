@@ -190,3 +190,29 @@ describe('CategoryCard — reaction', () => {
     );
   });
 });
+
+describe('CategoryCard — limits', () => {
+  const props = {
+    category: { id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: '1000' },
+    currency: 'UAH',
+  };
+  const badgePops = (c: HTMLElement) => c.querySelector('.motion-safe\\:animate-badge-pop');
+
+  it('moves the bar smoothly', () => {
+    renderWithProviders(<CategoryCard {...props} spent="500" pct={50} />);
+    expect(screen.getByRole('progressbar').firstElementChild).toHaveClass(
+      'motion-safe:transition-[width,background-color]',
+    );
+  });
+
+  it('pops the over-limit badge when the limit is crossed, not when already over on load', () => {
+    const over = renderWithProviders(<CategoryCard {...props} spent="1200" pct={120} />);
+    expect(badgePops(over.container)).toBeNull();
+    over.unmount();
+    const { container, rerender } = renderWithProviders(
+      <CategoryCard {...props} spent="900" pct={90} />,
+    );
+    rerender(<CategoryCard {...props} spent="1200" pct={120} />);
+    expect(badgePops(container)).not.toBeNull();
+  });
+});
