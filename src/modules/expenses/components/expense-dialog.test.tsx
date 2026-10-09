@@ -12,7 +12,9 @@ vi.mock('@/shared/lib/api-client', () => ({
 }));
 const notify = vi.fn();
 vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
-beforeEach(() => notify.mockReset());
+beforeEach(() => {
+  notify.mockReset();
+});
 
 const wallets = [
   { id: 'w1', name: 'Mono', currency: 'UAH', balance: '100' },
@@ -97,7 +99,9 @@ describe('ExpenseDialog', () => {
     const user = userEvent.setup();
     await user.type(await screen.findByLabelText('Сума'), '340');
     await user.click(screen.getByRole('button', { name: 'Додати' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Цей гаманець в архіві — відновіть його в налаштуваннях',
+    );
     expect(openChanges).toEqual([false, true]);
     expect(screen.getByLabelText('Сума')).toHaveValue('340');
     expect(notify).not.toHaveBeenCalled();
@@ -161,7 +165,9 @@ describe('ExpenseDialog', () => {
     await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(2));
 
     answerFirst({ error: { statusCode: 400, code: 'WALLET_ARCHIVED', message: 'x' } });
-    expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Цей гаманець в архіві — відновіть його в налаштуваннях',
+    );
     expect(screen.getByLabelText('Сума')).toHaveValue('340');
     expect(screen.getByText(/Mono/)).toBeInTheDocument();
     expect(screen.getByText(/Кафе/)).toBeInTheDocument();
@@ -177,7 +183,7 @@ describe('ExpenseDialog', () => {
     const user = userEvent.setup();
     await user.type(await screen.findByLabelText('Сума'), '5');
     await user.click(screen.getByRole('button', { name: 'Додати' }));
-    expect(await screen.findByText('Оберіть гаманець')).toBeInTheDocument();
+    expect(await screen.findByText('З якого гаманця платимо?')).toBeInTheDocument();
     expect(post).not.toHaveBeenCalled();
   });
 

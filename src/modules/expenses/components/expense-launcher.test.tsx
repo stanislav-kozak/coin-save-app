@@ -89,7 +89,9 @@ describe('pending category spends', () => {
   it('drops it again when the server refuses', async () => {
     post.mockResolvedValue({ error: { statusCode: 400, code: 'WALLET_ARCHIVED', message: 'x' } });
     await dropAndSubmit();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Цей гаманець в архіві — відновіть його в налаштуваннях',
+    );
     // The optimistic value reverts when the save transition ends, a commit after the dialog reopens.
     await vi.waitFor(() => expect(screen.getByLabelText('pending')).toBeEmptyDOMElement());
   });

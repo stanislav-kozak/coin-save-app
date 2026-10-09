@@ -16,7 +16,9 @@ vi.mock('@/shared/lib/api-client', () => ({
 }));
 const notify = vi.fn();
 vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
-beforeEach(() => notify.mockReset());
+beforeEach(() => {
+  notify.mockReset();
+});
 
 const expense = {
   id: 'e1',
@@ -108,7 +110,9 @@ describe('ExpenseEditDialog', () => {
     await user.clear(when);
     await user.type(when, '2026-10-09T10:00');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
-    expect(await screen.findByText('Дата не може бути в майбутньому')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Ця дата ще не настала — оберіть сьогодні чи раніше'),
+    ).toBeInTheDocument();
     expect(api.PATCH).not.toHaveBeenCalled();
   });
 
@@ -135,7 +139,9 @@ describe('ExpenseEditDialog', () => {
     const user = userEvent.setup();
     await user.type(await screen.findByLabelText('Нотатка'), '!');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Цей гаманець в архіві — відновіть його в налаштуваннях',
+    );
     expect(notify).not.toHaveBeenCalled();
   });
 });

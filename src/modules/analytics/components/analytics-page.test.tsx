@@ -151,7 +151,7 @@ describe('AnalyticsPage', () => {
   it('has an empty state, a skeleton and a retry', async () => {
     serve({ ...analytics, totalExpense: '0', totalIncome: '0', byCategory: [], expenses: [] });
     const empty = renderWithProviders(<AnalyticsPage spaceId="s1" />);
-    expect(await screen.findByText('Немає записів за цей період')).toBeInTheDocument();
+    expect(await screen.findByText('За цей період записів немає')).toBeInTheDocument();
     empty.unmount();
     serve('pending');
     const loading = renderWithProviders(<AnalyticsPage spaceId="s1" />);

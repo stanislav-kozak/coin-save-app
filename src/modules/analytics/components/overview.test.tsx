@@ -91,7 +91,7 @@ describe('CategorySplit', () => {
 
   it('says when nothing was spent', () => {
     renderWithProviders(<CategorySplit analytics={{ byCategory: [] }} />);
-    expect(screen.getByText('Немає витрат за цей період')).toBeInTheDocument();
+    expect(screen.getByText('За цей період витрат немає')).toBeInTheDocument();
   });
 });
 

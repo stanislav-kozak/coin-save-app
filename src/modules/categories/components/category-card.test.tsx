@@ -134,7 +134,7 @@ describe('CategoriesGrid', () => {
         : { data: { currency: 'UAH', byCategory: [] } };
     });
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
-    expect(await screen.findByRole('alert')).toHaveTextContent('Помилка сервера');
+    expect(await screen.findByRole('alert')).toHaveTextContent('У нас щось зламалося');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Спробувати ще раз' }));
     expect(await screen.findByRole('progressbar', { name: 'Продукти' })).toBeInTheDocument();
     expect(screen.queryByRole('alert')).toBeNull();
@@ -245,5 +245,29 @@ describe('CategoryTile — reaction', () => {
     const { container, rerender } = renderWithProviders(<CategoryTile {...props} />);
     rerender(<CategoryTile {...props} spent="150" />);
     expect(container.querySelector('.motion-safe\\:animate-entity-pulse-inset')).not.toBeNull();
+  });
+});
+
+describe('CategoryCard — colour edge', () => {
+  const base = { spent: '0', pct: 0, currency: 'UAH' };
+  it('has an edge in the category colour', () => {
+    const { container } = renderWithProviders(
+      <CategoryCard
+        {...base}
+        category={{ id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: null }}
+      />,
+    );
+    const card = container.querySelector('article')!;
+    expect(card).toHaveClass('border-l-4', 'border-l-[color:var(--entity)]');
+    expect(card.getAttribute('style')).toContain('--entity: #A855F7');
+  });
+  it('has no edge without a colour', () => {
+    const { container } = renderWithProviders(
+      <CategoryCard
+        {...base}
+        category={{ id: 'c1', name: 'Кафе', icon: '☕', color: null, monthlyLimit: null }}
+      />,
+    );
+    expect(container.querySelector('article')).not.toHaveClass('border-l-4');
   });
 });

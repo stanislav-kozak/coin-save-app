@@ -40,3 +40,19 @@ it('lifts a little on hover', () => {
     'motion-safe:hover:-translate-y-0.5',
   );
 });
+
+it('has an edge in the wallet colour, none without one', () => {
+  const { container, rerender } = render(
+    wrap(
+      <WalletCard
+        wallet={{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', color: '#3B82F6' }}
+      />,
+    ),
+  );
+  expect(container.querySelector('article')).toHaveClass(
+    'border-l-4',
+    'border-l-[color:var(--entity)]',
+  );
+  rerender(wrap(<WalletCard wallet={{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1' }} />));
+  expect(container.querySelector('article')).not.toHaveClass('border-l-4');
+});

@@ -14,7 +14,9 @@ let desktop = false;
 vi.mock('@/shared/hooks/use-is-desktop', () => ({ useIsDesktop: () => desktop }));
 vi.mock('next-themes', () => ({ useTheme: () => ({ resolvedTheme: 'dark' }) }));
 
-beforeEach(() => props.mockReset());
+beforeEach(() => {
+  props.mockReset();
+});
 
 it('is styled by our tokens and follows the theme (sonner styles would win otherwise)', () => {
   render(<Toaster />);

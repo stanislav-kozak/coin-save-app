@@ -14,7 +14,9 @@ vi.mock('@/shared/lib/api-client', () => ({
 }));
 const notify = vi.fn();
 vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
-beforeEach(() => notify.mockReset());
+beforeEach(() => {
+  notify.mockReset();
+});
 
 const netflix = {
   id: 'r1',
@@ -136,7 +138,7 @@ describe('RecurringDialog', () => {
     await user.type(screen.getByLabelText('Діє до'), '2026-10-10');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(
-      await screen.findByText('Дата завершення має бути після першого платежу'),
+      await screen.findByText('Завершення має бути після першого платежу'),
     ).toBeInTheDocument();
     expect(api.POST).not.toHaveBeenCalled();
   });
@@ -150,7 +152,9 @@ describe('RecurringDialog', () => {
     await screen.findByRole('option', { name: /Cash/ });
     await user.type(screen.getByLabelText('Назва'), ' HD');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Цей гаманець в архіві — відновіть його в налаштуваннях',
+    );
     expect(notify).not.toHaveBeenCalled();
   });
 

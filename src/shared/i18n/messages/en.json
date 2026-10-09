@@ -21,38 +21,38 @@
   },
   "errors": {
     "UNKNOWN_ERROR": "Something went wrong. Try again in a moment.",
-    "VALIDATION_ERROR": "Please check the fields you filled in",
-    "HTTP_ERROR": "The request failed. Please try again",
-    "INTERNAL_ERROR": "Server error. Please try again later",
+    "VALIDATION_ERROR": "Something in the form needs a look — check the highlighted fields",
+    "HTTP_ERROR": "That didn’t go through. Please try again",
+    "INTERNAL_ERROR": "Something broke on our side. Please try again a bit later",
     "TOO_MANY_REQUESTS": "Too many tries in a row. Wait a minute and try again.",
     "EMAIL_ALREADY_EXISTS": "This email is already registered. Did you mean to sign in?",
     "INVALID_CREDENTIALS": "That email and password don't match. Check your keyboard layout.",
-    "EMAIL_NOT_VERIFIED": "Verify your email to sign in",
-    "EMAIL_DELIVERY_FAILED": "We couldn't send the confirmation email. Please try signing up again a bit later",
-    "INVALID_VERIFICATION_TOKEN": "The verification link is invalid or expired",
-    "INVALID_REFRESH_TOKEN": "Your session has ended. Please sign in again",
-    "REFRESH_TOKEN_REUSE_DETECTED": "Your session was ended for security reasons. Please sign in again",
-    "INVALID_RESET_TOKEN": "The password reset link is invalid or expired",
-    "FORBIDDEN_NOT_MEMBER": "You are not a member of this space",
+    "EMAIL_NOT_VERIFIED": "Confirm your email first — the letter is waiting in your inbox",
+    "EMAIL_DELIVERY_FAILED": "We couldn’t send the email. Please try signing up again a little later",
+    "INVALID_VERIFICATION_TOKEN": "This link no longer works. Ask for a new email and you’ll be all set",
+    "INVALID_REFRESH_TOKEN": "It’s been a while — please sign in again",
+    "REFRESH_TOKEN_REUSE_DETECTED": "For your safety we ended the session. Please sign in again",
+    "INVALID_RESET_TOKEN": "This password link no longer works. Ask for a new one",
+    "FORBIDDEN_NOT_MEMBER": "You don’t have access to this space yet",
     "FORBIDDEN_NOT_OWNER": "Only the space owner can do this",
-    "SPACE_NOT_FOUND": "Space not found",
+    "SPACE_NOT_FOUND": "This space doesn’t exist anymore",
     "MEMBER_NOT_FOUND": "Member not found",
-    "ALREADY_MEMBER": "This user is already a member of the space",
-    "INVALID_INVITATION_TOKEN": "The invitation is invalid or expired",
-    "INVITATION_EMAIL_MISMATCH": "This invitation was sent to a different email",
+    "ALREADY_MEMBER": "This person is already in the space",
+    "INVALID_INVITATION_TOKEN": "This invitation no longer works. Ask for a new one",
+    "INVITATION_EMAIL_MISMATCH": "The invitation went to another email — sign in with that one",
     "INVITATION_NOT_FOUND": "Invitation not found",
-    "CANNOT_REMOVE_LAST_OWNER": "You can't remove the last owner",
+    "CANNOT_REMOVE_LAST_OWNER": "A space needs at least one owner",
     "WALLET_NOT_FOUND": "Wallet not found",
     "CATEGORY_NOT_FOUND": "Category not found",
-    "CATEGORY_NAME_TAKEN": "A category with this name already exists",
-    "INVALID_REORDER": "Couldn't reorder categories",
-    "CURRENCY_API_UNAVAILABLE": "Exchange rates are temporarily unavailable. Try again later",
+    "CATEGORY_NAME_TAKEN": "There’s already a category with this name — pick another",
+    "INVALID_REORDER": "Couldn’t change the order. Please try again",
+    "CURRENCY_API_UNAVAILABLE": "Exchange rates are unavailable right now. Try again in a few minutes",
     "CURRENCY_NOT_SUPPORTED": "Currency is not supported",
     "EXPENSE_NOT_FOUND": "Expense not found",
-    "INVALID_OCCURRED_AT": "Invalid transaction date",
+    "INVALID_OCCURRED_AT": "That date doesn’t look right — please check it",
     "INVALID_RECURRING_DATE_RANGE": "End date must be after the start date",
-    "WALLET_ARCHIVED": "The wallet is archived",
-    "CATEGORY_ARCHIVED": "The category is archived",
+    "WALLET_ARCHIVED": "This wallet is archived — restore it in settings",
+    "CATEGORY_ARCHIVED": "This category is archived — restore it in settings",
     "INVALID_PERIOD": "Invalid period",
     "RECURRING_NOT_FOUND": "Recurring payment not found"
   },
@@ -149,7 +149,7 @@
       "submit": "Create space"
     },
     "validation": {
-      "nameRequired": "Enter a space name",
+      "nameRequired": "What shall we call the space?",
       "nameTooLong": "100 characters at most"
     },
     "switcher": {
@@ -186,12 +186,23 @@
     "wallets": "Wallets",
     "categories": "Categories",
     "recent": "Recent transactions",
-    "soon": "More is coming soon"
+    "soon": "More is coming here soon",
+    "month": {
+      "spentIn": "{month} · spent",
+      "ofLimits": "of {limits} in limits",
+      "ofLimitsApprox": "of ≈ {limits} in limits",
+      "excluded": "Some limits aren't counted: the rate is unavailable right now",
+      "noLimits": "No limits set",
+      "setLimit": "Set one",
+      "income": "Income",
+      "balance": "Month balance",
+      "daysLeft": "Days left"
+    }
   },
   "wallets": {
     "add": "Add wallet",
-    "emptyTitle": "No wallets yet",
-    "emptyText": "Add your first wallet to start tracking expenses",
+    "emptyTitle": "Your money will live here",
+    "emptyText": "Add a card, cash or an account — and we'll start counting together",
     "close": "Close",
     "create": {
       "title": "New wallet",
@@ -203,16 +214,16 @@
       "color": "Color"
     },
     "validation": {
-      "nameRequired": "Enter a name",
+      "nameRequired": "Give the wallet a name",
       "nameTooLong": "100 characters at most",
       "amountInvalid": "Enter an amount, e.g. 1250.50",
-      "amountTooLarge": "Amount is too large"
+      "amountTooLarge": "That’s too much even for us — check the amount"
     },
     "edit": {
       "title": "Wallet",
       "save": "Save",
       "archive": "Archive",
-      "confirmArchive": "Archive “{name}”? It disappears from the main screen; its history stays.",
+      "confirmArchive": "Move «{name}» to the archive? It leaves the dashboard; its history stays.",
       "archiveConfirm": "Archive wallet",
       "cancel": "Cancel",
       "edit": "Edit: {name}",
@@ -250,8 +261,8 @@
       "move": "Move: {name}",
       "archive": "Archive",
       "delete": "Delete",
-      "confirmArchive": "Archive “{name}”? It disappears from the main screen; its expense history stays.",
-      "confirmDelete": "Delete “{name}”? Its expenses will have no category.",
+      "confirmArchive": "Move «{name}» to the archive? It leaves the dashboard; its expenses stay.",
+      "confirmDelete": "Delete «{name}»? Its expenses stay, just without a category.",
       "archiveConfirm": "Archive category",
       "deleteConfirm": "Delete category",
       "cancel": "Cancel",
@@ -261,18 +272,18 @@
       "limitConverted": "Converted at today's rate: ≈ {amount}"
     },
     "validation": {
-      "nameRequired": "Enter a name",
+      "nameRequired": "Give the category a name",
       "nameTooLong": "Up to 100 characters",
       "limitInvalid": "Enter an amount, e.g. 1500",
-      "limitPositive": "The limit must be above zero",
-      "limitTooLarge": "The amount is too large"
+      "limitPositive": "The limit must be above zero — or leave it empty",
+      "limitTooLarge": "That’s too much even for us — check the amount"
     }
   },
   "expenses": {
     "today": "Today",
     "yesterday": "Yesterday",
-    "emptyTitle": "No transactions yet",
-    "emptyText": "Drag a wallet onto a category to add your first expense",
+    "emptyTitle": "No expenses yet",
+    "emptyText": "Drag a wallet onto a category — and your first expense is in",
     "create": {
       "title": "New expense",
       "wallet": "Wallet",
@@ -285,23 +296,23 @@
       "close": "Close"
     },
     "validation": {
-      "walletRequired": "Choose a wallet",
-      "amountRequired": "Enter an amount",
+      "walletRequired": "Which wallet is paying?",
+      "amountRequired": "How much was it?",
       "amountInvalid": "Enter a positive amount, e.g. 250.50",
       "amountPositive": "Amount must be greater than zero",
-      "amountTooLarge": "Amount is too large",
+      "amountTooLarge": "That’s too much even for us — check the amount",
       "noteTooLong": "500 characters at most",
       "nameRequired": "Enter a name",
       "nameTooLong": "Up to 100 characters",
       "dateInvalid": "Enter a date and time",
-      "dateInFuture": "The date can't be in the future"
+      "dateInFuture": "That date hasn’t come yet — pick today or earlier"
     },
     "income": {
       "title": "New income",
       "monthly": "Monthly, on day {day}",
       "name": "Name",
       "namePlaceholder": "e.g. Salary",
-      "recurringFailed": "Income added, but the monthly repeat wasn't created:",
+      "recurringFailed": "The income is added, but the monthly repeat wasn’t created:",
       "retryRecurring": "Create the repeat",
       "addFor": "Add income: {name}"
     },
@@ -312,7 +323,7 @@
       "save": "Save",
       "delete": "Delete",
       "deleteTitle": "Delete record",
-      "confirmDelete": "Delete this record? The wallet balance will be recalculated.",
+      "confirmDelete": "Delete this entry? We’ll recalculate the wallet balance.",
       "archived": "(archived)"
     }
   },
@@ -361,7 +372,7 @@
     },
     "categories": {
       "title": "Archived categories",
-      "none": "No archived categories"
+      "none": "Nothing in the archive"
     },
     "close": "Close",
     "cancel": "Cancel",
@@ -389,12 +400,12 @@
       },
       "remove": "Remove: {name}",
       "removeTitle": "Remove member",
-      "confirmRemove": "Remove {name} from the space? A new invitation brings them back.",
+      "confirmRemove": "Remove {name} from the space? You can invite them back any time.",
       "removeConfirm": "Remove",
       "invite": "Invite a member",
       "send": "Send invitation",
       "sent": "Invitation sent to {email}",
-      "emailInvalid": "Enter a valid email",
+      "emailInvalid": "Looks like there’s a typo in the email",
       "pending": "Awaiting acceptance",
       "expires": "until {date}",
       "revoke": "Revoke: {email}"
@@ -402,12 +413,12 @@
     "danger": {
       "title": "Danger zone",
       "delete": "Delete space",
-      "deleteHint": "This cannot be undone",
+      "deleteHint": "This can’t be undone",
       "confirmDelete": "Delete “{name}” with all its wallets, categories and expenses? Type the space name to confirm.",
       "typeName": "Space name",
       "deleteConfirm": "Delete forever",
       "leave": "Leave space",
-      "leaveHint": "You lose access until you're invited again",
+      "leaveHint": "You’ll only get back in with a new invitation",
       "confirmLeave": "Leave “{name}”?",
       "leaveConfirm": "Leave"
     },
@@ -415,15 +426,15 @@
   },
   "invitations": {
     "joining": "Accepting the invitation…",
-    "joinedTitle": "You've joined the space",
+    "joinedTitle": "Welcome to the space!",
     "open": "Open the space",
     "failedTitle": "Couldn't accept the invitation",
     "home": "Go home",
-    "alreadyTitle": "You're already in this space"
+    "alreadyTitle": "You’re already in this space"
   },
   "realtime": {
-    "offline": "No connection to the server. Data may be out of date.",
-    "memberJoined": "A new member joined the space"
+    "offline": "No connection to the server — showing the last known data",
+    "memberJoined": "Someone new just joined the space 🎉"
   },
   "recurring": {
     "title": "Recurring payments",
@@ -439,10 +450,10 @@
     "resume": "Resume: {name}",
     "delete": "Delete: {name}",
     "deleteTitle": "Delete recurring payment",
-    "confirmDelete": "Delete “{name}”? No new payments will be created; recorded ones stay.",
+    "confirmDelete": "Delete «{name}»? No new payments will be made; the recorded ones stay.",
     "deleteConfirm": "Delete",
     "emptyTitle": "No recurring payments yet",
-    "emptyText": "Add subscriptions, bills or salary — they will be recorded every month by themselves",
+    "emptyText": "Add a subscription or a utility bill — we'll remind you and record it",
     "form": {
       "createTitle": "New recurring payment",
       "editTitle": "Recurring payment",
@@ -470,10 +481,10 @@
       "amountRequired": "Enter an amount",
       "amountInvalid": "Enter a positive amount, e.g. 250.50",
       "amountPositive": "The amount must be above zero",
-      "amountTooLarge": "The amount is too large",
+      "amountTooLarge": "That’s too much even for us — check the amount",
       "noteTooLong": "Up to 500 characters",
-      "walletRequired": "Choose a wallet",
-      "endBeforeStart": "The end date must be after the first payment"
+      "walletRequired": "Which wallet is paying?",
+      "endBeforeStart": "The end must come after the first payment"
     },
     "editHint": "Edit:"
   },
@@ -516,14 +527,14 @@
     },
     "list": {
       "title": "Records in the period",
-      "empty": "No records"
+      "empty": "No entries yet"
     },
     "csv": {
       "export": "Export CSV",
       "hint": "All records of the period, regardless of the wallet filter"
     },
-    "emptyTitle": "No records in this period",
-    "emptyText": "Pick another period or add an expense on the main screen"
+    "emptyTitle": "Nothing in this period",
+    "emptyText": "Pick another period or add an expense on the dashboard"
   },
   "profile": {
     "title": "Profile",

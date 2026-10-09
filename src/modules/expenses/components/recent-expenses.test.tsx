@@ -103,7 +103,7 @@ describe('RecentExpenses', () => {
   it('says so when there is nothing recent', async () => {
     get.mockResolvedValue({ data: [] });
     renderWithProviders(<RecentExpenses spaceId="sp1" />);
-    expect(await screen.findByText('Витрат ще немає')).toBeInTheDocument();
+    expect(await screen.findByText('Витрат поки немає')).toBeInTheDocument();
   });
 
   it('shows a skeleton while recent expenses load', () => {

@@ -67,7 +67,7 @@ describe('AcceptInvitation', () => {
   it('treats an invitation to a space you are already in as done, not as a failure', async () => {
     post.mockResolvedValue({ error: { statusCode: 409, code: 'ALREADY_MEMBER', message: 'x' } });
     renderWithProviders(<AcceptInvitation token="tok" />);
-    expect(await screen.findByText('Ви вже в цьому просторі')).toBeInTheDocument();
+    expect(await screen.findByText('Ви вже тут — у цьому просторі')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).toBeNull();
   });
 });

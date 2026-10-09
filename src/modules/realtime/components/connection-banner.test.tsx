@@ -26,14 +26,16 @@ describe('ConnectionBanner', () => {
     state.status = 'disconnected';
     renderWithProviders(<ConnectionBanner />);
     expect(screen.getByRole('status')).toHaveTextContent(
-      "Немає з'єднання з сервером. Дані можуть бути неактуальні.",
+      'Немає зв’язку з сервером — показуємо останні відомі дані',
     );
   });
 
   it('announces a new member for a moment', () => {
     state.joined = true;
     renderWithProviders(<ConnectionBanner />);
-    expect(screen.getByRole('status')).toHaveTextContent('До простору приєднався новий учасник');
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'У просторі поповнення — приєднався новий учасник 🎉',
+    );
   });
 
   it('keeps an empty live region mounted so the message is announced when it appears', () => {

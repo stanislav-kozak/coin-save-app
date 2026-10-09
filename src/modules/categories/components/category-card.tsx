@@ -72,7 +72,12 @@ export function CategoryCard(props: Props) {
   return (
     <article
       style={entityStyle(category.color)}
-      className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5"
+      className={cn(
+        'relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5',
+        // The colour edge: a left border follows the rounded corners and clips nothing (the
+        // over-limit badge overhangs the top edge).
+        entityStyle(category.color) && 'border-l-4 border-l-[color:var(--entity)]',
+      )}
     >
       {pulse > 0 ? (
         // Keyed by the count, so every new expense restarts the glow.
@@ -189,8 +194,10 @@ export function CategoryTile(props: Props) {
       </span>
     </>
   );
-  const tile =
-    'relative flex w-full flex-col items-center gap-1 overflow-hidden rounded-card border border-border bg-card px-1 py-2 text-center';
+  const tile = cn(
+    'relative flex w-full flex-col items-center gap-1 overflow-hidden rounded-card border border-border bg-card px-1 py-2 text-center',
+    entityStyle(category.color) && 'border-l-4 border-l-[color:var(--entity)]',
+  );
   if (!onEdit)
     return (
       <div style={entityStyle(category.color)} className={tile}>

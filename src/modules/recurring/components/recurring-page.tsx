@@ -10,7 +10,7 @@ import { getErrorCode } from '@/shared/lib/api-error';
 import { formatMoney } from '@/shared/lib/money';
 import { Button } from '@/shared/ui/button';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
-import { EmptyState } from '@/shared/ui/empty-state';
+import { EmptyScene } from '@/shared/ui/empty-scene';
 import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import {
@@ -107,7 +107,8 @@ export function RecurringPage({ spaceId }: { spaceId: string }) {
     );
   } else if (rules.data.length === 0) {
     body = (
-      <EmptyState
+      <EmptyScene
+        scene="repeat"
         title={t('emptyTitle')}
         text={t('emptyText')}
         action={

@@ -1,4 +1,5 @@
 import { isNegative } from '@/shared/lib/money';
+import { entityStyle } from '@/shared/lib/entity-color';
 import { cn } from '@/shared/lib/utils';
 import { Badge } from '@/shared/ui/badge';
 import { CountUpMoney } from '@/shared/ui/count-up-money';
@@ -17,10 +18,12 @@ export type WalletView = {
 export function WalletCard({ wallet, withAction }: { wallet: WalletView; withAction?: boolean }) {
   return (
     <article
+      style={entityStyle(wallet.color)}
       className={cn(
         'flex items-center gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5',
         // Room for the panel's buttons (edit, + income) laid over the card's right edge.
         withAction && 'pr-20',
+        entityStyle(wallet.color) && 'border-l-4 border-l-[color:var(--entity)]',
       )}
     >
       <EntityIcon id={wallet.id} color={wallet.color} icon={wallet.icon} size="l" />
