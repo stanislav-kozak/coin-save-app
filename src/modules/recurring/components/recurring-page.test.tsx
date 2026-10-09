@@ -157,7 +157,7 @@ describe('RecurringPage', () => {
   it('shows an empty state, a skeleton and an error with retry', async () => {
     serve([]);
     const empty = renderWithProviders(<RecurringPage spaceId="s1" />);
-    expect(await screen.findByText('Ще немає регулярних платежів')).toBeInTheDocument();
+    expect(await screen.findByText('Регулярних платежів поки немає')).toBeInTheDocument();
     empty.unmount();
     serve('pending');
     const loading = renderWithProviders(<RecurringPage spaceId="s1" />);

@@ -41,7 +41,7 @@ describe('WalletsPanel', () => {
     get.mockResolvedValue({ data: [] });
     const onAdd = vi.fn();
     renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={onAdd} />);
-    expect(await screen.findByText('Ще немає гаманців')).toBeInTheDocument();
+    expect(await screen.findByText('Тут житимуть ваші гроші')).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('button', { name: /Додати гаманець/ }));
     expect(onAdd).toHaveBeenCalled();
   });

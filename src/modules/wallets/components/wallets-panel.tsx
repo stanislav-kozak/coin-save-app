@@ -4,7 +4,7 @@ import { Pencil, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/shared/ui/button';
-import { EmptyState } from '@/shared/ui/empty-state';
+import { EmptyScene } from '@/shared/ui/empty-scene';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { SectionError } from '@/shared/ui/section-error';
 import { useWallets } from '../api/wallets-queries';
@@ -77,7 +77,12 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
         {td('wallets')}
       </h2>
       {wallets.data.length === 0 ? (
-        <EmptyState title={t('emptyTitle')} text={t('emptyText')} action={addButton} />
+        <EmptyScene
+          scene="wallet"
+          title={t('emptyTitle')}
+          text={t('emptyText')}
+          action={addButton}
+        />
       ) : (
         <>
           <ul className="flex gap-4 overflow-x-auto p-1 md:hidden">

@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useCategories } from '@/modules/categories';
 import { useNewIds } from '@/shared/hooks/use-new-ids';
-import { EmptyState } from '@/shared/ui/empty-state';
+import { EmptyScene } from '@/shared/ui/empty-scene';
 import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useRecentExpenses } from '../api/expenses-queries';
@@ -65,7 +65,9 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
       <h2 id="recent-title" className="text-h2">
         {td('recent')}
       </h2>
-      {groups.length === 0 ? <EmptyState title={t('emptyTitle')} text={t('emptyText')} /> : null}
+      {groups.length === 0 ? (
+        <EmptyScene scene="expenses" title={t('emptyTitle')} text={t('emptyText')} />
+      ) : null}
       {groups.map((g) => (
         <div key={g.key}>
           <h3 className="mb-1 text-caption font-medium text-muted-foreground">

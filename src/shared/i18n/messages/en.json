@@ -201,8 +201,8 @@
   },
   "wallets": {
     "add": "Add wallet",
-    "emptyTitle": "No wallets yet",
-    "emptyText": "Add your first wallet to start tracking expenses",
+    "emptyTitle": "Your money will live here",
+    "emptyText": "Add a card, cash or an account — and we'll start counting together",
     "close": "Close",
     "create": {
       "title": "New wallet",
@@ -282,8 +282,8 @@
   "expenses": {
     "today": "Today",
     "yesterday": "Yesterday",
-    "emptyTitle": "No transactions yet",
-    "emptyText": "Drag a wallet onto a category to add your first expense",
+    "emptyTitle": "No expenses yet",
+    "emptyText": "Drag a wallet onto a category — and your first expense is in",
     "create": {
       "title": "New expense",
       "wallet": "Wallet",
@@ -453,7 +453,7 @@
     "confirmDelete": "Delete “{name}”? No new payments will be created; recorded ones stay.",
     "deleteConfirm": "Delete",
     "emptyTitle": "No recurring payments yet",
-    "emptyText": "Add subscriptions, bills or salary — they will be recorded every month by themselves",
+    "emptyText": "Add a subscription or a utility bill — we'll remind you and record it",
     "form": {
       "createTitle": "New recurring payment",
       "editTitle": "Recurring payment",
@@ -533,8 +533,8 @@
       "export": "Export CSV",
       "hint": "All records of the period, regardless of the wallet filter"
     },
-    "emptyTitle": "No records in this period",
-    "emptyText": "Pick another period or add an expense on the main screen"
+    "emptyTitle": "Nothing in this period",
+    "emptyText": "Pick another period or add an expense on the dashboard"
   },
   "profile": {
     "title": "Profile",

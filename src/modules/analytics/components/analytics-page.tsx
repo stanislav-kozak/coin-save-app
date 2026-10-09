@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { EmptyState } from '@/shared/ui/empty-state';
+import { EmptyScene } from '@/shared/ui/empty-scene';
 import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useAnalytics } from '../api/analytics-queries';
@@ -43,7 +43,7 @@ export function AnalyticsPage({ spaceId }: { spaceId: string }) {
       </LoadingRegion>
     );
   } else if (analytics.data.expenses.length === 0) {
-    body = <EmptyState title={t('emptyTitle')} text={t('emptyText')} />;
+    body = <EmptyScene scene="chart" title={t('emptyTitle')} text={t('emptyText')} />;
   } else {
     const data = analytics.data;
     body = (
