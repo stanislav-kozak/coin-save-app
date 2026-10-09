@@ -5,6 +5,10 @@ import { CategorySplit } from './category-split';
 import { LimitBars } from './limit-bars';
 import { SummaryCards } from './summary-cards';
 
+// The amount's container: CountUpMoney renders the shown frame (aria-hidden) and the final value.
+const amount = (text: RegExp, scope: { getByText: typeof screen.getByText } = screen) =>
+  scope.getByText(text, { selector: '[aria-hidden="true"]' }).parentElement!.parentElement!;
+
 const analytics = {
   currency: 'UAH',
   totalExpense: '1000',
@@ -44,10 +48,10 @@ describe('SummaryCards', () => {
         kind="month"
       />,
     );
-    expect(screen.getByText(/1\s000,00\s₴/)).toBeInTheDocument();
+    expect(amount(/1\s000,00\s₴/)).toBeInTheDocument();
     expect(screen.getByText('+25%')).toHaveClass('text-destructive'); // spending grew
     expect(screen.getByText('—')).toBeInTheDocument(); // no income last month
-    expect(screen.getByText(/\+2\s500,00\s₴/)).toHaveClass('text-success');
+    expect(amount(/\+2\s500,00\s₴/)).toHaveClass('text-success');
     expect(screen.getAllByText('vs минулий місяць')).toHaveLength(2);
   });
 });

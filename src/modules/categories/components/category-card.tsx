@@ -4,7 +4,9 @@ import { GripVertical, Pencil } from 'lucide-react';
 import type { ComponentPropsWithRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/shared/lib/money';
+import { useCountUp } from '@/shared/hooks/use-count-up';
 import { cn } from '@/shared/lib/utils';
+import { CountUpMoney } from '@/shared/ui/count-up-money';
 import { EntityIcon } from '@/shared/ui/entity-icon';
 import { limitFill } from '../lib/limit-fill';
 import { limitStatus, overLimit, type LimitStatus } from '../lib/limit-status';
@@ -44,11 +46,13 @@ export function useCategoryCaption({ category, spent, pct, currency }: Props) {
   const money = (v: string) => formatMoney(v, currency, locale);
   const limit = category.monthlyLimit;
   const excess = overLimit(spent, limit);
+  // The amount counts to its new value; status and percentage use the real one.
+  const shownSpent = useCountUp(spent);
   return {
     status: limitStatus(spent, limit, pct),
     caption: limit
-      ? t('spentOfLimit', { spent: money(spent), limit: money(limit), pct })
-      : t('spent', { amount: money(spent) }),
+      ? t('spentOfLimit', { spent: money(shownSpent), limit: money(limit), pct })
+      : t('spent', { amount: money(shownSpent) }),
     over: excess ? t('over', { amount: money(excess) }) : null,
     overLabel: t('overLabel'),
   };
@@ -126,7 +130,6 @@ export function CategoryCard(props: Props) {
 export function CategoryTile(props: Props) {
   const { category, spent, currency, onEdit, handle } = props;
   const t = useTranslations('categories');
-  const locale = useLocale();
   const { status, caption } = useCategoryCaption(props);
   const fill = limitFill(spent, category.monthlyLimit);
   const content = (
@@ -150,7 +153,7 @@ export function CategoryTile(props: Props) {
           status === 'over' ? 'text-destructive' : 'text-muted-foreground',
         )}
       >
-        {formatMoney(spent, currency, locale)}
+        <CountUpMoney value={spent} currency={currency} />
       </span>
     </>
   );

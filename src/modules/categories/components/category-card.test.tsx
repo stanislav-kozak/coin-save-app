@@ -5,6 +5,10 @@ import { renderWithProviders } from '@/test-utils/render';
 import { CategoriesGrid } from './categories-grid';
 import { CategoryCard, CategoryTile } from './category-card';
 
+// The amount's container: CountUpMoney renders the shown frame (aria-hidden) and the final value.
+const amount = (text: RegExp, scope: { getByText: typeof screen.getByText } = screen) =>
+  scope.getByText(text, { selector: '[aria-hidden="true"]' }).parentElement!.parentElement!;
+
 const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({ api: { GET: (...a: unknown[]) => get(...a) } }));
 
@@ -164,6 +168,6 @@ describe('CategoryTile (mobile)', () => {
     const fills = document.querySelectorAll<HTMLElement>('[data-fill]');
     expect(fills).toHaveLength(1);
     expect(fills[0]!.style.height).toBe('100%');
-    expect(screen.getByText(/2\s400,00\s₴/)).toHaveClass('text-destructive');
+    expect(amount(/2\s400,00\s₴/)).toHaveClass('text-destructive');
   });
 });

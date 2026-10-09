@@ -4,6 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
 import { WalletsPanel } from './wallets-panel';
 
+// The amount's container: CountUpMoney renders the shown frame (aria-hidden) and the final value.
+const amount = (text: RegExp, scope: { getByText: typeof screen.getByText } = screen) =>
+  scope.getByText(text, { selector: '[aria-hidden="true"]' }).parentElement!.parentElement!;
+
 const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({ api: { GET: (...a: unknown[]) => get(...a) } }));
 
@@ -29,8 +33,8 @@ describe('WalletsPanel', () => {
     renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
     expect(await screen.findByRole('heading', { name: 'Family Card' })).toBeInTheDocument();
     const cards = screen.getAllByRole('list')[1]!; // desktop cards (circles come first)
-    expect(within(cards).getByText(/8\s240,50\s₴/)).not.toHaveClass('text-destructive');
-    expect(within(cards).getByText(/-45,00\s(USD|\$)/)).toHaveClass('text-destructive');
+    expect(amount(/8\s240,50\s₴/, within(cards))).not.toHaveClass('text-destructive');
+    expect(amount(/-45,00\s(USD|\$)/, within(cards))).toHaveClass('text-destructive');
   });
 
   it('invites to add the first wallet when there are none', async () => {
@@ -113,7 +117,7 @@ describe('WalletsPanel', () => {
     renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} />);
     const mobile = (await screen.findAllByRole('list'))[0]!; // the circles list comes first
     expect(within(mobile).getByText('Mono')).toBeInTheDocument();
-    expect(within(mobile).getByText(/8\s240,50\s₴/)).toBeInTheDocument();
-    expect(within(mobile).getByText(/-45,00\s(USD|\$)/)).toHaveClass('text-destructive');
+    expect(amount(/8\s240,50\s₴/, within(mobile))).toBeInTheDocument();
+    expect(amount(/-45,00\s(USD|\$)/, within(mobile))).toHaveClass('text-destructive');
   });
 });

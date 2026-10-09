@@ -1,9 +1,10 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import type { components } from '@/generated/api';
-import { formatMoney, isNegative, subtractMoney } from '@/shared/lib/money';
+import { isNegative, subtractMoney } from '@/shared/lib/money';
 import { cn } from '@/shared/lib/utils';
+import { CountUpMoney } from '@/shared/ui/count-up-money';
 import { deltaPercent } from '../lib/delta';
 import type { PeriodKind } from '../lib/period';
 
@@ -33,16 +34,15 @@ type Props = {
 /** Figma 16:505: expenses, incomes (vs the previous period) and the period balance. */
 export function SummaryCards({ analytics, previous, kind }: Props) {
   const t = useTranslations('analytics.summary');
-  const locale = useLocale();
-  const money = (v: string, sign?: 'always') =>
-    formatMoney(v, analytics.currency, locale, { sign });
   const balance = subtractMoney(analytics.totalIncome, analytics.totalExpense);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <div className={CARD}>
         <span className="text-caption text-muted-foreground">{t('expenses')}</span>
-        <span className="text-h1 tabular-nums">{money(analytics.totalExpense)}</span>
+        <span className="text-h1 tabular-nums">
+          <CountUpMoney value={analytics.totalExpense} currency={analytics.currency} />
+        </span>
         <span className="flex items-center gap-2 text-caption text-muted-foreground">
           {t(`vs.${kind}`)}
           <Delta
@@ -53,7 +53,9 @@ export function SummaryCards({ analytics, previous, kind }: Props) {
       </div>
       <div className={CARD}>
         <span className="text-caption text-muted-foreground">{t('incomes')}</span>
-        <span className="text-h1 tabular-nums">{money(analytics.totalIncome)}</span>
+        <span className="text-h1 tabular-nums">
+          <CountUpMoney value={analytics.totalIncome} currency={analytics.currency} />
+        </span>
         <span className="flex items-center gap-2 text-caption text-muted-foreground">
           {t(`vs.${kind}`)}
           <Delta
@@ -70,7 +72,7 @@ export function SummaryCards({ analytics, previous, kind }: Props) {
             isNegative(balance) ? 'text-destructive' : 'text-success',
           )}
         >
-          {money(balance, 'always')}
+          <CountUpMoney value={balance} currency={analytics.currency} sign="always" />
         </span>
         <span className="text-caption text-muted-foreground">{t('thisPeriod')}</span>
       </div>
