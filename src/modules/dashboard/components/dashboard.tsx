@@ -10,6 +10,7 @@ import { getErrorCode } from '@/shared/lib/api-error';
 import { formatMoney } from '@/shared/lib/money';
 import { EntityIcon } from '@/shared/ui/entity-icon';
 import { DndProvider } from './dnd-provider';
+import { MonthCard } from './month-card';
 import { DraggableWallet, SortableCategory } from './dnd-items';
 import { categoryDndId } from '../lib/resolve-drop';
 import { resolveReorder } from '../lib/resolve-reorder';
@@ -73,6 +74,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
       }}
     >
       <main className="grid gap-8 px-4 py-6 md:grid-cols-[1fr_2fr_1fr] md:px-16 md:pb-8">
+        <MonthCard spaceId={spaceId} />
         <WalletsPanel
           spaceId={spaceId}
           onAdd={openAddWallet}

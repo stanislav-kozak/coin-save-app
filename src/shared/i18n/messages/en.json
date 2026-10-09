@@ -186,7 +186,18 @@
     "wallets": "Wallets",
     "categories": "Categories",
     "recent": "Recent transactions",
-    "soon": "More is coming soon"
+    "soon": "More is coming soon",
+    "month": {
+      "spentIn": "{month} · spent",
+      "ofLimits": "of {limits} in limits",
+      "ofLimitsApprox": "of ≈ {limits} in limits",
+      "excluded": "Some limits aren't counted: the rate is unavailable right now",
+      "noLimits": "No limits set",
+      "setLimit": "Set one",
+      "income": "Income",
+      "balance": "Month balance",
+      "daysLeft": "Days left"
+    }
   },
   "wallets": {
     "add": "Add wallet",
