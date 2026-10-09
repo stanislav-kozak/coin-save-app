@@ -136,7 +136,7 @@ describe('RecurringPage', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Видалити: Netflix' }));
     const dialog = await screen.findByRole('dialog');
-    expect(dialog).toHaveTextContent(/уже записані залишаться/);
+    expect(dialog).toHaveTextContent(/вже записані залишаться/);
     expect(api.DELETE).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button', { name: 'Видалити' }));
     expect(await within(dialog).findByRole('alert')).toBeInTheDocument();

@@ -111,9 +111,11 @@ describe('IncomeDialog', () => {
     await user.type(screen.getByLabelText('Назва'), 'Зарплата');
     await user.click(screen.getByRole('button', { name: 'Додати' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Дохід додано, але щомісячне повторення не створено',
+      'Дохід додано, але щомісячне повторення не створилося',
     );
-    expect(screen.getByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Цей гаманець в архіві — відновіть його в налаштуваннях',
+    );
     await user.click(screen.getByRole('button', { name: 'Створити повторення' }));
     await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(3));
     expect(post.mock.calls[2][0]).toBe('/api/spaces/{spaceId}/recurring');
@@ -125,7 +127,9 @@ describe('IncomeDialog', () => {
     const user = userEvent.setup();
     await user.type(await screen.findByLabelText('Сума'), '250');
     await user.click(screen.getByRole('button', { name: 'Додати' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Цей гаманець в архіві — відновіть його в налаштуваннях',
+    );
     expect(screen.getByLabelText('Сума')).toHaveValue('250');
     expect(post).toHaveBeenCalledTimes(1);
     expect(notify).not.toHaveBeenCalled();

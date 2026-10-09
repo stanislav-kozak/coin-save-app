@@ -58,7 +58,7 @@ describe('ResetPasswordForm', () => {
     });
     renderWithProviders(<ResetPasswordForm token="t1" />);
     await fill('12345678', '12345678');
-    expect(await screen.findByRole('alert')).toHaveTextContent('недійсне або застаріло');
+    expect(await screen.findByRole('alert')).toHaveTextContent('вже не діє');
   });
 
   it('shows the invalid-link state when the URL has no token', () => {

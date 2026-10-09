@@ -146,7 +146,9 @@ describe('CategoryDialog', () => {
     await user.clear(screen.getByLabelText('Місячний ліміт'));
     await user.type(screen.getByLabelText('Місячний ліміт'), '0');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
-    expect(await screen.findByText('Ліміт має бути більшим за нуль')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Ліміт має бути більшим за нуль — або залиште поле порожнім'),
+    ).toBeInTheDocument();
     expect(patch).not.toHaveBeenCalled();
   });
 
@@ -155,7 +157,7 @@ describe('CategoryDialog', () => {
     renderDialog({ category: cafe });
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Видалити' }));
-    expect(screen.getByText(/Витрати залишаться без категорії/)).toBeInTheDocument();
+    expect(screen.getByText(/витрати залишаться, просто без категорії/)).toBeInTheDocument();
     expect(del).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Видалити категорію' }));
     await vi.waitFor(() =>
@@ -188,7 +190,7 @@ describe('CategoryDialog', () => {
     await user.type(screen.getByLabelText('Назва'), 'Кафе');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Категорія з такою назвою вже існує',
+      'Категорія з такою назвою вже є — оберіть іншу',
     );
     expect(notify).not.toHaveBeenCalled();
   });

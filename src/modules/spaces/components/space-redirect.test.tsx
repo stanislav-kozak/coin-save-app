@@ -48,7 +48,7 @@ describe('SpaceRedirect', () => {
       .mockResolvedValueOnce({ error: { statusCode: 503, code: 'INTERNAL_ERROR', message: 'x' } })
       .mockResolvedValueOnce({ data: [{ id: 'a' }] });
     renderWithProviders(<SpaceRedirect />);
-    expect(await screen.findByRole('alert')).toHaveTextContent('Помилка сервера');
+    expect(await screen.findByRole('alert')).toHaveTextContent('У нас щось зламалося');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Спробувати ще раз' }));
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/a'));
   });

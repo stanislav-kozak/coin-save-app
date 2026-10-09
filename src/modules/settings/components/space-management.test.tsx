@@ -154,7 +154,7 @@ describe('Settings — space management', () => {
     const email = await screen.findByLabelText('Запросити учасника');
     await user.type(email, 'nope');
     await user.click(screen.getByRole('button', { name: 'Надіслати запрошення' }));
-    expect(await screen.findByText('Введіть коректний email')).toBeInTheDocument();
+    expect(await screen.findByText('Схоже, в email закралася помилка')).toBeInTheDocument();
     expect(api.POST).not.toHaveBeenCalled();
     await user.clear(email);
     await user.type(email, 'olena@example.com');

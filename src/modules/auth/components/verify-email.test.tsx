@@ -47,7 +47,7 @@ describe('VerifyEmail', () => {
       await screen.findByRole('heading', { name: 'Не вдалося підтвердити email' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Посилання для підтвердження недійсне або застаріло'),
+      screen.getByText('Це посилання вже не діє. Попросіть новий лист — і все вийде'),
     ).toBeInTheDocument();
   });
 
