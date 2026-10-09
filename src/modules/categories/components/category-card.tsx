@@ -72,7 +72,7 @@ export function CategoryCard(props: Props) {
   return (
     <article
       style={entityStyle(category.color)}
-      className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card"
+      className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5"
     >
       {pulse > 0 ? (
         // Keyed by the count, so every new expense restarts the glow.

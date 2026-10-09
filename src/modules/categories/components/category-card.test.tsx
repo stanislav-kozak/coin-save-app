@@ -216,3 +216,20 @@ describe('CategoryCard — limits', () => {
     expect(badgePops(container)).not.toBeNull();
   });
 });
+
+describe('CategoryCard — hover', () => {
+  it('lifts a little on hover', () => {
+    const { container } = renderWithProviders(
+      <CategoryCard
+        category={{ id: 'c1', name: 'Кафе', icon: '☕', color: null, monthlyLimit: null }}
+        spent="0"
+        pct={0}
+        currency="UAH"
+      />,
+    );
+    expect(container.querySelector('article')).toHaveClass(
+      'hover:shadow-card-raised',
+      'motion-safe:hover:-translate-y-0.5',
+    );
+  });
+});

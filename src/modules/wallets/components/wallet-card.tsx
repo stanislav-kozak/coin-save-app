@@ -18,7 +18,7 @@ export function WalletCard({ wallet, withAction }: { wallet: WalletView; withAct
   return (
     <article
       className={cn(
-        'flex items-center gap-3 rounded-card border border-border bg-card p-4 shadow-card',
+        'flex items-center gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5',
         // Room for the panel's buttons (edit, + income) laid over the card's right edge.
         withAction && 'pr-20',
       )}

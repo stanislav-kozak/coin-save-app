@@ -30,3 +30,13 @@ it('counts the balance to its new value', () => {
   expect(animated.textContent).toMatch(/^900,00\s₴/);
   expect(screen.getByText(/900,00\s₴/, { selector: '.sr-only' })).toBeInTheDocument();
 });
+
+it('lifts a little on hover', () => {
+  const { container } = render(
+    wrap(<WalletCard wallet={{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1' }} />),
+  );
+  expect(container.querySelector('article')).toHaveClass(
+    'hover:shadow-card-raised',
+    'motion-safe:hover:-translate-y-0.5',
+  );
+});
