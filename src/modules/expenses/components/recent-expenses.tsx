@@ -19,7 +19,11 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
   const locale = useLocale();
   const expenses = useRecentExpenses(spaceId);
   const [editing, setEditing] = useState<EditableExpense | null>(null);
-  const fresh = useNewIds(expenses.data?.map((e) => e.id));
+  // An optimistic row (`optimistic-…`) is replaced by the saved one: it slides in once, not twice.
+  const fresh = useNewIds(
+    expenses.data?.map((e) => e.id),
+    (id) => id.startsWith('optimistic-'),
+  );
   // Names for history include archived categories.
   const categories = useCategories(spaceId, { includeArchived: true });
   if (expenses.isError && !expenses.isFetching) {
