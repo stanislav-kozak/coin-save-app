@@ -9,14 +9,17 @@ export function renderWithProviders(ui: ReactElement, { locale = 'uk' as 'uk' | 
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  const result = render(
-    <NextIntlClientProvider
-      locale={locale}
-      messages={locale === 'uk' ? uk : en}
-      timeZone="Europe/Kyiv"
-    >
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
-    </NextIntlClientProvider>,
-  );
+  // As a wrapper, so `rerender` keeps the providers.
+  const result = render(ui, {
+    wrapper: ({ children }) => (
+      <NextIntlClientProvider
+        locale={locale}
+        messages={locale === 'uk' ? uk : en}
+        timeZone="Europe/Kyiv"
+      >
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </NextIntlClientProvider>
+    ),
+  });
   return { ...result, queryClient };
 }

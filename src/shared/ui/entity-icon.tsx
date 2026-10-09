@@ -1,3 +1,4 @@
+import { ENTITY_HEX as HEX } from '@/shared/lib/entity-color';
 import { cn } from '@/shared/lib/utils';
 
 const FALLBACK = [
@@ -14,7 +15,6 @@ const SIZES = {
   m: 'size-10 text-h2',
   l: 'size-12 text-h1',
 };
-const HEX = /^#[0-9a-f]{6}$/i; // the backend validates the same; never inject anything else into style
 
 type Props = {
   id: string;

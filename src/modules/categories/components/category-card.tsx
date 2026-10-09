@@ -5,6 +5,8 @@ import type { ComponentPropsWithRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/shared/lib/money';
 import { useCountUp } from '@/shared/hooks/use-count-up';
+import { usePulseOnIncrease } from '@/shared/hooks/use-pulse-on-increase';
+import { entityStyle } from '@/shared/lib/entity-color';
 import { cn } from '@/shared/lib/utils';
 import { CountUpMoney } from '@/shared/ui/count-up-money';
 import { EntityIcon } from '@/shared/ui/entity-icon';
@@ -63,9 +65,21 @@ export function CategoryCard(props: Props) {
   const { category, pct, onEdit, handle } = props;
   const t = useTranslations('categories');
   const { status, caption, over, overLabel } = useCategoryCaption(props);
+  const pulse = usePulseOnIncrease(props.spent);
 
   return (
-    <article className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card">
+    <article
+      style={entityStyle(category.color)}
+      className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card"
+    >
+      {pulse > 0 ? (
+        // Keyed by the count, so every new expense restarts the glow.
+        <span
+          key={pulse}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-card motion-safe:animate-entity-pulse"
+        />
+      ) : null}
       {status === 'over' && over ? (
         // On the card's top edge, so the header keeps its whole width for the name.
         <span className="absolute -top-3 right-4 rounded-full border border-destructive bg-card px-2 text-caption font-medium whitespace-nowrap text-destructive shadow-card">
@@ -132,8 +146,16 @@ export function CategoryTile(props: Props) {
   const t = useTranslations('categories');
   const { status, caption } = useCategoryCaption(props);
   const fill = limitFill(spent, category.monthlyLimit);
+  const pulse = usePulseOnIncrease(spent);
   const content = (
     <>
+      {pulse > 0 ? (
+        <span
+          key={pulse}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-card motion-safe:animate-entity-pulse"
+        />
+      ) : null}
       {fill ? (
         // Height and colour are data (share of the limit), like the desktop progress width.
         <span
@@ -159,10 +181,16 @@ export function CategoryTile(props: Props) {
   );
   const tile =
     'relative flex w-full flex-col items-center gap-1 overflow-hidden rounded-card border border-border bg-card px-1 py-2 text-center';
-  if (!onEdit) return <div className={tile}>{content}</div>;
+  if (!onEdit)
+    return (
+      <div style={entityStyle(category.color)} className={tile}>
+        {content}
+      </div>
+    );
   return (
     <button
       type="button"
+      style={entityStyle(category.color)}
       {...handle}
       onClick={onEdit}
       aria-label={t('manage.edit', { name: category.name })}

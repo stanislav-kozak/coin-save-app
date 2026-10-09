@@ -171,3 +171,22 @@ describe('CategoryTile (mobile)', () => {
     expect(amount(/2\s400,00\s₴/)).toHaveClass('text-destructive');
   });
 });
+
+describe('CategoryCard — reaction', () => {
+  it('glows in its colour when an expense lands, not on first show', () => {
+    const props = {
+      category: { id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: null },
+      spent: '100',
+      pct: 0,
+      currency: 'UAH',
+    };
+    const { container, rerender } = renderWithProviders(<CategoryCard {...props} />);
+    const pulse = () => container.querySelector('.motion-safe\\:animate-entity-pulse');
+    expect(pulse()).toBeNull();
+    rerender(<CategoryCard {...props} spent="150" />);
+    expect(pulse()).not.toBeNull();
+    expect(container.querySelector('article')!.getAttribute('style')).toContain(
+      '--entity: #A855F7',
+    );
+  });
+});
