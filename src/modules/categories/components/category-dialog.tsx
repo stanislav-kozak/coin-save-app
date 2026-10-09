@@ -32,6 +32,7 @@ import { useCategories, useMonthAnalytics } from '../api/categories-queries';
 import { CATEGORY_EMOJI } from '../lib/category-emoji';
 import { categoryFormSchema, type CategoryFormInput, type CategoryFormValues } from '../schemas';
 import type { CategoryView } from './category-card';
+import { notify } from '@/shared/ui/toaster';
 
 type ValidationKey =
   'nameRequired' | 'nameTooLong' | 'limitInvalid' | 'limitPositive' | 'limitTooLarge';
@@ -46,6 +47,7 @@ type Props = {
 /** Create/edit a category: name, emoji, color, monthly limit (spec §4.3, §10.4); archive or delete. */
 export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props) {
   const t = useTranslations('categories');
+  const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const locale = useLocale();
   // A limit is in the category's own currency, or the space's primary one (spec §4.3) by default.
@@ -102,11 +104,13 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
       : CATEGORY_EMOJI;
 
   // Not optimistic: these are rare, and a refusal (e.g. a taken name) must show in place.
-  const run = async (action: () => Promise<unknown>) => {
+  // `done`: the confirmation toast for a save (none for archive/delete here).
+  const run = async (action: () => Promise<unknown>, done?: string) => {
     if (busy) return;
     setError(null);
     try {
       await action();
+      if (done) notify(done);
       onOpenChange(false);
     } catch (e) {
       setError(e);
@@ -129,7 +133,7 @@ export function CategoryDialog({ spaceId, open, onOpenChange, category }: Props)
         ...(monthlyLimit === null ? {} : { monthlyLimit }),
         ...(own ? { currency: own } : {}),
       });
-    });
+    }, tt('categorySaved'));
 
   const alert = error ? (
     <p role="alert" className="text-caption text-destructive">

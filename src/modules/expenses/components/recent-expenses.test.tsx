@@ -135,4 +135,31 @@ describe('RecentExpenses', () => {
       .click(await screen.findByRole('button', { name: /Редагувати.*Без категорії/ }));
     expect(await screen.findByRole('dialog', { name: 'Редагувати запис' })).toBeInTheDocument();
   });
+
+  it('slides in an expense that arrives after the list was shown, not the first rows', async () => {
+    const row = (id: string, amount: string) => ({
+      id,
+      type: 'EXPENSE',
+      amount,
+      walletCurrency: 'UAH',
+      walletId: 'w1',
+      categoryId: null,
+      note: null,
+      occurredAt: now(),
+    });
+    get.mockImplementation(async (path: string) =>
+      path.endsWith('/categories') ? { data: [] } : { data: [row('e1', '10')] },
+    );
+    const { queryClient, container } = renderWithProviders(<RecentExpenses spaceId="s1" />);
+    await screen.findByText(/-10,00/);
+    expect(container.querySelector('li.motion-safe\\:animate-row-in')).toBeNull();
+    get.mockImplementation(async (path: string) =>
+      path.endsWith('/categories') ? { data: [] } : { data: [row('e2', '20'), row('e1', '10')] },
+    );
+    await queryClient.invalidateQueries({ queryKey: ['expenses', 's1'] });
+    await screen.findByText(/-20,00/);
+    const animated = container.querySelectorAll('li.motion-safe\\:animate-row-in');
+    expect(animated).toHaveLength(1);
+    expect(animated[0]).toHaveTextContent(/-20,00/);
+  });
 });

@@ -10,6 +10,9 @@ const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({
   api: { POST: (...a: unknown[]) => post(...a), GET: (...a: unknown[]) => get(...a) },
 }));
+const notify = vi.fn();
+vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
+beforeEach(() => notify.mockReset());
 
 const wallets = [
   { id: 'w1', name: 'Mono', currency: 'UAH', balance: '100' },
@@ -82,6 +85,10 @@ describe('ExpenseDialog', () => {
       body: expect.objectContaining({ walletId: 'w1', categoryId: 'c9', amount: 340 }),
     });
     resolve({ data: { id: 'e1' } });
+    // A drag spend's feedback is the category's glow, not a toast (spec §3).
+    await vi.waitFor(() => expect(post).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 0));
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('reopens with the same values and the reason when the server refuses', async () => {
@@ -93,6 +100,7 @@ describe('ExpenseDialog', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Гаманець в архіві');
     expect(openChanges).toEqual([false, true]);
     expect(screen.getByLabelText('Сума')).toHaveValue('340');
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('validates the amount before sending', async () => {
@@ -131,6 +139,7 @@ describe('ExpenseDialog', () => {
     const body = post.mock.calls[0][1].body;
     expect(body).toMatchObject({ walletId: 'w2', amount: 5 });
     expect(body.categoryId).toBeUndefined();
+    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Витрату додано'));
   });
 
   it('accepts a new drop while the previous save is pending and still reports its failure', async () => {

@@ -19,12 +19,14 @@ import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
 import { useCreateWallet, useWallets } from '../api/wallets-queries';
 import { createWalletSchema, type CreateWalletValues } from '../schemas';
+import { notify } from '@/shared/ui/toaster';
 
 type ValidationKey = 'nameRequired' | 'nameTooLong' | 'amountInvalid' | 'amountTooLarge';
 type Props = { spaceId: string; open: boolean; onOpenChange: (open: boolean) => void };
 
 export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
   const t = useTranslations('wallets');
+  const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const locale = useLocale();
   const create = useCreateWallet(spaceId);
@@ -62,6 +64,7 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
     if (create.isPending) return;
     try {
       await create.mutateAsync(values);
+      notify(tt('walletSaved'));
       reset();
       create.reset();
       onOpenChange(false);

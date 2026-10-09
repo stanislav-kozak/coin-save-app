@@ -5,6 +5,10 @@ import { renderWithProviders } from '@/test-utils/render';
 import { CategoriesGrid } from './categories-grid';
 import { CategoryCard, CategoryTile } from './category-card';
 
+// The amount's container: CountUpMoney renders the shown frame (aria-hidden) and the final value.
+const amount = (text: RegExp, scope: { getByText: typeof screen.getByText } = screen) =>
+  scope.getByText(text, { selector: '[aria-hidden="true"]' }).parentElement!.parentElement!;
+
 const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({ api: { GET: (...a: unknown[]) => get(...a) } }));
 
@@ -164,6 +168,82 @@ describe('CategoryTile (mobile)', () => {
     const fills = document.querySelectorAll<HTMLElement>('[data-fill]');
     expect(fills).toHaveLength(1);
     expect(fills[0]!.style.height).toBe('100%');
-    expect(screen.getByText(/2\s400,00\s₴/)).toHaveClass('text-destructive');
+    expect(amount(/2\s400,00\s₴/)).toHaveClass('text-destructive');
+  });
+});
+
+describe('CategoryCard — reaction', () => {
+  it('glows in its colour when an expense lands, not on first show', () => {
+    const props = {
+      category: { id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: null },
+      spent: '100',
+      pct: 0,
+      currency: 'UAH',
+    };
+    const { container, rerender } = renderWithProviders(<CategoryCard {...props} />);
+    const pulse = () => container.querySelector('.motion-safe\\:animate-entity-pulse');
+    expect(pulse()).toBeNull();
+    rerender(<CategoryCard {...props} spent="150" />);
+    expect(pulse()).not.toBeNull();
+    expect(container.querySelector('article')!.getAttribute('style')).toContain(
+      '--entity: #A855F7',
+    );
+  });
+});
+
+describe('CategoryCard — limits', () => {
+  const props = {
+    category: { id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: '1000' },
+    currency: 'UAH',
+  };
+  const badgePops = (c: HTMLElement) => c.querySelector('.motion-safe\\:animate-badge-pop');
+
+  it('moves the bar smoothly', () => {
+    renderWithProviders(<CategoryCard {...props} spent="500" pct={50} />);
+    expect(screen.getByRole('progressbar').firstElementChild).toHaveClass(
+      'motion-safe:transition-[width,background-color]',
+    );
+  });
+
+  it('pops the over-limit badge when the limit is crossed, not when already over on load', () => {
+    const over = renderWithProviders(<CategoryCard {...props} spent="1200" pct={120} />);
+    expect(badgePops(over.container)).toBeNull();
+    over.unmount();
+    const { container, rerender } = renderWithProviders(
+      <CategoryCard {...props} spent="900" pct={90} />,
+    );
+    rerender(<CategoryCard {...props} spent="1200" pct={120} />);
+    expect(badgePops(container)).not.toBeNull();
+  });
+});
+
+describe('CategoryCard — hover', () => {
+  it('lifts a little on hover', () => {
+    const { container } = renderWithProviders(
+      <CategoryCard
+        category={{ id: 'c1', name: 'Кафе', icon: '☕', color: null, monthlyLimit: null }}
+        spent="0"
+        pct={0}
+        currency="UAH"
+      />,
+    );
+    expect(container.querySelector('article')).toHaveClass(
+      'hover:shadow-card-raised',
+      'motion-safe:hover:-translate-y-0.5',
+    );
+  });
+});
+
+describe('CategoryTile — reaction', () => {
+  it('glows inside the tile (an outer glow would be clipped by its rounded overflow)', () => {
+    const props = {
+      category: { id: 'c1', name: 'Кафе', icon: '☕', color: '#A855F7', monthlyLimit: null },
+      spent: '100',
+      pct: 0,
+      currency: 'UAH',
+    };
+    const { container, rerender } = renderWithProviders(<CategoryTile {...props} />);
+    rerender(<CategoryTile {...props} spent="150" />);
+    expect(container.querySelector('.motion-safe\\:animate-entity-pulse-inset')).not.toBeNull();
   });
 });

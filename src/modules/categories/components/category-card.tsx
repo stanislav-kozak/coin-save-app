@@ -4,7 +4,12 @@ import { GripVertical, Pencil } from 'lucide-react';
 import type { ComponentPropsWithRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/shared/lib/money';
+import { useCountUp } from '@/shared/hooks/use-count-up';
+import { useBecameTrue } from '@/shared/hooks/use-became-true';
+import { usePulseOnIncrease } from '@/shared/hooks/use-pulse-on-increase';
+import { entityStyle } from '@/shared/lib/entity-color';
 import { cn } from '@/shared/lib/utils';
+import { CountUpMoney } from '@/shared/ui/count-up-money';
 import { EntityIcon } from '@/shared/ui/entity-icon';
 import { limitFill } from '../lib/limit-fill';
 import { limitStatus, overLimit, type LimitStatus } from '../lib/limit-status';
@@ -44,11 +49,13 @@ export function useCategoryCaption({ category, spent, pct, currency }: Props) {
   const money = (v: string) => formatMoney(v, currency, locale);
   const limit = category.monthlyLimit;
   const excess = overLimit(spent, limit);
+  // The amount counts to its new value; status and percentage use the real one.
+  const shownSpent = useCountUp(spent, currency);
   return {
     status: limitStatus(spent, limit, pct),
     caption: limit
-      ? t('spentOfLimit', { spent: money(spent), limit: money(limit), pct })
-      : t('spent', { amount: money(spent) }),
+      ? t('spentOfLimit', { spent: money(shownSpent), limit: money(limit), pct })
+      : t('spent', { amount: money(shownSpent) }),
     over: excess ? t('over', { amount: money(excess) }) : null,
     overLabel: t('overLabel'),
   };
@@ -59,12 +66,30 @@ export function CategoryCard(props: Props) {
   const { category, pct, onEdit, handle } = props;
   const t = useTranslations('categories');
   const { status, caption, over, overLabel } = useCategoryCaption(props);
+  const pulse = usePulseOnIncrease(props.spent, props.currency);
+  const justOver = useBecameTrue(status === 'over');
 
   return (
-    <article className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card">
+    <article
+      style={entityStyle(category.color)}
+      className="relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5"
+    >
+      {pulse > 0 ? (
+        // Keyed by the count, so every new expense restarts the glow.
+        <span
+          key={pulse}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-card motion-safe:animate-entity-pulse"
+        />
+      ) : null}
       {status === 'over' && over ? (
         // On the card's top edge, so the header keeps its whole width for the name.
-        <span className="absolute -top-3 right-4 rounded-full border border-destructive bg-card px-2 text-caption font-medium whitespace-nowrap text-destructive shadow-card">
+        <span
+          className={cn(
+            'absolute -top-3 right-4 rounded-full border border-destructive bg-card px-2 text-caption font-medium whitespace-nowrap text-destructive shadow-card',
+            justOver && 'motion-safe:animate-badge-pop',
+          )}
+        >
           {over} <span>{overLabel}</span>
         </span>
       ) : null}
@@ -102,7 +127,10 @@ export function CategoryCard(props: Props) {
       >
         {/* Width is data (percentage), the only other inline style besides entity colors. */}
         <div
-          className={cn('h-full rounded-full', BAR[status])}
+          className={cn(
+            'h-full rounded-full motion-safe:transition-[width,background-color] motion-safe:duration-500 motion-safe:ease-out',
+            BAR[status],
+          )}
           style={{ width: `${status === 'none' ? 0 : Math.min(pct, 100)}%` }}
         />
       </div>
@@ -126,11 +154,18 @@ export function CategoryCard(props: Props) {
 export function CategoryTile(props: Props) {
   const { category, spent, currency, onEdit, handle } = props;
   const t = useTranslations('categories');
-  const locale = useLocale();
   const { status, caption } = useCategoryCaption(props);
   const fill = limitFill(spent, category.monthlyLimit);
+  const pulse = usePulseOnIncrease(spent, currency);
   const content = (
     <>
+      {pulse > 0 ? (
+        <span
+          key={pulse}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-card motion-safe:animate-entity-pulse-inset"
+        />
+      ) : null}
       {fill ? (
         // Height and colour are data (share of the limit), like the desktop progress width.
         <span
@@ -150,16 +185,22 @@ export function CategoryTile(props: Props) {
           status === 'over' ? 'text-destructive' : 'text-muted-foreground',
         )}
       >
-        {formatMoney(spent, currency, locale)}
+        <CountUpMoney value={spent} currency={currency} />
       </span>
     </>
   );
   const tile =
     'relative flex w-full flex-col items-center gap-1 overflow-hidden rounded-card border border-border bg-card px-1 py-2 text-center';
-  if (!onEdit) return <div className={tile}>{content}</div>;
+  if (!onEdit)
+    return (
+      <div style={entityStyle(category.color)} className={tile}>
+        {content}
+      </div>
+    );
   return (
     <button
       type="button"
+      style={entityStyle(category.color)}
       {...handle}
       onClick={onEdit}
       aria-label={t('manage.edit', { name: category.name })}
@@ -175,6 +216,7 @@ export function CategoryTile(props: Props) {
 export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
   const { category, pct } = props;
   const { status, caption, over, overLabel } = useCategoryCaption(props);
+  const justOver = useBecameTrue(status === 'over');
   return (
     <li className="flex items-center gap-3 py-2">
       <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
@@ -182,7 +224,12 @@ export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
         <div className="flex items-center justify-between gap-2">
           <span className="truncate text-body font-medium">{category.name}</span>
           {status === 'over' && over ? (
-            <span className="shrink-0 rounded-full border border-destructive px-2 text-caption font-medium text-destructive">
+            <span
+              className={cn(
+                'shrink-0 rounded-full border border-destructive px-2 text-caption font-medium text-destructive',
+                justOver && 'motion-safe:animate-badge-pop',
+              )}
+            >
               {over} <span>{overLabel}</span>
             </span>
           ) : null}
@@ -196,7 +243,10 @@ export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
           className="mt-1 h-2 overflow-hidden rounded-full bg-border"
         >
           <div
-            className={cn('h-full rounded-full', BAR[status])}
+            className={cn(
+              'h-full rounded-full motion-safe:transition-[width,background-color] motion-safe:duration-500 motion-safe:ease-out',
+              BAR[status],
+            )}
             style={{ width: `${status === 'none' ? 0 : Math.min(pct, 100)}%` }}
           />
         </div>

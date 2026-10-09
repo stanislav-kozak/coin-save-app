@@ -16,6 +16,9 @@ vi.mock('@/shared/lib/api-client', () => ({
     DELETE: (...a: unknown[]) => del(...a),
   },
 }));
+const notify = vi.fn();
+vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
+beforeEach(() => notify.mockReset());
 
 const cafe = {
   id: 'c9',
@@ -61,6 +64,7 @@ describe('CategoryDialog', () => {
       color: '#6366f1',
       monthlyLimit: 500,
     });
+    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Категорію збережено'));
   });
 
   it('creates a category with its own currency', async () => {
@@ -184,6 +188,7 @@ describe('CategoryDialog', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Категорія з такою назвою вже існує',
     );
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('edits a category without an icon or color without inventing them', async () => {

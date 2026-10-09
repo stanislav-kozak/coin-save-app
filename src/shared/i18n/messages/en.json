@@ -541,5 +541,14 @@
       "changePassword": "Change password",
       "sent": "We sent a link to change your password to {email}"
     }
+  },
+  "toasts": {
+    "expenseAdded": "Expense added",
+    "incomeAdded": "Income added",
+    "saved": "Saved",
+    "deleted": "Entry deleted",
+    "walletSaved": "Wallet saved",
+    "categorySaved": "Category saved",
+    "recurringSaved": "Recurring payment saved"
   }
 }

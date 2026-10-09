@@ -9,6 +9,9 @@ const get = vi.fn();
 vi.mock('@/shared/lib/api-client', () => ({
   api: { POST: (...a: unknown[]) => post(...a), GET: (...a: unknown[]) => get(...a) },
 }));
+const notify = vi.fn();
+vi.mock('@/shared/ui/toaster', () => ({ notify: (...a: unknown[]) => notify(...a) }));
+beforeEach(() => notify.mockReset());
 
 beforeEach(() => {
   post.mockReset();
@@ -34,6 +37,7 @@ describe('CreateWalletDialog', () => {
       params: { path: { spaceId: 'sp1' } },
       body: { name: 'Mono', currency: 'UAH', initialBalance: 1250.5, color: '#3b82f6' },
     });
+    await vi.waitFor(() => expect(notify).toHaveBeenCalledWith('Гаманець збережено'));
   });
 
   it('shows a server error in the current language', async () => {
@@ -45,6 +49,7 @@ describe('CreateWalletDialog', () => {
     await fill(user, '0');
     await user.click(screen.getByRole('button', { name: 'Додати' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Валюта не підтримується');
+    expect(notify).not.toHaveBeenCalled();
   });
 
   it('creates one wallet even if clicked again while saving', async () => {
