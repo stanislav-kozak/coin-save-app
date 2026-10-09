@@ -17,10 +17,12 @@ type Props = {
   wallet?: string;
   /** Makes the row a button that opens the record for editing. */
   onOpen?: () => void;
+  /** Just arrived: slides in (motion allowed only). */
+  isNew?: boolean;
 };
 
 /** Figma 8:161. Amount in the wallet's currency; incomes in green with "+". */
-export function ExpenseRow({ expense, category, wallet, onOpen }: Props) {
+export function ExpenseRow({ expense, category, wallet, onOpen, isNew }: Props) {
   const te = useTranslations('expenses.edit');
   const t = useTranslations('categories');
   const locale = useLocale();
@@ -73,7 +75,7 @@ export function ExpenseRow({ expense, category, wallet, onOpen }: Props) {
     </>
   );
   return (
-    <li>
+    <li className={isNew ? 'motion-safe:animate-row-in' : undefined}>
       {onOpen ? (
         <button
           type="button"

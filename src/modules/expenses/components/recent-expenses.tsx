@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useCategories } from '@/modules/categories';
+import { useNewIds } from '@/shared/hooks/use-new-ids';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { SectionError } from '@/shared/ui/section-error';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
@@ -18,6 +19,7 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
   const locale = useLocale();
   const expenses = useRecentExpenses(spaceId);
   const [editing, setEditing] = useState<EditableExpense | null>(null);
+  const fresh = useNewIds(expenses.data?.map((e) => e.id));
   // Names for history include archived categories.
   const categories = useCategories(spaceId, { includeArchived: true });
   if (expenses.isError && !expenses.isFetching) {
@@ -74,6 +76,7 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
                 expense={e}
                 category={e.categoryId ? byId.get(e.categoryId) : undefined}
                 onOpen={() => setEditing(e)}
+                isNew={fresh.has(e.id)}
               />
             ))}
           </ul>
