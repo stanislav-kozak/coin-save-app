@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
@@ -58,6 +58,20 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+/** Opens the date field and picks a day of the shown month. */
+async function pickDay(
+  user: ReturnType<typeof userEvent.setup>,
+  label: RegExp,
+  day: string,
+  months = 0,
+) {
+  await user.click(screen.getByRole('button', { name: label }));
+  for (let i = 0; i < months; i++)
+    await user.click(await screen.findByRole('button', { name: 'Наступний місяць' }));
+  const grid = await screen.findByRole('grid');
+  await user.click(within(grid).getByText(day, { selector: 'button' }));
+}
+
 const renderDialog = (rule?: typeof netflix) =>
   renderWithProviders(<RecurringDialog spaceId="s1" rule={rule} open onOpenChange={vi.fn()} />);
 
@@ -69,8 +83,12 @@ describe('RecurringDialog', () => {
     await user.type(screen.getByLabelText('Назва'), 'Netflix');
     await user.type(screen.getByLabelText('Сума'), '249');
     await user.selectOptions(screen.getByLabelText('Категорія'), 'c1');
-    await user.selectOptions(screen.getByLabelText('День місяця'), '15');
-    expect(screen.getByText(/Перший платіж: 15 жовтня/)).toBeInTheDocument();
+    // The calendar opens on the default first payment (7 November); pick the 15th.
+    await pickDay(user, /Перший платіж/, '15');
+    expect(screen.getByRole('button', { name: /Перший платіж/ })).toHaveTextContent(
+      '15 листопада 2026',
+    );
+    expect(screen.getByText('Далі щомісяця 15-го числа')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     await vi.waitFor(() => expect(api.POST).toHaveBeenCalled());
     expect(api.POST.mock.calls[0]).toEqual([
@@ -85,7 +103,7 @@ describe('RecurringDialog', () => {
           categoryId: 'c1',
           frequency: 'MONTHLY',
           dayOfMonth: 15,
-          startDate: '2026-10-15',
+          startDate: '2026-11-15',
         },
       },
     ]);
@@ -118,6 +136,18 @@ describe('RecurringDialog', () => {
     expect(api.PATCH.mock.calls[0][1].body).toEqual({ amount: 299 });
   });
 
+  it('moves the payment day of an existing rule with the calendar', async () => {
+    renderDialog(netflix);
+    const user = userEvent.setup();
+    await screen.findByRole('option', { name: /Cash/ });
+    const field = screen.getByRole('button', { name: /Наступний платіж/ });
+    expect(field).toHaveTextContent('15 жовтня 2026');
+    await pickDay(user, /Наступний платіж/, '20');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(api.PATCH).toHaveBeenCalled());
+    expect(api.PATCH.mock.calls[0][1].body).toEqual({ dayOfMonth: 20 });
+  });
+
   it('clears the end date with null', async () => {
     renderDialog(netflix);
     const user = userEvent.setup();
@@ -134,8 +164,8 @@ describe('RecurringDialog', () => {
     await screen.findByRole('option', { name: /Cash/ });
     await user.type(screen.getByLabelText('Назва'), 'Netflix');
     await user.type(screen.getByLabelText('Сума'), '249');
-    await user.selectOptions(screen.getByLabelText('День місяця'), '15');
-    await user.type(screen.getByLabelText('Діє до'), '2026-10-10');
+    await pickDay(user, /Перший платіж/, '15');
+    await user.type(screen.getByLabelText('Діє до'), '2026-11-10');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(
       await screen.findByText('Завершення має бути після першого платежу'),
@@ -162,7 +192,7 @@ describe('RecurringDialog', () => {
     renderDialog();
     const user = userEvent.setup();
     await screen.findByRole('option', { name: /Cash/ });
-    await user.selectOptions(screen.getByLabelText('День місяця'), '31');
+    await pickDay(user, /Перший платіж/, '31', 1); // December
     expect(screen.getByText('У коротші місяці — останнього дня')).toBeInTheDocument();
   });
 
