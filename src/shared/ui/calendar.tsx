@@ -22,9 +22,9 @@ export function Calendar({ className, ...props }: DayPickerProps) {
         caption_label: 'text-body font-medium first-letter:uppercase',
         nav: 'absolute inset-x-0 top-0 flex h-9 items-center justify-between',
         button_previous:
-          'flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-40',
+          'flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 aria-disabled:pointer-events-none aria-disabled:opacity-40',
         button_next:
-          'flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-40',
+          'flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 aria-disabled:pointer-events-none aria-disabled:opacity-40',
         month_grid: 'mt-2 border-collapse',
         weekday: 'size-9 text-caption font-normal text-muted-foreground',
         day: 'p-0.5 text-center',
