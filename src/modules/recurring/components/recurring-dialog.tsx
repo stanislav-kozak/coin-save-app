@@ -56,6 +56,9 @@ type Props = {
   onDelete?: () => void;
 };
 
+/** The end date is hidden for now; an existing rule keeps its end date untouched. */
+const SHOW_END_DATE = false;
+
 const SELECT =
   'h-10 w-full rounded-control border border-input bg-card px-3 text-field md:text-body text-foreground outline-none focus-visible:border-primary';
 
@@ -275,19 +278,21 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
               <p>{t('form.monthlyOn', { day: Number(day) })}</p>
               {Number(day) >= 29 ? <p>{t('form.shortMonths')}</p> : null}
             </div>
-            <FormField
-              id="recurring-end"
-              label={t('form.endDate')}
-              error={vm(errors.endDate?.message)}
-            >
-              <Input
+            {SHOW_END_DATE ? (
+              <FormField
                 id="recurring-end"
-                type="date"
-                aria-invalid={!!errors.endDate}
-                aria-describedby={errors.endDate ? 'recurring-end-error' : undefined}
-                {...register('endDate')}
-              />
-            </FormField>
+                label={t('form.endDate')}
+                error={vm(errors.endDate?.message)}
+              >
+                <Input
+                  id="recurring-end"
+                  type="date"
+                  aria-invalid={!!errors.endDate}
+                  aria-describedby={errors.endDate ? 'recurring-end-error' : undefined}
+                  {...register('endDate')}
+                />
+              </FormField>
+            ) : null}
             <FormField id="recurring-note" label={t('form.note')} error={vm(errors.note?.message)}>
               <Input id="recurring-note" autoComplete="off" {...register('note')} />
             </FormField>

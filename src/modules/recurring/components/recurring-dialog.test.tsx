@@ -187,7 +187,18 @@ describe('RecurringDialog', () => {
     );
   });
 
-  it('clears the end date with null', async () => {
+  it('does not offer an end date for now, when creating or editing', async () => {
+    const { unmount } = renderDialog();
+    await screen.findByRole('option', { name: /Cash/ });
+    expect(screen.queryByLabelText('Діє до')).toBeNull();
+    unmount();
+    renderDialog(netflix);
+    await screen.findByRole('option', { name: /Cash/ });
+    expect(screen.queryByLabelText('Діє до')).toBeNull();
+  });
+
+  // The end date is hidden for now (SHOW_END_DATE); these come back with it.
+  it.skip('clears the end date with null', async () => {
     renderDialog(netflix);
     const user = userEvent.setup();
     await screen.findByRole('option', { name: /Cash/ });
@@ -197,7 +208,7 @@ describe('RecurringDialog', () => {
     expect(api.PATCH.mock.calls[0][1].body).toEqual({ endDate: null });
   });
 
-  it('refuses an end date before the first payment', async () => {
+  it.skip('refuses an end date before the first payment', async () => {
     renderDialog();
     const user = userEvent.setup();
     await screen.findByRole('option', { name: /Cash/ });
