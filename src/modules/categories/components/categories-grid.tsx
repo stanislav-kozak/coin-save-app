@@ -70,7 +70,7 @@ export function CategoriesGrid({
           {t('categories')}
         </h2>
         <LoadingRegion label={tl('loading')}>
-          <div className="grid grid-cols-3 gap-3 md:hidden">
+          <div className="grid grid-cols-2 gap-3 min-[360px]:grid-cols-3 md:hidden">
             {Array.from({ length: 6 }, (_, i) => (
               <Skeleton key={i} shape="card" className="h-24" />
             ))}
@@ -121,7 +121,7 @@ export function CategoriesGrid({
           {notice}
         </p>
       ) : null}
-      <ul className="grid grid-cols-3 gap-3 md:hidden">
+      <ul className="grid grid-cols-2 gap-3 min-[360px]:grid-cols-3 md:hidden">
         {items.map((item) => (
           <li key={item.category.id}>
             {wrap(

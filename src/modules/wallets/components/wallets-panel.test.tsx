@@ -120,4 +120,14 @@ describe('WalletsPanel', () => {
     expect(amount(/8\s240,50\s₴/, within(mobile))).toBeInTheDocument();
     expect(amount(/-45,00\s(USD|\$)/, within(mobile))).toHaveClass('text-destructive');
   });
+
+  it('shows wallet cards 2 per row on tablets and as a column next to the categories', async () => {
+    get.mockResolvedValue({
+      data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', icon: null, color: null }],
+    });
+    const { container } = renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={() => {}} />);
+    await screen.findAllByText('Mono');
+    const cards = container.querySelector('ul.hidden')!;
+    expect(cards).toHaveClass('md:grid', 'md:grid-cols-2', 'lg:flex', 'lg:flex-col');
+  });
 });

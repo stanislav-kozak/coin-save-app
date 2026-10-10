@@ -73,39 +73,50 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
         );
       }}
     >
-      <main className="grid gap-8 px-4 py-6 md:grid-cols-[1fr_2fr_1fr] md:px-16 md:pb-8">
+      {/*
+        Phones and tablets (< 1024): one column — month, wallets, categories, recent.
+        1024–1439: wallets with the recent list under them on the left, categories on the right.
+        1440+ (the design width): three columns; the wallets one keeps room for a whole balance.
+      */}
+      <main className="grid items-start gap-8 px-4 py-6 md:px-6 md:pb-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:px-8 xl:px-16 min-[90rem]:grid-cols-[minmax(21.5rem,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
         <MonthCard spaceId={spaceId} />
-        <WalletsPanel
-          spaceId={spaceId}
-          onAdd={openAddWallet}
-          onAddIncome={openIncome}
-          // Only the visible variant (card on desktop, circle on mobile) registers with dnd-kit.
-          wrap={(id, node, isCard, onActivate) =>
-            isCard === isDesktop ? (
-              <DraggableWallet id={id} onClick={onActivate}>
-                {node}
-              </DraggableWallet>
-            ) : (
-              node
-            )
-          }
-        />
-        <SortableContext items={categoryIds.map(categoryDndId)} strategy={rectSortingStrategy}>
-          <CategoriesGrid
+        <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+          <WalletsPanel
             spaceId={spaceId}
-            pending={pendingSpends}
-            order={order ?? undefined}
-            notice={dropped.error ? te(getErrorCode(dropped.error)) : undefined}
-            wrap={(id, render, isCard) =>
+            onAdd={openAddWallet}
+            onAddIncome={openIncome}
+            // Only the visible variant (card on desktop, circle on mobile) registers with dnd-kit.
+            wrap={(id, node, isCard, onActivate) =>
               isCard === isDesktop ? (
-                <SortableCategory id={id}>{render}</SortableCategory>
+                <DraggableWallet id={id} onClick={onActivate}>
+                  {node}
+                </DraggableWallet>
               ) : (
-                render()
+                node
               )
             }
           />
-        </SortableContext>
-        <RecentExpenses spaceId={spaceId} />
+        </div>
+        <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-2 min-[90rem]:row-span-1">
+          <SortableContext items={categoryIds.map(categoryDndId)} strategy={rectSortingStrategy}>
+            <CategoriesGrid
+              spaceId={spaceId}
+              pending={pendingSpends}
+              order={order ?? undefined}
+              notice={dropped.error ? te(getErrorCode(dropped.error)) : undefined}
+              wrap={(id, render, isCard) =>
+                isCard === isDesktop ? (
+                  <SortableCategory id={id}>{render}</SortableCategory>
+                ) : (
+                  render()
+                )
+              }
+            />
+          </SortableContext>
+        </div>
+        <div className="min-w-0 lg:col-start-1 lg:row-start-3 min-[90rem]:col-start-3 min-[90rem]:row-start-2">
+          <RecentExpenses spaceId={spaceId} />
+        </div>
       </main>
     </DndProvider>
   );

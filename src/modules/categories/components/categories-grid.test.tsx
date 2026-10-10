@@ -144,4 +144,13 @@ describe('CategoriesGrid', () => {
     renderWithProviders(<CategoriesGrid spaceId="sp1" notice="Не вдалося змінити порядок" />);
     expect(await screen.findByRole('alert')).toHaveTextContent('Не вдалося змінити порядок');
   });
+
+  it('lays categories out by width: 2 per row on small phones, 3 on phones, 2 from tablets up', async () => {
+    const { container } = renderWithProviders(<CategoriesGrid spaceId="sp1" />);
+    await screen.findAllByText('Кафе');
+    const phone = container.querySelector('ul.md\\:hidden')!;
+    expect(phone).toHaveClass('grid-cols-2', 'min-[360px]:grid-cols-3');
+    const wide = container.querySelector('div.hidden.md\\:grid')!;
+    expect(wide).toHaveClass('md:grid', 'grid-cols-2'); // 3 would break the names next to the grip and pencil
+  });
 });
