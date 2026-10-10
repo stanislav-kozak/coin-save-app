@@ -47,7 +47,7 @@ export function MonthCard({ spaceId }: { spaceId: string }) {
   // A failed load steps aside: the categories grid below shows the same error with a retry.
   if (analytics.isError || categories.isError) return null;
   if (!analytics.data || !categories.data || !space) {
-    return <Skeleton shape="card" className="h-36 md:col-span-3" />;
+    return <Skeleton shape="card" className="h-36 lg:col-span-2 min-[90rem]:col-span-3" />;
   }
 
   const { totalExpense, totalIncome } = analytics.data;
@@ -66,7 +66,7 @@ export function MonthCard({ spaceId }: { spaceId: string }) {
   return (
     <section
       aria-label={t('spentIn', { month })}
-      className="flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card md:col-span-3 md:p-6"
+      className="flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card md:p-6 lg:col-span-2 min-[90rem]:col-span-3"
     >
       <p className="text-caption text-muted-foreground">
         {t('spentIn', { month: month.charAt(0).toLocaleUpperCase(locale) + month.slice(1) })}

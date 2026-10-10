@@ -55,7 +55,7 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
             <Skeleton shape="circle" className="size-12" />
             <Skeleton shape="circle" className="size-12" />
           </div>
-          <div className="hidden flex-col gap-3 md:flex">
+          <div className="hidden gap-3 md:grid md:grid-cols-2 lg:flex lg:flex-col">
             <Skeleton shape="card" className="h-20" />
             <Skeleton shape="card" className="h-20" />
           </div>
@@ -121,7 +121,7 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
               );
             })}
           </ul>
-          <ul className="hidden flex-col gap-3 md:flex">
+          <ul className="hidden gap-3 md:grid md:grid-cols-2 lg:flex lg:flex-col">
             {wallets.data.map((w) => (
               <li key={w.id} className="relative">
                 {wrap ? (
