@@ -1,11 +1,13 @@
+# Base image from Google's mirror of Docker Hub official images: the same image, without Docker
+# Hub's anonymous pull limit that CI runners hit (429 Too Many Requests).
 # ---- deps: install all dependencies (build-time) ----
-FROM node:24-alpine AS deps
+FROM mirror.gcr.io/library/node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # ---- build: Next build from the committed API client (src/generated) ----
-FROM node:24-alpine AS build
+FROM mirror.gcr.io/library/node:24-alpine AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
@@ -13,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # ---- runtime: Next standalone server only ----
-FROM node:24-alpine AS runtime
+FROM mirror.gcr.io/library/node:24-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
