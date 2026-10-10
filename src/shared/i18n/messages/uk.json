@@ -466,14 +466,15 @@
       "wallet": "Гаманець",
       "category": "Категорія",
       "noCategory": "Без категорії",
-      "day": "День місяця",
       "shortMonths": "У коротші місяці — останнього дня",
-      "firstPayment": "Перший платіж: {date}",
+      "firstPayment": "Перший платіж",
       "endDate": "Діє до",
       "note": "Нотатка",
       "save": "Зберегти",
       "delete": "Видалити",
-      "archived": "(архів)"
+      "archived": "(архів)",
+      "nextPayment": "Наступний платіж",
+      "monthlyOn": "Далі щомісяця {day}-го числа"
     },
     "validation": {
       "nameRequired": "Введіть назву",
@@ -561,5 +562,9 @@
     "walletSaved": "Гаманець збережено",
     "categorySaved": "Категорію збережено",
     "recurringSaved": "Регулярний платіж збережено"
+  },
+  "calendar": {
+    "next": "Наступний місяць",
+    "previous": "Попередній місяць"
   }
 }

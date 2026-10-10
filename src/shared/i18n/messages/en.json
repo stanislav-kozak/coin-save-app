@@ -466,14 +466,15 @@
       "wallet": "Wallet",
       "category": "Category",
       "noCategory": "No category",
-      "day": "Day of month",
       "shortMonths": "In shorter months — on the last day",
-      "firstPayment": "First payment: {date}",
+      "firstPayment": "First payment",
       "endDate": "Until",
       "note": "Note",
       "save": "Save",
       "delete": "Delete",
-      "archived": "(archived)"
+      "archived": "(archived)",
+      "nextPayment": "Next payment",
+      "monthlyOn": "Then monthly on day {day}"
     },
     "validation": {
       "nameRequired": "Enter a name",
@@ -561,5 +562,9 @@
     "walletSaved": "Wallet saved",
     "categorySaved": "Category saved",
     "recurringSaved": "Recurring payment saved"
+  },
+  "calendar": {
+    "next": "Next month",
+    "previous": "Previous month"
   }
 }

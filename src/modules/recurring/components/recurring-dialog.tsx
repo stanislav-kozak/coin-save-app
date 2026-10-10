@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { components } from '@/generated/api';
@@ -14,6 +14,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Dialog, DialogContent } from '@/shared/ui/dialog';
 import { FormField } from '@/shared/ui/form-field';
+import { DateField } from '@/shared/ui/date-field';
 import { Input } from '@/shared/ui/input';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useCreateRecurring, useUpdateRecurring } from '../api/recurring-mutations';
@@ -55,7 +56,6 @@ type Props = {
 
 const SELECT =
   'h-10 w-full rounded-control border border-input bg-card px-3 text-field md:text-body text-foreground outline-none focus-visible:border-primary';
-const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 
 /** Create/edit a monthly rule (spec §7.6). Not optimistic: nothing is on screen until it's saved. */
 export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }: Props) {
@@ -63,7 +63,6 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
   const tt = useTranslations('toasts');
   const te = useTranslations('errors');
   const tc = useTranslations('common');
-  const locale = useLocale();
   // Incl. archived: a rule may still point at one, and the select must show it (marked) rather than
   // silently display another option. Only active ones are offered otherwise.
   const wallets = useWallets(spaceId, { includeArchived: true });
@@ -108,10 +107,21 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
 
   const [type, walletId, day] = useWatch({ control, name: ['type', 'walletId', 'dayOfMonth'] });
   const wallet = wallets.data?.find((w) => w.id === walletId);
-  const start = rule ? rule.startDate.slice(0, 10) : firstPaymentDate(Number(day), now);
-  const startLabel = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' }).format(
-    new Date(`${start}T00:00:00`),
-  );
+  // A new rule: the date picked in the calendar is its first payment (and its day of month).
+  // An existing rule keeps its start; the calendar shows (and moves) its next payment.
+  const [picked, setPicked] = useState<string | null>(null);
+  const next = firstPaymentDate(Number(day), now);
+  const start = rule ? rule.startDate.slice(0, 10) : (picked ?? next);
+  const shown = rule
+    ? rule.startDate.slice(0, 10) > next
+      ? rule.startDate.slice(0, 10)
+      : next
+    : start;
+  // Payments start from tomorrow: today already counts as past for a new rule (firstPaymentDate).
+  const tomorrow = (() => {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  })();
 
   const save = async (values: RecurringFormValues) => {
     if (values.endDate && values.endDate < start) {
@@ -246,23 +256,25 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
                 </select>
               </FormField>
             ) : null}
-            <FormField id="recurring-day" label={t('form.day')}>
-              <select id="recurring-day" className={SELECT} {...register('dayOfMonth')}>
-                {DAYS.map((d) => (
-                  <option key={d} value={String(d)}>
-                    {d}
-                  </option>
-                ))}
-              </select>
+            <FormField
+              id="recurring-date"
+              label={rule ? t('form.nextPayment') : t('form.firstPayment')}
+            >
+              <DateField
+                id="recurring-date"
+                label={rule ? t('form.nextPayment') : t('form.firstPayment')}
+                value={shown}
+                min={tomorrow}
+                onChange={(v) => {
+                  if (!rule) setPicked(v);
+                  setValue('dayOfMonth', String(Number(v.slice(8))), { shouldDirty: true });
+                }}
+              />
             </FormField>
-            {Number(day) >= 29 ? (
-              <p className="-mt-2 text-caption text-muted-foreground">{t('form.shortMonths')}</p>
-            ) : null}
-            {rule ? null : (
-              <p className="text-body text-muted-foreground">
-                {t('form.firstPayment', { date: startLabel })}
-              </p>
-            )}
+            <div className="-mt-2 flex flex-col gap-1 text-caption text-muted-foreground">
+              <p>{t('form.monthlyOn', { day: Number(day) })}</p>
+              {Number(day) >= 29 ? <p>{t('form.shortMonths')}</p> : null}
+            </div>
             <FormField
               id="recurring-end"
               label={t('form.endDate')}
