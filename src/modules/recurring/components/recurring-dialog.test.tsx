@@ -29,6 +29,7 @@ const netflix = {
   note: null as string | null,
   dayOfMonth: 15,
   startDate: '2026-10-15T00:00:00.000Z',
+  lastGeneratedAt: null as string | null,
   endDate: '2027-01-01T00:00:00.000Z',
   active: true,
 };
@@ -148,7 +149,56 @@ describe('RecurringDialog', () => {
     expect(api.PATCH.mock.calls[0][1].body).toEqual({ dayOfMonth: 20 });
   });
 
-  it('clears the end date with null', async () => {
+  it('shows the picked date as the next payment, a month ahead too', async () => {
+    renderDialog(netflix);
+    const user = userEvent.setup();
+    await screen.findByRole('option', { name: /Cash/ });
+    await pickDay(user, /Наступний платіж/, '10', 1);
+    expect(screen.getByRole('button', { name: /Наступний платіж/ })).toHaveTextContent(
+      '10 листопада 2026',
+    );
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(api.PATCH).toHaveBeenCalled());
+    expect(api.PATCH.mock.calls[0][1].body).toEqual({ dayOfMonth: 10 });
+  });
+
+  it('offers only the dates the next payment can fall on', async () => {
+    renderDialog({
+      ...netflix,
+      dayOfMonth: 5,
+      startDate: '2026-09-05T00:00:00.000Z',
+      lastGeneratedAt: '2026-10-05T00:00:00.000Z',
+    });
+    const user = userEvent.setup();
+    await screen.findByRole('option', { name: /Cash/ });
+    const field = screen.getByRole('button', { name: /Наступний платіж/ });
+    expect(field).toHaveTextContent('5 листопада 2026');
+    await user.click(field);
+    const grid = await screen.findByRole('grid');
+    expect(screen.getByText(/листопад 2026/i)).toBeInTheDocument();
+    expect(within(grid).getByText('30', { selector: 'button' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Попередній місяць' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Наступний місяць' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+
+  it('does not offer an end date for now, when creating or editing', async () => {
+    const { unmount } = renderDialog();
+    await screen.findByRole('option', { name: /Cash/ });
+    expect(screen.queryByLabelText('Діє до')).toBeNull();
+    unmount();
+    renderDialog(netflix);
+    await screen.findByRole('option', { name: /Cash/ });
+    expect(screen.queryByLabelText('Діє до')).toBeNull();
+  });
+
+  // The end date is hidden for now (SHOW_END_DATE); these come back with it.
+  it.skip('clears the end date with null', async () => {
     renderDialog(netflix);
     const user = userEvent.setup();
     await screen.findByRole('option', { name: /Cash/ });
@@ -158,7 +208,7 @@ describe('RecurringDialog', () => {
     expect(api.PATCH.mock.calls[0][1].body).toEqual({ endDate: null });
   });
 
-  it('refuses an end date before the first payment', async () => {
+  it.skip('refuses an end date before the first payment', async () => {
     renderDialog();
     const user = userEvent.setup();
     await screen.findByRole('option', { name: /Cash/ });

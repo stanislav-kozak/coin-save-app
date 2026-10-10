@@ -19,6 +19,7 @@ import { Input } from '@/shared/ui/input';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useCreateRecurring, useUpdateRecurring } from '../api/recurring-mutations';
 import { firstPaymentDate } from '../lib/first-payment-date';
+import { nextPayment, nextPaymentWindow } from '../lib/next-payment';
 import { recurringFormSchema, type RecurringFormInput, type RecurringFormValues } from '../schemas';
 import { notify } from '@/shared/ui/toaster';
 
@@ -46,6 +47,7 @@ type Props = {
     | 'categoryId'
     | 'dayOfMonth'
     | 'startDate'
+    | 'lastGeneratedAt'
     | 'endDate'
     | 'note'
   >;
@@ -53,6 +55,9 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   onDelete?: () => void;
 };
+
+/** The end date is hidden for now; an existing rule keeps its end date untouched. */
+const SHOW_END_DATE = false;
 
 const SELECT =
   'h-10 w-full rounded-control border border-input bg-card px-3 text-field md:text-body text-foreground outline-none focus-visible:border-primary';
@@ -108,15 +113,12 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
   const [type, walletId, day] = useWatch({ control, name: ['type', 'walletId', 'dayOfMonth'] });
   const wallet = wallets.data?.find((w) => w.id === walletId);
   // A new rule: the date picked in the calendar is its first payment (and its day of month).
-  // An existing rule keeps its start; the calendar shows (and moves) its next payment.
+  // An existing rule keeps its start (only dayOfMonth is editable); the calendar shows its next
+  // payment and offers only the dates that payment can move to, so a pick is what the server does.
   const [picked, setPicked] = useState<string | null>(null);
-  const next = firstPaymentDate(Number(day), now);
-  const start = rule ? rule.startDate.slice(0, 10) : (picked ?? next);
-  const shown = rule
-    ? rule.startDate.slice(0, 10) > next
-      ? rule.startDate.slice(0, 10)
-      : next
-    : start;
+  const start = rule ? rule.startDate.slice(0, 10) : (picked ?? firstPaymentDate(Number(day), now));
+  const shown = rule ? nextPayment(Number(day), rule) : start;
+  const range = rule ? nextPaymentWindow(rule) : null;
   // Payments start from tomorrow: today already counts as past for a new rule (firstPaymentDate).
   const tomorrow = (() => {
     const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -264,7 +266,8 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
                 id="recurring-date"
                 label={rule ? t('form.nextPayment') : t('form.firstPayment')}
                 value={shown}
-                min={tomorrow}
+                min={range ? range.from : tomorrow}
+                max={range?.to}
                 onChange={(v) => {
                   if (!rule) setPicked(v);
                   setValue('dayOfMonth', String(Number(v.slice(8))), { shouldDirty: true });
@@ -275,19 +278,21 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
               <p>{t('form.monthlyOn', { day: Number(day) })}</p>
               {Number(day) >= 29 ? <p>{t('form.shortMonths')}</p> : null}
             </div>
-            <FormField
-              id="recurring-end"
-              label={t('form.endDate')}
-              error={vm(errors.endDate?.message)}
-            >
-              <Input
+            {SHOW_END_DATE ? (
+              <FormField
                 id="recurring-end"
-                type="date"
-                aria-invalid={!!errors.endDate}
-                aria-describedby={errors.endDate ? 'recurring-end-error' : undefined}
-                {...register('endDate')}
-              />
-            </FormField>
+                label={t('form.endDate')}
+                error={vm(errors.endDate?.message)}
+              >
+                <Input
+                  id="recurring-end"
+                  type="date"
+                  aria-invalid={!!errors.endDate}
+                  aria-describedby={errors.endDate ? 'recurring-end-error' : undefined}
+                  {...register('endDate')}
+                />
+              </FormField>
+            ) : null}
             <FormField id="recurring-note" label={t('form.note')} error={vm(errors.note?.message)}>
               <Input id="recurring-note" autoComplete="off" {...register('note')} />
             </FormField>

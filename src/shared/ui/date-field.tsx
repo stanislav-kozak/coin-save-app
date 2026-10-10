@@ -21,6 +21,7 @@ export function DateField({
   label,
   value,
   min,
+  max,
   onChange,
   className,
 }: {
@@ -28,6 +29,8 @@ export function DateField({
   label: string;
   value: string;
   min?: string;
+  /** The last date offered; the calendar doesn't page past the months of `min`…`max`. */
+  max?: string;
   onChange: (value: string) => void;
   className?: string;
 }) {
@@ -61,7 +64,12 @@ export function DateField({
           required
           selected={selected}
           defaultMonth={selected}
-          disabled={min ? { before: toDate(min) } : undefined}
+          disabled={[
+            ...(min ? [{ before: toDate(min) }] : []),
+            ...(max ? [{ after: toDate(max) }] : []),
+          ]}
+          startMonth={min ? toDate(min) : undefined}
+          endMonth={max ? toDate(max) : undefined}
           onSelect={(d) => {
             onChange(toValue(d));
             setOpen(false);
