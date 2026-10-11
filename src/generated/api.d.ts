@@ -719,6 +719,8 @@ export interface components {
             newPassword: string;
         };
         CreateSpaceDto: {
+            /** @description Language of the default categories (send the UI language); defaults to the account's language */
+            locale?: components["schemas"]["UserLocale"];
             name: string;
         };
         SpaceResponseDto: {

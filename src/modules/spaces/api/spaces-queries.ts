@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocale } from 'next-intl';
 import { api } from '@/shared/lib/api-client';
+import type { Locale } from '@/shared/i18n/routing';
 import type { CreateSpaceValues } from '../schemas';
 
 export function useSpaces() {
@@ -29,11 +31,13 @@ export function useSpace(spaceId: string) {
 
 export function useCreateSpace() {
   const queryClient = useQueryClient();
+  // The default categories come out in the UI language (without it: the account's saved language).
+  const locale = useLocale() as Locale;
   return useMutation({
     mutationFn: async ({ name, currency }: CreateSpaceValues) => {
-      const { data: space, error } = await api.POST('/api/spaces', { body: { name } });
+      const { data: space, error } = await api.POST('/api/spaces', { body: { name, locale } });
       if (error) throw error;
-      // POST takes only a name; the server picks the default currency (EUR at the time of writing).
+      // POST takes no currency; the server picks the default one (EUR at the time of writing).
       if (currency !== space.primaryCurrency) {
         try {
           const { data: updated } = await api.PATCH('/api/spaces/{spaceId}', {
