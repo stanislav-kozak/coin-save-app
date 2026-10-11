@@ -54,11 +54,23 @@ describe('CreateSpaceForm', () => {
     renderWithProviders(<CreateSpaceForm />);
     await submit(' Family ');
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/sp1'));
-    expect(post).toHaveBeenCalledWith('/api/spaces', { body: { name: 'Family' } });
+    // The UI language picks the language of the default categories.
+    expect(post).toHaveBeenCalledWith('/api/spaces', { body: { name: 'Family', locale: 'uk' } });
     expect(patch).toHaveBeenCalledWith('/api/spaces/{spaceId}', {
       params: { path: { spaceId: 'sp1' } },
       body: { primaryCurrency: 'UAH' },
     });
+  });
+
+  it('creates the default categories in English on English pages', async () => {
+    post.mockResolvedValue({ data: created });
+    renderWithProviders(<CreateSpaceForm />, { locale: 'en' });
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('Space name'), 'Family');
+    await user.selectOptions(screen.getByLabelText('Primary currency'), 'EUR');
+    await user.click(screen.getByRole('button', { name: 'Create space' }));
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledWith('/s/sp1'));
+    expect(post).toHaveBeenCalledWith('/api/spaces', { body: { name: 'Family', locale: 'en' } });
   });
 
   it('skips the PATCH when the server default already matches', async () => {
