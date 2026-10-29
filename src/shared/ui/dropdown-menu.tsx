@@ -18,7 +18,7 @@ export function DropdownMenuContent({
       <Primitive.Content
         sideOffset={sideOffset}
         className={cn(
-          'z-50 min-w-56 rounded-card border border-border bg-popover p-2 text-popover-foreground shadow-modal',
+          'z-50 min-w-56 rounded-card border border-border bg-popover p-2 text-popover-foreground shadow-modal origin-(--radix-dropdown-menu-content-transform-origin) motion-safe:data-[state=open]:animate-in motion-safe:data-[state=open]:fade-in-0 motion-safe:data-[state=open]:zoom-in-95 motion-safe:data-[state=closed]:animate-out motion-safe:data-[state=closed]:fade-out-0 motion-safe:data-[state=closed]:zoom-out-95',
           className,
         )}
         {...props}

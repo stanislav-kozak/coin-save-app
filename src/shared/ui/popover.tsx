@@ -19,7 +19,7 @@ export function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          'z-50 rounded-card border border-border bg-card p-3 text-foreground shadow-modal outline-none',
+          'z-50 rounded-card border border-border bg-card p-3 text-foreground shadow-modal outline-none origin-(--radix-popover-content-transform-origin) motion-safe:data-[state=open]:animate-in motion-safe:data-[state=open]:fade-in-0 motion-safe:data-[state=open]:zoom-in-95 motion-safe:data-[state=closed]:animate-out motion-safe:data-[state=closed]:fade-out-0 motion-safe:data-[state=closed]:zoom-out-95',
           className,
         )}
         {...props}
