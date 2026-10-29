@@ -237,6 +237,11 @@
       "preview": "Balance: {from} → ≈ {to}",
       "rate": "Today's rate: {one} = {rate}",
       "balanceLocked": "Converted together with the whole wallet"
+    },
+    "sheet": {
+      "open": "Wallet {name}",
+      "income": "Income",
+      "edit": "Edit"
     }
   },
   "categories": {

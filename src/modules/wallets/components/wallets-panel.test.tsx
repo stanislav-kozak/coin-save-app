@@ -46,39 +46,56 @@ describe('WalletsPanel', () => {
     expect(onAdd).toHaveBeenCalled();
   });
 
-  it('offers adding income per wallet', async () => {
+  it('offers adding income per wallet: the desktop "+" and the mobile sheet', async () => {
     get.mockResolvedValue({
       data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', icon: null, color: null }],
     });
     const onAddIncome = vi.fn();
     renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} onAddIncome={onAddIncome} />);
-    // Both variants are in the DOM (CSS shows one): the desktop card's "+" and the mobile circle.
-    const buttons = await screen.findAllByRole('button', { name: 'Додати дохід: Mono' });
-    expect(buttons).toHaveLength(2);
     const user = userEvent.setup();
-    for (const button of buttons) await user.click(button);
+    // Both variants are in the DOM (CSS shows one): the desktop card's "+" and the mobile circle.
+    await user.click(await screen.findByRole('button', { name: 'Додати дохід: Mono' }));
+    await user.click(screen.getByRole('button', { name: 'Гаманець Mono' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Mono' });
+    await user.click(within(sheet).getByRole('button', { name: 'Дохід' }));
     expect(onAddIncome.mock.calls).toEqual([['w1'], ['w1']]);
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('keeps adding income reachable by keyboard when the circles are draggable', async () => {
+  it('opens the wallet editor from the mobile sheet', async () => {
+    get.mockResolvedValue({
+      data: [
+        { id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', initialBalance: '0', color: null },
+      ],
+    });
+    renderWithProviders(<WalletsPanel spaceId="sp1" onAdd={vi.fn()} onAddIncome={vi.fn()} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Гаманець Mono' }));
+    await user.click(
+      within(await screen.findByRole('dialog', { name: 'Mono' })).getByRole('button', {
+        name: 'Редагувати',
+      }),
+    );
+    expect(await screen.findByRole('dialog', { name: 'Гаманець' })).toBeInTheDocument();
+  });
+
+  it('keeps the sheet reachable by keyboard when the circles are draggable', async () => {
     get.mockResolvedValue({
       data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', icon: null, color: null }],
     });
-    const onAddIncome = vi.fn();
     renderWithProviders(
       <WalletsPanel
         spaceId="sp1"
         onAdd={vi.fn()}
-        onAddIncome={onAddIncome}
+        onAddIncome={vi.fn()}
         // Like the dashboard: the wrapper owns the element (and Enter/Space start a drag there).
         wrap={(_id, node) => <div role="button">{node}</div>}
       />,
     );
-    const buttons = await screen.findAllByRole('button', { name: 'Додати дохід: Mono' });
-    expect(buttons).toHaveLength(2); // desktop "+" and the circle's own
-    buttons[0].focus();
+    const button = await screen.findByRole('button', { name: 'Гаманець Mono' });
+    button.focus();
     await userEvent.setup().keyboard('{Enter}');
-    expect(onAddIncome).toHaveBeenCalledWith('w1');
+    expect(await screen.findByRole('dialog', { name: 'Mono' })).toBeInTheDocument();
   });
 
   it('shows a skeleton while wallets load, not a blank space', () => {
