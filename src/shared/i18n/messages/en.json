@@ -675,5 +675,33 @@
         "alt": "Space settings: members and invitations"
       }
     }
+  },
+  "pwa": {
+    "menu": "Install the app",
+    "banner": {
+      "title": "Install CoinSave on your phone",
+      "text": "Opens with one tap, like any other app",
+      "install": "Install"
+    },
+    "sheet": {
+      "title": "Install CoinSave",
+      "ios": {
+        "share": "Tap “Share” on the Safari toolbar",
+        "add": "Choose “Add to Home Screen”",
+        "confirm": "Tap “Add” — the CoinSave icon appears next to your other apps",
+        "note": "In other iPhone browsers the Share button is in the address bar."
+      },
+      "android": {
+        "menu": "Open the browser menu (⋮)",
+        "install": "Choose “Install app” or “Add to Home screen”"
+      },
+      "mac": {
+        "dock": "In Safari, choose File → Add to Dock"
+      },
+      "desktop": {
+        "addressBar": "Click the install icon in the address bar, or choose “Install CoinSave” in the browser menu"
+      },
+      "unsupported": "This browser can't install web apps. Open CoinSave in Chrome or Edge, or bookmark the page."
+    }
   }
 }

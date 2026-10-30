@@ -20,6 +20,8 @@ vi.mock('@/shared/i18n/navigation', () => ({
 }));
 const startTour = vi.fn();
 vi.mock('@/modules/onboarding', () => ({ useOnboarding: () => ({ start: startTour }) }));
+const pwa = { installed: false, install: vi.fn() };
+vi.mock('@/modules/pwa', () => ({ usePwaInstall: () => pwa }));
 const assign = vi.fn();
 
 beforeEach(() => {
@@ -94,5 +96,20 @@ describe('UserMenu', () => {
     const user = await openMenu();
     await user.click(await screen.findByRole('menuitem', { name: 'Як користуватись' }));
     expect(startTour).toHaveBeenCalled();
+  });
+
+  it('offers installing the app, unless it runs installed', async () => {
+    pwa.installed = false;
+    const { unmount } = renderWithProviders(<UserMenu spaceId="a" />);
+    let user = await openMenu();
+    await user.click(await screen.findByRole('menuitem', { name: 'Встановити застосунок' }));
+    expect(pwa.install).toHaveBeenCalled();
+    unmount();
+    pwa.installed = true;
+    renderWithProviders(<UserMenu spaceId="a" />);
+    user = await openMenu();
+    await screen.findByRole('menuitem', { name: 'Як користуватись' });
+    expect(screen.queryByRole('menuitem', { name: 'Встановити застосунок' })).toBeNull();
+    pwa.installed = false;
   });
 });
