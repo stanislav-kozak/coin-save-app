@@ -647,7 +647,7 @@ export interface components {
          * @description Stable machine-readable code; localize on the client
          * @enum {string}
          */
-        ErrorCode: "EMAIL_ALREADY_EXISTS" | "EMAIL_DELIVERY_FAILED" | "INVALID_CREDENTIALS" | "EMAIL_NOT_VERIFIED" | "INVALID_VERIFICATION_TOKEN" | "INVALID_REFRESH_TOKEN" | "REFRESH_TOKEN_REUSE_DETECTED" | "INVALID_RESET_TOKEN" | "FORBIDDEN_NOT_MEMBER" | "FORBIDDEN_NOT_OWNER" | "SPACE_NOT_FOUND" | "MEMBER_NOT_FOUND" | "ALREADY_MEMBER" | "INVALID_INVITATION_TOKEN" | "INVITATION_EMAIL_MISMATCH" | "INVITATION_NOT_FOUND" | "CANNOT_REMOVE_LAST_OWNER" | "WALLET_NOT_FOUND" | "CATEGORY_NOT_FOUND" | "CATEGORY_NAME_TAKEN" | "INVALID_REORDER" | "CURRENCY_API_UNAVAILABLE" | "CURRENCY_NOT_SUPPORTED" | "EXPENSE_NOT_FOUND" | "INVALID_OCCURRED_AT" | "INVALID_RECURRING_DATE_RANGE" | "WALLET_ARCHIVED" | "CATEGORY_ARCHIVED" | "INVALID_PERIOD" | "RECURRING_NOT_FOUND" | "VALIDATION_ERROR" | "HTTP_ERROR" | "INTERNAL_ERROR";
+        ErrorCode: "EMAIL_ALREADY_EXISTS" | "EMAIL_DELIVERY_FAILED" | "INVALID_CREDENTIALS" | "EMAIL_NOT_VERIFIED" | "INVALID_VERIFICATION_TOKEN" | "INVALID_REFRESH_TOKEN" | "REFRESH_TOKEN_REUSE_DETECTED" | "INVALID_RESET_TOKEN" | "FORBIDDEN_NOT_MEMBER" | "FORBIDDEN_NOT_OWNER" | "SPACE_NOT_FOUND" | "MEMBER_NOT_FOUND" | "ALREADY_MEMBER" | "INVALID_INVITATION_TOKEN" | "INVITATION_EMAIL_MISMATCH" | "INVITATION_NOT_FOUND" | "CANNOT_REMOVE_LAST_OWNER" | "WALLET_NOT_FOUND" | "CATEGORY_NOT_FOUND" | "CATEGORY_NAME_TAKEN" | "INVALID_REORDER" | "CURRENCY_API_UNAVAILABLE" | "CURRENCY_NOT_SUPPORTED" | "EXPENSE_NOT_FOUND" | "INVALID_OCCURRED_AT" | "INVALID_RECURRING_DATE_RANGE" | "WALLET_ARCHIVED" | "CATEGORY_ARCHIVED" | "INVALID_PERIOD" | "RECURRING_NOT_FOUND" | "NEXT_PAYMENT_DATE_IN_PAST" | "VALIDATION_ERROR" | "HTTP_ERROR" | "INTERNAL_ERROR";
         ErrorResponseDto: {
             /** @example 404 */
             statusCode: number;
@@ -1014,6 +1014,12 @@ export interface components {
         UpdateRecurringTransactionDto: {
             /** @example 12.5 */
             amount?: number;
+            /**
+             * Format: date
+             * @description Moves the next payment to this calendar day (YYYY-MM-DD), which must be tomorrow or later in the `tz` time zone. Later payments then fall on this day's number (it overrides `dayOfMonth`); payments already recorded stay as they are. Earlier dates fail with NEXT_PAYMENT_DATE_IN_PAST.
+             * @example 2026-12-20
+             */
+            nextPaymentDate?: string;
             walletId?: string;
             categoryId?: string | null;
             name?: string;
@@ -3504,7 +3510,10 @@ export interface operations {
     };
     RecurringController_update: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description IANA time zone in which `nextPaymentDate` is checked against today (the browser's zone). Defaults to Europe/Kyiv. */
+                tz?: string;
+            };
             header?: never;
             path: {
                 spaceId: string;
@@ -3526,7 +3535,7 @@ export interface operations {
                     "application/json": components["schemas"]["RecurringTransactionResponseDto"];
                 };
             };
-            /** @description Codes: VALIDATION_ERROR, INVALID_RECURRING_DATE_RANGE */
+            /** @description Codes: VALIDATION_ERROR, INVALID_RECURRING_DATE_RANGE, NEXT_PAYMENT_DATE_IN_PAST */
             400: {
                 headers: {
                     [name: string]: unknown;

@@ -30,7 +30,7 @@ const netflix = {
   dayOfMonth: 15,
   startDate: '2026-10-15T00:00:00.000Z',
   lastGeneratedAt: null as string | null,
-  endDate: '2027-01-01T00:00:00.000Z',
+  endDate: '2027-01-01T00:00:00.000Z' as string | null,
   active: true,
 };
 
@@ -137,7 +137,7 @@ describe('RecurringDialog', () => {
     expect(api.PATCH.mock.calls[0][1].body).toEqual({ amount: 299 });
   });
 
-  it('moves the payment day of an existing rule with the calendar', async () => {
+  it('moves the next payment of an existing rule to the picked date', async () => {
     renderDialog(netflix);
     const user = userEvent.setup();
     await screen.findByRole('option', { name: /Cash/ });
@@ -146,44 +146,70 @@ describe('RecurringDialog', () => {
     await pickDay(user, /Наступний платіж/, '20');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     await vi.waitFor(() => expect(api.PATCH).toHaveBeenCalled());
-    expect(api.PATCH.mock.calls[0][1].body).toEqual({ dayOfMonth: 20 });
+    expect(api.PATCH.mock.calls[0][1].body).toEqual({ nextPaymentDate: '2026-10-20' });
+    expect(api.PATCH.mock.calls[0][1].params.query).toEqual({ tz: expect.any(String) });
   });
 
-  it('shows the picked date as the next payment, a month ahead too', async () => {
-    renderDialog(netflix);
-    const user = userEvent.setup();
-    await screen.findByRole('option', { name: /Cash/ });
-    await pickDay(user, /Наступний платіж/, '10', 1);
-    expect(screen.getByRole('button', { name: /Наступний платіж/ })).toHaveTextContent(
-      '10 листопада 2026',
-    );
-    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
-    await vi.waitFor(() => expect(api.PATCH).toHaveBeenCalled());
-    expect(api.PATCH.mock.calls[0][1].body).toEqual({ dayOfMonth: 10 });
-  });
-
-  it('offers only the dates the next payment can fall on', async () => {
+  it('moves the next payment months ahead, past the next occurrence', async () => {
     renderDialog({
       ...netflix,
       dayOfMonth: 5,
       startDate: '2026-09-05T00:00:00.000Z',
       lastGeneratedAt: '2026-10-05T00:00:00.000Z',
+      endDate: null,
     });
     const user = userEvent.setup();
     await screen.findByRole('option', { name: /Cash/ });
-    const field = screen.getByRole('button', { name: /Наступний платіж/ });
-    expect(field).toHaveTextContent('5 листопада 2026');
-    await user.click(field);
+    expect(screen.getByRole('button', { name: /Наступний платіж/ })).toHaveTextContent(
+      '5 листопада 2026',
+    );
+    await pickDay(user, /Наступний платіж/, '10', 2);
+    expect(screen.getByRole('button', { name: /Наступний платіж/ })).toHaveTextContent(
+      '10 січня 2027',
+    );
+    expect(screen.getByText('Далі щомісяця 10-го числа')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(api.PATCH).toHaveBeenCalled());
+    expect(api.PATCH.mock.calls[0][1].body).toEqual({ nextPaymentDate: '2027-01-10' });
+  });
+
+  it("says so when a rule's hidden end date comes before the picked date", async () => {
+    renderDialog(netflix); // ends 1 January 2027
+    const user = userEvent.setup();
+    await screen.findByRole('option', { name: /Cash/ });
+    await pickDay(user, /Наступний платіж/, '10', 3);
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Дата завершення має бути пізніше дати початку',
+    );
+    expect(api.PATCH).not.toHaveBeenCalled();
+  });
+
+  it('offers any date from tomorrow, for an existing rule too', async () => {
+    renderDialog(netflix);
+    const user = userEvent.setup();
+    await screen.findByRole('option', { name: /Cash/ });
+    await user.click(screen.getByRole('button', { name: /Наступний платіж/ }));
     const grid = await screen.findByRole('grid');
-    expect(screen.getByText(/листопад 2026/i)).toBeInTheDocument();
-    expect(within(grid).getByText('30', { selector: 'button' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Попередній місяць' })).toHaveAttribute(
+    expect(within(grid).getByText('7', { selector: 'button' })).toBeDisabled();
+    expect(within(grid).getByText('8', { selector: 'button' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Наступний місяць' })).not.toHaveAttribute(
       'aria-disabled',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'Наступний місяць' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
+  });
+
+  it('shows the server refusing a past next payment', async () => {
+    api.PATCH.mockResolvedValue({
+      error: { statusCode: 400, code: 'NEXT_PAYMENT_DATE_IN_PAST', message: 'x' },
+    });
+    renderDialog(netflix);
+    const user = userEvent.setup();
+    await screen.findByRole('option', { name: /Cash/ });
+    await pickDay(user, /Наступний платіж/, '20');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Наступний платіж можна призначити лише з завтрашнього дня',
     );
   });
 

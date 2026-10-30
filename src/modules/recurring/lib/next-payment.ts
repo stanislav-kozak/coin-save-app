@@ -30,16 +30,3 @@ export function nextPayment(dayOfMonth: number, rule: Rule): string {
   if (date < start) date = clamped(month.getFullYear(), month.getMonth() + 1, dayOfMonth);
   return toValue(date);
 }
-
-/**
- * The dates the next payment can be moved to by changing only `dayOfMonth`: one month from the
- * start (before the first payment) or from the cursor month. Each date in it is its own next payment.
- */
-export function nextPaymentWindow(rule: Rule): { from: string; to: string } {
-  const start = toDate(rule.startDate);
-  const month = cursorMonth(rule);
-  const first = new Date(month.getFullYear(), month.getMonth(), 1);
-  const from = start > first ? start : first;
-  const to = new Date(from.getFullYear(), from.getMonth() + 1, from.getDate() - 1);
-  return { from: toValue(from), to: toValue(to) };
-}

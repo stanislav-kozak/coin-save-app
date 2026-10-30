@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { components } from '@/generated/api';
 import { api } from '@/shared/lib/api-client';
+import { userTimeZone } from '@/shared/lib/periods';
 
 type CreateRecurring = components['schemas']['CreateRecurringTransactionDto'];
 
@@ -31,7 +32,8 @@ export function useUpdateRecurring(spaceId: string) {
   return useMutation({
     mutationFn: async ({ id, body }: { id: string; body: UpdateRecurring }) => {
       const { data, error } = await api.PATCH('/api/spaces/{spaceId}/recurring/{recurringId}', {
-        params: { path: { spaceId, recurringId: id } },
+        // `tz`: the day `nextPaymentDate` must come after ("tomorrow") is the user's.
+        params: { path: { spaceId, recurringId: id }, query: { tz: userTimeZone() } },
         body,
       });
       if (error) throw error;
