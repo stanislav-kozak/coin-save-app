@@ -1,6 +1,6 @@
 'use client';
 
-import { Pencil, Plus } from 'lucide-react';
+import { MoreHorizontal, Pencil, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/shared/ui/button';
@@ -10,6 +10,7 @@ import { SectionError } from '@/shared/ui/section-error';
 import { useWallets } from '../api/wallets-queries';
 import { WalletCard, WalletCircle } from './wallet-card';
 import { WalletDialog, type EditableWallet } from './wallet-dialog';
+import { WalletSheet } from './wallet-sheet';
 
 const ACTION =
   'flex size-8 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-primary/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50';
@@ -17,11 +18,11 @@ const ACTION =
 type Props = {
   spaceId: string;
   onAdd: () => void;
-  /** "+" on a desktop card / a tap on a mobile circle: add income to that wallet (spec §6.3). */
+  /** "+" on a desktop card / "+ Income" in a mobile circle's sheet: add income to that wallet (spec §6.3). */
   onAddIncome?: (walletId: string) => void;
   /**
    * Lets the dashboard make each wallet draggable without this module knowing about drag-and-drop.
-   * `onActivate` is the circle's tap action, for the wrapper to attach when it owns the element.
+   * `onActivate` is the circle's tap action (open its sheet), for the wrapper to attach when it owns the element.
    */
   wrap?: (walletId: string, node: ReactNode, isCard: boolean, onActivate?: () => void) => ReactNode;
 };
@@ -32,6 +33,9 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
   const tc = useTranslations('common');
   const tw = useTranslations('wallets.edit');
   const [editing, setEditing] = useState<EditableWallet | null>(null);
+  // The mobile circle whose actions sheet is open.
+  const [acting, setActing] = useState<EditableWallet | null>(null);
+  const ts = useTranslations('wallets.sheet');
   const td = useTranslations('dashboard');
   const wallets = useWallets(spaceId);
   if (wallets.isError && !wallets.isFetching) {
@@ -87,31 +91,29 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
         <>
           <ul className="flex gap-4 overflow-x-auto p-1 md:hidden">
             {wallets.data.map((w) => {
-              const activate = onAddIncome ? () => onAddIncome(w.id) : undefined;
+              const activate = () => setActing(w);
               const circle = <WalletCircle wallet={w} />;
               return (
                 <li key={w.id} className="relative">
                   {wrap ? (
                     <>
                       {wrap(w.id, circle, false, activate)}
-                      {activate ? (
-                        // The draggable circle takes Enter/Space to lift it, so keyboard and
-                        // screen-reader users get their own "add income" button (shown on focus).
-                        <button
-                          type="button"
-                          onClick={activate}
-                          aria-label={ti('addFor', { name: w.name })}
-                          className="sr-only rounded-full bg-card text-primary shadow-card focus-visible:not-sr-only focus-visible:absolute focus-visible:-right-1 focus-visible:-bottom-1 focus-visible:flex focus-visible:size-6 focus-visible:items-center focus-visible:justify-center focus-visible:ring-2 focus-visible:ring-ring/50"
-                        >
-                          <Plus aria-hidden className="size-4" />
-                        </button>
-                      ) : null}
+                      {/* The draggable circle takes Enter/Space to lift it, so keyboard and
+                          screen-reader users get their own button for the sheet (shown on focus). */}
+                      <button
+                        type="button"
+                        onClick={activate}
+                        aria-label={ts('open', { name: w.name })}
+                        className="sr-only rounded-full bg-card text-primary shadow-card focus-visible:not-sr-only focus-visible:absolute focus-visible:-right-1 focus-visible:-bottom-1 focus-visible:flex focus-visible:size-6 focus-visible:items-center focus-visible:justify-center focus-visible:ring-2 focus-visible:ring-ring/50"
+                      >
+                        <MoreHorizontal aria-hidden className="size-4" />
+                      </button>
                     </>
                   ) : (
                     <button
                       type="button"
                       onClick={activate}
-                      aria-label={ti('addFor', { name: w.name })}
+                      aria-label={ts('open', { name: w.name })}
                       className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                     >
                       {circle}
@@ -163,6 +165,26 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
           </button>
         </>
       )}
+      {acting ? (
+        <WalletSheet
+          key={acting.id}
+          wallet={acting}
+          open
+          onOpenChange={(open) => !open && setActing(null)}
+          onAddIncome={
+            onAddIncome
+              ? () => {
+                  setActing(null);
+                  onAddIncome(acting.id);
+                }
+              : undefined
+          }
+          onEdit={() => {
+            setActing(null);
+            setEditing(acting);
+          }}
+        />
+      ) : null}
       {editing ? (
         <WalletDialog
           key={editing.id}
