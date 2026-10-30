@@ -19,7 +19,7 @@ import { Input } from '@/shared/ui/input';
 import { LoadingRegion, Skeleton } from '@/shared/ui/skeleton';
 import { useCreateRecurring, useUpdateRecurring } from '../api/recurring-mutations';
 import { firstPaymentDate } from '../lib/first-payment-date';
-import { nextPayment, nextPaymentWindow } from '../lib/next-payment';
+import { nextPayment } from '../lib/next-payment';
 import { recurringFormSchema, type RecurringFormInput, type RecurringFormValues } from '../schemas';
 import { notify } from '@/shared/ui/toaster';
 
@@ -112,22 +112,24 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
 
   const [type, walletId, day] = useWatch({ control, name: ['type', 'walletId', 'dayOfMonth'] });
   const wallet = wallets.data?.find((w) => w.id === walletId);
-  // A new rule: the date picked in the calendar is its first payment (and its day of month).
-  // An existing rule keeps its start (only dayOfMonth is editable); the calendar shows its next
-  // payment and offers only the dates that payment can move to, so a pick is what the server does.
+  // The date picked in the calendar is the first payment of a new rule, or the next payment of an
+  // existing one (any date from tomorrow: the server restarts the rule there); its day is the
+  // day of month either way. Until a pick, an existing rule shows its next payment.
   const [picked, setPicked] = useState<string | null>(null);
-  const start = rule ? rule.startDate.slice(0, 10) : (picked ?? firstPaymentDate(Number(day), now));
-  const shown = rule ? nextPayment(Number(day), rule) : start;
-  const range = rule ? nextPaymentWindow(rule) : null;
-  // Payments start from tomorrow: today already counts as past for a new rule (firstPaymentDate).
+  const shown =
+    picked ?? (rule ? nextPayment(rule.dayOfMonth, rule) : firstPaymentDate(Number(day), now));
+  // Payments start from tomorrow: today already counts as past (firstPaymentDate), and the server
+  // refuses an earlier next payment (NEXT_PAYMENT_DATE_IN_PAST).
   const tomorrow = (() => {
     const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   })();
 
   const save = async (values: RecurringFormValues) => {
-    if (values.endDate && values.endDate < start) {
-      setFieldError('endDate', { message: 'endBeforeStart' });
+    if (values.endDate && values.endDate < shown) {
+      // With the end date hidden, an older rule's end date can still block a move: say it aloud.
+      if (SHOW_END_DATE) setFieldError('endDate', { message: 'endBeforeStart' });
+      else setError({ code: 'INVALID_RECURRING_DATE_RANGE' });
       return;
     }
     setError(null);
@@ -135,16 +137,21 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
       if (rule) {
         const changed = changedFields(values, dirtyFields);
         delete changed.type; // can't change on edit (not in the update DTO)
+        // A new date moves the next payment; the server takes its day of month from it.
+        delete changed.dayOfMonth;
         // A cleared note parses to undefined, which JSON drops; '' is what removes it.
         if (dirtyFields.note && values.note === undefined) changed.note = '';
-        await update.mutateAsync({ id: rule.id, body: changed });
+        await update.mutateAsync({
+          id: rule.id,
+          body: { ...changed, ...(picked ? { nextPaymentDate: picked } : {}) },
+        });
       } else {
         const { categoryId, endDate, note, ...rest } = values;
         await create.mutateAsync({
           ...rest,
           ...(values.type === 'EXPENSE' && categoryId ? { categoryId } : {}),
           frequency: 'MONTHLY',
-          startDate: start,
+          startDate: shown,
           ...(endDate ? { endDate } : {}),
           ...(note ? { note } : {}),
         });
@@ -266,10 +273,9 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
                 id="recurring-date"
                 label={rule ? t('form.nextPayment') : t('form.firstPayment')}
                 value={shown}
-                min={range ? range.from : tomorrow}
-                max={range?.to}
+                min={tomorrow}
                 onChange={(v) => {
-                  if (!rule) setPicked(v);
+                  setPicked(v);
                   setValue('dayOfMonth', String(Number(v.slice(8))), { shouldDirty: true });
                 }}
               />

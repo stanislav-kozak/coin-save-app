@@ -54,7 +54,8 @@
     "WALLET_ARCHIVED": "This wallet is archived — restore it in settings",
     "CATEGORY_ARCHIVED": "This category is archived — restore it in settings",
     "INVALID_PERIOD": "Invalid period",
-    "RECURRING_NOT_FOUND": "Recurring payment not found"
+    "RECURRING_NOT_FOUND": "Recurring payment not found",
+    "NEXT_PAYMENT_DATE_IN_PAST": "The next payment can only be from tomorrow on"
   },
   "auth": {
     "brand": {

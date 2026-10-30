@@ -50,7 +50,7 @@ describe('recurring API hooks', () => {
     const update = setup(() => useUpdateRecurring('s1'));
     await act(() => update.result.current.mutateAsync({ id: 'r1', body: { amount: 299 } }));
     expect(api.PATCH).toHaveBeenCalledWith('/api/spaces/{spaceId}/recurring/{recurringId}', {
-      ...path({ recurringId: 'r1' }),
+      params: { path: { spaceId: 's1', recurringId: 'r1' }, query: { tz: expect.any(String) } },
       body: { amount: 299 },
     });
     expect(update.keys()).toContainEqual(['recurring', 's1']);
