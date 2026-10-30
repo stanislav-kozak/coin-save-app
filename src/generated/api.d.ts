@@ -665,6 +665,8 @@ export interface components {
             /** @description Display name, trimmed; null removes it */
             name?: string | null;
             locale?: components["schemas"]["UserLocale"];
+            /** @description true records the onboarding tour as completed now; false resets it so the tour shows again */
+            onboardingCompleted?: boolean;
         };
         UserResponseDto: {
             id: string;
@@ -675,6 +677,11 @@ export interface components {
             avatarUrl: string | null;
             /** @example uk */
             locale: string;
+            /**
+             * Format: date-time
+             * @description When the user finished (or skipped) the onboarding tour; null shows it
+             */
+            onboardingCompletedAt: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */

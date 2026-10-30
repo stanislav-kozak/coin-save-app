@@ -572,5 +572,108 @@
   "calendar": {
     "next": "Next month",
     "previous": "Previous month"
+  },
+  "onboarding": {
+    "menu": "How it works",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "start": "Get started",
+    "step": "Step {n} of {total}",
+    "goTo": "Step {n}",
+    "desktop": {
+      "welcome": {
+        "title": "Welcome to CoinSave",
+        "text": "Your family budget in one shared space: everyone sees expenses, income and limits right away.",
+        "alt": "The dashboard: the month at a glance, wallets, categories and recent expenses"
+      },
+      "wallets": {
+        "title": "Wallets",
+        "text": "Cards, cash, accounts — in any currency. Balances update with every record.",
+        "alt": "The wallets column with balances"
+      },
+      "drag": {
+        "title": "An expense in one move",
+        "text": "Drag a wallet onto a category and enter the amount — done.",
+        "alt": "A wallet being dragged onto the Groceries category"
+      },
+      "recent": {
+        "title": "Recent transactions",
+        "text": "The last few days at a glance. Click a record to edit or delete it.",
+        "alt": "The recent transactions list"
+      },
+      "categories": {
+        "title": "Categories and limits",
+        "text": "Set a monthly limit: the bar fills up and turns yellow, then red near the limit. The pencil edits, the dots reorder.",
+        "alt": "Category cards with limit bars"
+      },
+      "income": {
+        "title": "Income",
+        "text": "The “+” on a wallet adds income. Tick “monthly” and your salary records itself.",
+        "alt": "The “+” button on a wallet card"
+      },
+      "recurring": {
+        "title": "Recurring payments",
+        "text": "Subscriptions, bills, salary: set a rule once and records appear on the right day.",
+        "alt": "The recurring payments page"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "text": "A month, quarter or year by category, compared with the previous period, with CSV export.",
+        "alt": "The analytics page"
+      },
+      "together": {
+        "title": "Better together",
+        "text": "Invite your family in the space settings — everyone sees each other's changes instantly.",
+        "alt": "Space settings: members and invitations"
+      }
+    },
+    "mobile": {
+      "welcome": {
+        "title": "Welcome to CoinSave",
+        "text": "Your family budget in one shared space: everyone sees expenses, income and limits right away.",
+        "alt": "The dashboard with the month at a glance"
+      },
+      "wallets": {
+        "title": "Wallets",
+        "text": "Cards, cash, accounts — in any currency. Tap a circle to add income or edit the wallet.",
+        "alt": "Wallet circles with balances"
+      },
+      "drag": {
+        "title": "An expense in one move",
+        "text": "Drag a wallet circle onto a category tile and enter the amount.",
+        "alt": "A wallet being dragged onto the Groceries tile"
+      },
+      "plus": {
+        "title": "Or use “+”",
+        "text": "The “+” at the bottom opens a new expense from any screen.",
+        "alt": "The “+” button in the bottom navigation"
+      },
+      "categories": {
+        "title": "Categories and limits",
+        "text": "A tile fills up toward its monthly limit. Tap a tile to edit the category or its limit.",
+        "alt": "Category tiles filled by their limits"
+      },
+      "income": {
+        "title": "Income",
+        "text": "In a wallet's sheet, tap “Income”. Tick “monthly” and your salary records itself.",
+        "alt": "The wallet sheet with the Income button"
+      },
+      "recurring": {
+        "title": "Recurring payments",
+        "text": "Subscriptions, bills, salary: set a rule once and records appear on the right day.",
+        "alt": "The recurring payments page"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "text": "A month, quarter or year by category, compared with the previous period, with CSV export.",
+        "alt": "The analytics page"
+      },
+      "together": {
+        "title": "Better together",
+        "text": "Invite your family in the space settings (the gear at the bottom) — everyone sees each other's changes instantly.",
+        "alt": "Space settings: members and invitations"
+      }
+    }
   }
 }

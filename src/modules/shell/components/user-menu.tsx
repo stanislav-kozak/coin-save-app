@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useCurrentUser } from '@/modules/auth';
+import { useOnboarding } from '@/modules/onboarding';
 import { Link } from '@/shared/i18n/navigation';
 import { api } from '@/shared/lib/api-client';
 import {
@@ -26,6 +27,8 @@ export function UserMenu({ spaceId }: { spaceId: string }) {
   const locale = useLocale();
   const queryClient = useQueryClient();
   const me = useCurrentUser();
+  const onboarding = useOnboarding();
+  const to = useTranslations('onboarding');
 
   async function logout() {
     setLogoutFailed(false);
@@ -70,6 +73,7 @@ export function UserMenu({ spaceId }: { spaceId: string }) {
           <DropdownMenuItem asChild>
             <Link href={`/s/${spaceId}/profile`}>{tn('profile')}</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem onSelect={onboarding.start}>{to('menu')}</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => void logout()}>{t('logout')}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

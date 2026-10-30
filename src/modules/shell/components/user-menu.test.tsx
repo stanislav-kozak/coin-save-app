@@ -18,6 +18,8 @@ vi.mock('@/shared/i18n/navigation', () => ({
     </a>
   ),
 }));
+const startTour = vi.fn();
+vi.mock('@/modules/onboarding', () => ({ useOnboarding: () => ({ start: startTour }) }));
 const assign = vi.fn();
 
 beforeEach(() => {
@@ -85,5 +87,12 @@ describe('UserMenu', () => {
       '/s/a/profile',
     );
     expect(screen.queryByRole('menuitem', { name: 'Налаштування простору' })).toBeNull();
+  });
+
+  it('replays the onboarding tour', async () => {
+    renderWithProviders(<UserMenu spaceId="a" />);
+    const user = await openMenu();
+    await user.click(await screen.findByRole('menuitem', { name: 'Як користуватись' }));
+    expect(startTour).toHaveBeenCalled();
   });
 });
