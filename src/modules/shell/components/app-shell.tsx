@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ExpenseLauncherProvider } from '@/modules/expenses';
 import { OnboardingProvider } from '@/modules/onboarding';
+import { PwaInstallProvider } from '@/modules/pwa';
 import { ConnectionBanner, RealtimeProvider } from '@/modules/realtime';
 import { SpaceGuard } from '@/modules/spaces';
 import { AppHeader } from './app-header';
@@ -11,18 +12,20 @@ export function AppShell({ spaceId, children }: { spaceId: string; children: Rea
   return (
     <RealtimeProvider spaceId={spaceId}>
       <ExpenseLauncherProvider spaceId={spaceId}>
-        <OnboardingProvider>
-          <div className="pb-nav flex min-h-dvh flex-col bg-background md:pb-0">
-            {/* Header and connection banner stick together at the top. */}
-            <div className="sticky top-0 z-40">
-              <AppHeader spaceId={spaceId} />
-              <ConnectionBanner />
+        <PwaInstallProvider>
+          <OnboardingProvider>
+            <div className="pb-nav flex min-h-dvh flex-col bg-background md:pb-0">
+              {/* Header and connection banner stick together at the top. */}
+              <div className="sticky top-0 z-40">
+                <AppHeader spaceId={spaceId} />
+                <ConnectionBanner />
+              </div>
+              <SpaceGuard spaceId={spaceId}>{children}</SpaceGuard>
+              <BottomNav spaceId={spaceId} />
+              <Toaster />
             </div>
-            <SpaceGuard spaceId={spaceId}>{children}</SpaceGuard>
-            <BottomNav spaceId={spaceId} />
-            <Toaster />
-          </div>
-        </OnboardingProvider>
+          </OnboardingProvider>
+        </PwaInstallProvider>
       </ExpenseLauncherProvider>
     </RealtimeProvider>
   );

@@ -9,10 +9,23 @@ import '../globals.css';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'], variable: '--font-inter' });
 
-export const metadata: Metadata = { title: 'CoinSaveKeeper' };
+export const metadata: Metadata = {
+  title: 'CoinSaveKeeper',
+  // Home-screen app on iPhone (the icon is app/apple-icon.tsx).
+  appleWebApp: { capable: true, title: 'CoinSave', statusBarStyle: 'default' },
+};
 
 // Edge-to-edge on phones; the header and bottom nav pad themselves by the safe-area insets.
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  // Browser and installed-app chrome: the design system's `bg` per colour scheme.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fdfbf9' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1917' },
+  ],
+};
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

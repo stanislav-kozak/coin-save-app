@@ -5,6 +5,7 @@ import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { CategoriesGrid, useCategories } from '@/modules/categories';
 import { RecentExpenses, useExpenseLauncher } from '@/modules/expenses';
 import { useWallets, WalletsPanel } from '@/modules/wallets';
+import { InstallBanner } from '@/modules/pwa';
 import { useIsDesktop } from '@/shared/hooks/use-is-desktop';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { formatMoney } from '@/shared/lib/money';
@@ -80,6 +81,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
       */}
       <main className="grid items-start gap-8 px-4 py-6 md:px-6 md:pb-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:px-8 xl:px-16 min-[90rem]:grid-cols-[minmax(21.5rem,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
         <MonthCard spaceId={spaceId} />
+        <InstallBanner />
         <div className="min-w-0 lg:col-start-1 lg:row-start-2">
           <WalletsPanel
             spaceId={spaceId}

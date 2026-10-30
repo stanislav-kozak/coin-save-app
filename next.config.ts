@@ -10,6 +10,19 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   // Socket.IO's path is `/socket.io/` — Next would 308 it to `/socket.io`, which the backend doesn't serve.
   skipTrailingSlashRedirect: true,
+  async headers() {
+    // The service worker must never be cached, or a fix would wait for the browser's own expiry.
+    return [
+      {
+        source: '/sw.js',
+        headers: [
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self'" },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     // Browser talks to /api on its own origin, so the backend's Secure httpOnly cookies stay first-party.
     // Socket.IO too (spec §8): same origin, cookies included. Note the backend accepts only its own
