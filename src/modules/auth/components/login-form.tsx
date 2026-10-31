@@ -22,7 +22,8 @@ import { AuthHeader } from './auth-header';
 import { GoogleButton } from './google-button';
 import { OrDivider } from './or-divider';
 
-export function LoginForm() {
+/** `redirectError`: an error code from a redirect back here (`?error=`, e.g. a failed Google sign-in). */
+export function LoginForm({ redirectError }: { redirectError?: string } = {}) {
   const t = useTranslations('auth');
   const te = useTranslations('errors');
   const vm = useValidationMessage();
@@ -69,6 +70,11 @@ export function LoginForm() {
   return (
     <>
       <AuthHeader title={t('login.title')} subtitle={t('login.subtitle')} />
+      {redirectError && !login.error ? (
+        <p role="alert" className="mb-4 text-caption text-destructive">
+          {te(getErrorCode({ code: redirectError }))}
+        </p>
+      ) : null}
       <GoogleButton />
       <OrDivider />
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4">
