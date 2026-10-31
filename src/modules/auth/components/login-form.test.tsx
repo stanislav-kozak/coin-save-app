@@ -123,4 +123,16 @@ describe('LoginForm', () => {
     await fillAndSubmit('a@b.co', 'secret');
     expect(await screen.findByRole('alert')).toHaveTextContent('Забагато спроб');
   });
+
+  it('says why after a failed Google sign-in sent the user back here', () => {
+    renderWithProviders(<LoginForm redirectError="GOOGLE_AUTH_FAILED" />);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Не вдалося увійти через Google. Спробуйте ще раз',
+    );
+  });
+
+  it('shows an unknown redirect code as a generic error, never the raw code', () => {
+    renderWithProviders(<LoginForm redirectError="<script>" />);
+    expect(screen.getByRole('alert')).not.toHaveTextContent('<script>');
+  });
 });
