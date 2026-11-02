@@ -4,9 +4,20 @@ import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { DragHandleProps } from '@/modules/categories';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { entityStyle } from '@/shared/lib/entity-color';
 import { cn } from '@/shared/lib/utils';
 import { categoryDndId, walletDndId, walletTargetDndId } from '../lib/resolve-drop';
+
+// A drop target under a dragged wallet: outlined in its own colour (the colour edge's, the accent
+// without one) and lifted a little. The outline is always there but transparent, so it fades in.
+const DROP_TARGET =
+  'outline-2 outline-transparent motion-safe:transition-[outline-color,scale,box-shadow] motion-safe:duration-200 motion-safe:ease-out';
+const DROP_OVER = 'scale-[1.03] shadow-card-raised outline-[color:var(--entity,var(--primary))]';
+// A sortable category also slides (dnd-kit's inline `transition`, which would replace the fade): its
+// transition comes in as --sort-transition and joins the fade in one rule.
+const SORTABLE_DROP_TARGET =
+  'outline-2 outline-transparent motion-safe:[transition:var(--sort-transition,transform_0s),outline-color_200ms_ease-out,scale_200ms_ease-out,box-shadow_200ms_ease-out]';
 
 /**
  * Wallet card/circle you can pick up (design system §5 "Wallet card — drag state") and drop another
@@ -15,10 +26,13 @@ import { categoryDndId, walletDndId, walletTargetDndId } from '../lib/resolve-dr
  */
 export function DraggableWallet({
   id,
+  color,
   onClick,
   children,
 }: {
   id: string;
+  /** The wallet's colour: a wallet dropped on it is outlined in it. */
+  color?: string | null;
   onClick?: () => void;
   children: ReactNode;
 }) {
@@ -38,12 +52,14 @@ export function DraggableWallet({
       {...listeners}
       {...attributes}
       onClick={onClick}
+      style={entityStyle(color)}
       // touch-none: a long-press must start a drag, not scroll the page (spec §6.6 TouchSensor).
       // no-callout + select-none: a press or a drag never selects text or opens the iOS menu.
       className={cn(
-        'no-callout cursor-grab touch-none rounded-card outline-none select-none focus-visible:ring-2 focus-visible:ring-ring/50 motion-safe:transition-transform',
+        'no-callout cursor-grab touch-none rounded-card select-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        DROP_TARGET,
         isDragging && 'opacity-40',
-        otherWalletOver && 'scale-105 shadow-card-raised ring-2 ring-primary',
+        otherWalletOver && DROP_OVER,
       )}
     >
       {children}
@@ -58,9 +74,12 @@ export function DraggableWallet({
  */
 export function SortableCategory({
   id,
+  color,
   children,
 }: {
   id: string;
+  /** The category's colour: a wallet dropped on it is outlined in it. */
+  color?: string | null;
   children: (handle: DragHandleProps) => ReactNode;
 }) {
   const {
@@ -79,11 +98,18 @@ export function SortableCategory({
     <div
       ref={setNodeRef}
       // Position while sorting is data from dnd-kit, like the progress width.
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      style={
+        {
+          ...entityStyle(color),
+          transform: CSS.Transform.toString(transform),
+          '--sort-transition': transition ?? undefined,
+        } as CSSProperties
+      }
       className={cn(
         // Desktop cards and mobile tiles are both rounded-card; the highlight follows their shape.
-        'no-callout rounded-card transition-transform select-none',
-        walletOver && 'scale-105 shadow-card-raised ring-2 ring-primary',
+        'no-callout rounded-card select-none',
+        SORTABLE_DROP_TARGET,
+        walletOver && DROP_OVER,
         // Lifted while it moves in place (design system: raised shadow for drag).
         isDragging && 'relative z-10 shadow-card-raised',
       )}

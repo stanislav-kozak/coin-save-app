@@ -180,6 +180,30 @@
   --animate-row-in: row-in 0.3s ease-out;
   --animate-badge-pop: badge-pop 0.35s ease-out;
   --animate-float: float 2.6s ease-in-out infinite;
+  /* The app backdrop's two soft lights (AnimatedBackground). */
+  --animate-glow-drift: glow-drift 18s ease-in-out infinite;
+  --animate-glow-drift-alt: glow-drift-alt 24s ease-in-out infinite;
+
+  @keyframes glow-drift {
+    0%,
+    100% {
+      transform: translate(-40px, 0) scale(1);
+      opacity: 0.85;
+    }
+    50% {
+      transform: translate(50px, 60px) scale(1.2);
+      opacity: 1;
+    }
+  }
+  @keyframes glow-drift-alt {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1.1);
+    }
+    50% {
+      transform: translate(-60px, -40px) scale(0.9);
+    }
+  }
 
   @keyframes entity-pulse {
     0% {

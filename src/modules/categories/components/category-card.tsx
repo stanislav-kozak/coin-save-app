@@ -81,7 +81,7 @@ export function CategoryCard(props: Props) {
     <article
       style={entityStyle(category.color)}
       className={cn(
-        'relative flex flex-col gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5',
+        'relative flex flex-col gap-2 rounded-card border border-border bg-card px-4 py-3 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5',
         // The colour edge: a left border follows the rounded corners and clips nothing (the
         // over-limit badge overhangs the top edge).
         entityStyle(category.color) && 'border-l-4 border-l-[color:var(--entity)]',
@@ -107,7 +107,7 @@ export function CategoryCard(props: Props) {
         </span>
       ) : null}
       <header className="flex items-center gap-3">
-        <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
+        <EntityIcon id={category.id} color={category.color} icon={category.icon} size="s" />
         <h3 className="line-clamp-2 flex-1 text-body font-medium break-words">{category.name}</h3>
         {handle ? (
           <button
@@ -198,13 +198,14 @@ export function CategoryTile(props: Props) {
         />
       ) : null}
       <EntityIcon id={category.id} color={category.color} icon={category.icon} size="s" />
-      <span className="relative w-full truncate text-caption font-medium text-foreground">
+      <span className="relative mt-1 w-full truncate text-caption font-medium text-foreground">
         {category.name}
       </span>
       {/* Variant C: the headline is what's left of the limit (or how much over), else the spent. */}
       <span
         className={cn(
-          'relative w-full truncate text-body font-semibold tabular-nums',
+          // Tighter than the body line: the tile stays short with four lines under the icon.
+          'relative mt-0.5 w-full truncate text-body leading-5 font-semibold tabular-nums',
           status === 'over' ? 'text-destructive' : 'text-foreground',
         )}
       >
@@ -231,7 +232,7 @@ export function CategoryTile(props: Props) {
     </>
   );
   const tile = cn(
-    'relative flex w-full flex-col items-center gap-1 overflow-hidden rounded-card border border-border bg-card px-1 py-2 text-center',
+    'relative flex w-full flex-col items-center overflow-hidden rounded-card border border-border bg-card px-1 py-1.5 text-center',
     entityStyle(category.color) && 'border-l-4 border-l-[color:var(--entity)]',
   );
   if (!onEdit)

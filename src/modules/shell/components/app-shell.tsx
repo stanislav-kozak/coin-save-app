@@ -5,6 +5,7 @@ import { PwaInstallProvider } from '@/modules/pwa';
 import { ConnectionBanner, RealtimeProvider } from '@/modules/realtime';
 import { SpaceGuard } from '@/modules/spaces';
 import { AppHeader } from './app-header';
+import { AnimatedBackground } from '@/shared/ui/animated-background';
 import { Toaster } from '@/shared/ui/toaster';
 import { BottomNav } from './bottom-nav';
 
@@ -14,7 +15,9 @@ export function AppShell({ spaceId, children }: { spaceId: string; children: Rea
       <ExpenseLauncherProvider spaceId={spaceId}>
         <PwaInstallProvider>
           <OnboardingProvider>
-            <div className="pb-nav flex min-h-dvh flex-col bg-background md:pb-0">
+            {/* No bg here: the body paints the background color, the animated grid sits on it. */}
+            <div className="pb-nav flex min-h-dvh flex-col md:pb-0">
+              <AnimatedBackground />
               {/* Header and connection banner stick together at the top. */}
               <div className="sticky top-0 z-40">
                 <AppHeader spaceId={spaceId} />
