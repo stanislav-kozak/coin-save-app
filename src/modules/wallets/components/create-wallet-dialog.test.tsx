@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
@@ -91,5 +91,18 @@ describe('CreateWalletDialog', () => {
     answer({ data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '0', color: '#3b82f6' }] });
     await vi.waitFor(() => expect(screen.getByRole('radio', { name: 'Бірюзовий' })).toBeChecked());
     expect(screen.getByLabelText('Назва')).toHaveValue('Cash');
+  });
+
+  it('saves the picked icon, previewed in the wallet color', async () => {
+    post.mockResolvedValue({ data: { id: 'w1' } });
+    renderWithProviders(<CreateWalletDialog spaceId="sp1" open onOpenChange={vi.fn()} />);
+    const user = userEvent.setup();
+    await fill(user, '0');
+    const icons = screen.getByRole('radiogroup', { name: 'Іконка' });
+    expect(within(icons).getByRole('radio', { name: 'Без іконки' })).toBeChecked();
+    await user.click(within(icons).getByRole('radio', { name: 'Банк' }));
+    await user.click(screen.getByRole('button', { name: 'Додати' }));
+    await vi.waitFor(() => expect(post).toHaveBeenCalled());
+    expect(post.mock.calls[0][1].body).toMatchObject({ icon: 'i:bank' });
   });
 });

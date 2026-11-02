@@ -21,6 +21,12 @@ export const createWalletSchema = z.object({
   currency: z.enum(SUPPORTED_CURRENCIES),
   initialBalance: amountField,
   color: z.string().regex(/^#[0-9a-f]{6}$/i),
+  // A key from shared/constants/wallet-icons (`i:…` / `c:…`); '' = none, so not sent.
+  icon: z
+    .string()
+    .max(50)
+    .optional()
+    .transform((v) => v || undefined),
 });
 
 export type CreateWalletValues = z.output<typeof createWalletSchema>;
@@ -28,5 +34,13 @@ export type CreateWalletValues = z.output<typeof createWalletSchema>;
 /** Editing a wallet; a new currency converts it on the server at today's rate. */
 export const updateWalletSchema = createWalletSchema
   // A wallet may have no color yet; empty means "leave it so".
-  .extend({ color: z.union([z.string().regex(/^#[0-9a-f]{6}$/i), z.literal('')]) });
+  .extend({
+    color: z.union([z.string().regex(/^#[0-9a-f]{6}$/i), z.literal('')]),
+    // '' clears it: null resets the icon to the plain colored circle.
+    icon: z
+      .string()
+      .max(50)
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v || null)),
+  });
 export type UpdateWalletValues = z.output<typeof updateWalletSchema>;

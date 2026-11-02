@@ -19,6 +19,7 @@ import { Input } from '@/shared/ui/input';
 import { useArchiveWallet, useUpdateWallet } from '../api/wallets-queries';
 import { updateWalletSchema, type UpdateWalletValues } from '../schemas';
 import { CurrencyPreview } from './currency-preview';
+import { WalletIconPicker } from './wallet-icon-picker';
 import { notify } from '@/shared/ui/toaster';
 
 type ValidationKey = 'nameRequired' | 'nameTooLong' | 'amountInvalid' | 'amountTooLarge';
@@ -27,6 +28,7 @@ export type EditableWallet = {
   name: string;
   currency: string;
   color: string | null;
+  icon?: string | null;
   initialBalance: string;
   balance: string;
 };
@@ -69,11 +71,12 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
     defaultValues: {
       name: wallet.name,
       color: wallet.color ?? '',
+      icon: wallet.icon ?? '',
       initialBalance: wallet.initialBalance,
       currency: walletCurrency,
     },
   });
-  const currency = useWatch({ control, name: 'currency' });
+  const [currency, color] = useWatch({ control, name: ['currency', 'color'] });
   const changing = currency !== walletCurrency;
   // The balance is locked while the currency changes: a half-typed value must not block saving.
   useEffect(() => {
@@ -205,6 +208,19 @@ export function WalletDialog({ spaceId, wallet, open, onOpenChange }: Props) {
                   id="wallet-edit-color"
                   label={t('create.color')}
                   value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="icon"
+              render={({ field }) => (
+                <WalletIconPicker
+                  id="wallet-edit-icon"
+                  label={t('create.icon')}
+                  value={field.value ?? ''}
+                  color={color || wallet.color || ''}
                   onChange={field.onChange}
                 />
               )}

@@ -3,7 +3,7 @@
 import { GripVertical, Pencil } from 'lucide-react';
 import type { ComponentPropsWithRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { formatMoney } from '@/shared/lib/money';
+import { formatMoney, isNegative, subtractMoney } from '@/shared/lib/money';
 import { useCountUp } from '@/shared/hooks/use-count-up';
 import { useBecameTrue } from '@/shared/hooks/use-became-true';
 import { usePulseOnIncrease } from '@/shared/hooks/use-pulse-on-increase';
@@ -51,7 +51,14 @@ export function useCategoryCaption({ category, spent, pct, currency }: Props) {
   const excess = overLimit(spent, limit);
   // The amount counts to its new value; status and percentage use the real one.
   const shownSpent = useCountUp(spent, currency);
+  // What's left of the limit as the spent amount counts up (never below zero: then it's `excess`).
+  const left = limit ? subtractMoney(limit, shownSpent) : null;
   return {
+    money,
+    whole: (v: string) => formatMoney(v, currency, locale, { whole: true }),
+    shownSpent,
+    left: left && !isNegative(left) ? left : '0',
+    excess,
     status: limitStatus(spent, limit, pct),
     caption: limit
       ? t('spentOfLimit', { spent: money(shownSpent), limit: money(limit), pct })
@@ -65,7 +72,8 @@ export function useCategoryCaption({ category, spent, pct, currency }: Props) {
 export function CategoryCard(props: Props) {
   const { category, pct, onEdit, handle } = props;
   const t = useTranslations('categories');
-  const { status, caption, over, overLabel } = useCategoryCaption(props);
+  const tt = useTranslations('categories.tile');
+  const { status, over, overLabel, money, shownSpent, left, excess } = useCategoryCaption(props);
   const pulse = usePulseOnIncrease(props.spent, props.currency);
   const justOver = useBecameTrue(status === 'over');
 
@@ -139,13 +147,21 @@ export function CategoryCard(props: Props) {
           style={{ width: `${status === 'none' ? 0 : Math.min(pct, 100)}%` }}
         />
       </div>
-      <p
-        className={cn(
-          'text-caption',
-          status === 'over' ? 'text-destructive' : 'text-muted-foreground',
-        )}
-      >
-        {caption}
+      {/* Variant C: what's left (or how much over) next to what's spent; the limit underneath. */}
+      <div className="grid grid-cols-2 gap-2">
+        <Stat label={tt('stats.spent')} value={money(shownSpent)} />
+        {category.monthlyLimit ? (
+          <Stat
+            label={tt(status === 'over' ? 'stats.over' : 'stats.left')}
+            value={money(status === 'over' && excess ? excess : left)}
+            tone={status === 'over' ? 'danger' : undefined}
+          />
+        ) : null}
+      </div>
+      <p className="text-caption text-muted-foreground">
+        {category.monthlyLimit
+          ? tt('stats.limit', { limit: money(category.monthlyLimit), pct })
+          : tt('stats.noLimit')}
       </p>
     </article>
   );
@@ -159,7 +175,8 @@ export function CategoryCard(props: Props) {
 export function CategoryTile(props: Props) {
   const { category, spent, currency, onEdit, handle } = props;
   const t = useTranslations('categories');
-  const { status, caption } = useCategoryCaption(props);
+  const tt = useTranslations('categories.tile');
+  const { status, caption, whole, shownSpent, left, excess } = useCategoryCaption(props);
   const fill = limitFill(spent, category.monthlyLimit);
   const pulse = usePulseOnIncrease(spent, currency);
   const content = (
@@ -180,17 +197,36 @@ export function CategoryTile(props: Props) {
           className="absolute inset-x-0 bottom-0 opacity-25 transition-[height]"
         />
       ) : null}
-      <EntityIcon id={category.id} color={category.color} icon={category.icon} size="m" />
+      <EntityIcon id={category.id} color={category.color} icon={category.icon} size="s" />
       <span className="relative w-full truncate text-caption font-medium text-foreground">
         {category.name}
       </span>
+      {/* Variant C: the headline is what's left of the limit (or how much over), else the spent. */}
       <span
         className={cn(
-          'relative w-full truncate text-caption tabular-nums',
-          status === 'over' ? 'text-destructive' : 'text-muted-foreground',
+          'relative w-full truncate text-body font-semibold tabular-nums',
+          status === 'over' ? 'text-destructive' : 'text-foreground',
         )}
       >
-        <CountUpMoney value={spent} currency={currency} />
+        {!category.monthlyLimit ? (
+          <CountUpMoney value={spent} currency={currency} />
+        ) : status === 'over' && excess ? (
+          `−${whole(excess)}`
+        ) : (
+          whole(left)
+        )}
+      </span>
+      <span className="relative w-full truncate text-micro text-muted-foreground">
+        {!category.monthlyLimit
+          ? tt('spentLabel')
+          : status === 'over'
+            ? tt('overShort')
+            : tt('left')}
+      </span>
+      <span className="relative w-full truncate text-micro text-muted-foreground tabular-nums">
+        {category.monthlyLimit
+          ? tt('ofLimit', { spent: whole(shownSpent), limit: whole(category.monthlyLimit) })
+          : tt('noLimit')}
       </span>
     </>
   );
@@ -267,5 +303,22 @@ export function CategoryLimitRow(props: Omit<Props, 'onEdit' | 'handle'>) {
         </p>
       </div>
     </li>
+  );
+}
+
+/** A labelled amount on the desktop card (variant C). */
+function Stat({ label, value, tone }: { label: string; value: string; tone?: 'danger' }) {
+  return (
+    <div className="flex min-w-0 flex-col">
+      <span className="text-caption text-muted-foreground">{label}</span>
+      <span
+        className={cn(
+          'text-body font-semibold tabular-nums',
+          tone === 'danger' ? 'text-destructive' : 'text-foreground',
+        )}
+      >
+        {value}
+      </span>
+    </div>
   );
 }

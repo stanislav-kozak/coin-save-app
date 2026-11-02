@@ -47,9 +47,7 @@ describe('CategoriesGrid', () => {
         ]}
       />,
     );
-    expect((await screen.findAllByText(/850,00\s₴ \/ 1\s000,00\s₴ · 85%/)).length).toBeGreaterThan(
-      0,
-    );
+    expect((await screen.findAllByText(/^Ліміт 1\s000,00\s₴ · 85%$/)).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/85,00\s₴/).length).toBeGreaterThan(0);
   });
 
@@ -87,7 +85,7 @@ describe('CategoriesGrid', () => {
           },
     );
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
-    expect((await screen.findAllByText(/88,00\s₴ \/ 60,00\s₴ · 147%/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/^Ліміт 60,00\s₴ · 147%$/)).length).toBeGreaterThan(0);
   });
 
   it('shows a category with its own currency in that currency', async () => {
@@ -123,7 +121,7 @@ describe('CategoriesGrid', () => {
           },
     );
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
-    expect((await screen.findAllByText(/340,00\s€ \/ 500,00\s€ · 68%/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/^Ліміт 500,00\s€ · 68%$/)).length).toBeGreaterThan(0);
   });
 
   it('renders categories in the given order without waiting for the cache', async () => {

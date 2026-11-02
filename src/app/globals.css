@@ -33,6 +33,10 @@
   --palette-indigo: #6366f1;
   --palette-pink: #ec4999;
   --palette-slate: #64748b;
+  /* A wallet's icon on its colored circle: white by default, ink when the user flips it (bright
+     colors). Theme-independent, like the palette it sits on. */
+  --palette-glyph-light: #ffffff;
+  --palette-glyph-dark: #1c1917;
 }
 
 .dark {
@@ -84,6 +88,8 @@
   --color-palette-indigo: var(--palette-indigo);
   --color-palette-pink: var(--palette-pink);
   --color-palette-slate: var(--palette-slate);
+  --color-glyph-light: var(--palette-glyph-light);
+  --color-glyph-dark: var(--palette-glyph-dark);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -117,6 +123,9 @@
   --text-field--line-height: 22px;
   --text-caption: 13px;
   --text-caption--line-height: 18px;
+  /* The smallest label (a category tile's «залишилось» / «10 356 з 12 000 ₴» on phones). */
+  --text-micro: 11px;
+  --text-micro--line-height: 14px;
 
   /* Brand motion (only behind motion-safe:, so reduced motion shows the final frame). */
   --animate-brand-draw: brand-draw 0.7s cubic-bezier(0.3, 0.7, 0.3, 1) both;
