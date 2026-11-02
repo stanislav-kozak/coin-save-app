@@ -23,7 +23,8 @@ import { notify } from '@/shared/ui/toaster';
 /** The fields both record shapes share (ExpenseResponseDto, AnalyticsExpenseItemDto). */
 export type EditableExpense = {
   id: string;
-  type: 'EXPENSE' | 'INCOME';
+  /** Lists route transfers to TransferDialog; the shared record type still carries the value. */
+  type: 'EXPENSE' | 'INCOME' | 'TRANSFER';
   amount: string;
   walletId: string;
   categoryId: string | null;

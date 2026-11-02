@@ -56,7 +56,11 @@
     "INVALID_PERIOD": "Invalid period",
     "RECURRING_NOT_FOUND": "Recurring payment not found",
     "NEXT_PAYMENT_DATE_IN_PAST": "The next payment can only be from tomorrow on",
-    "GOOGLE_AUTH_FAILED": "Couldn't sign in with Google. Please try again"
+    "GOOGLE_AUTH_FAILED": "Couldn't sign in with Google. Please try again",
+    "TRANSFER_SAME_WALLET": "You can't transfer to the same wallet",
+    "TRANSFER_AMOUNT_MISMATCH": "Both wallets use the same currency — the received amount must match",
+    "TRANSFER_NOT_FOUND": "Transfer not found — it may have been deleted",
+    "EXPENSE_IS_TRANSFER": "This is a transfer — edit it in the transfer dialog"
   },
   "auth": {
     "brand": {
@@ -343,7 +347,7 @@
     "spaceSettings": "Space settings"
   },
   "dnd": {
-    "instructions": "To drag a wallet or a category, press space, move with the arrow keys and press space again: a wallet on a category adds an expense, a category moves to its new place",
+    "instructions": "To drag a wallet or a category, press space, move with the arrow keys and press space again: a wallet on a category adds an expense, a wallet on another wallet makes a transfer, a category moves to its new place",
     "start": "Picked up wallet {wallet}",
     "over": "{wallet} over category {category}",
     "outside": "Not over a category",
@@ -351,7 +355,9 @@
     "cancelled": "Dragging cancelled",
     "reorderStart": "Moving category {category}",
     "reorderOver": "{category} over {target}",
-    "reorderDropped": "{category} moved"
+    "reorderDropped": "{category} moved",
+    "overWallet": "{wallet} over the wallet {target}",
+    "droppedWallet": "Dropped on the wallet {target}"
   },
   "colors": {
     "blue": "Blue",
@@ -568,7 +574,8 @@
     "deleted": "Entry deleted",
     "walletSaved": "Wallet saved",
     "categorySaved": "Category saved",
-    "recurringSaved": "Recurring payment saved"
+    "recurringSaved": "Recurring payment saved",
+    "transferSaved": "Transfer saved"
   },
   "calendar": {
     "next": "Next month",
@@ -703,6 +710,40 @@
         "addressBar": "Click the install icon in the address bar, or choose “Install CoinSave” in the browser menu"
       },
       "unsupported": "This browser can't install web apps. Open CoinSave in Chrome or Edge, or bookmark the page."
+    }
+  },
+  "transfers": {
+    "title": "Transfer",
+    "editTitle": "Transfer",
+    "from": "From wallet",
+    "to": "To wallet",
+    "choose": "Choose a wallet",
+    "amount": "Amount",
+    "toAmount": "Received",
+    "toAmountHint": "Optional — we'll convert at the rate on the transfer date",
+    "estimate": "≈ {amount} at the rate",
+    "when": "Date and time",
+    "note": "Note",
+    "submit": "Transfer",
+    "save": "Save",
+    "delete": "Delete",
+    "deleteTitle": "Delete transfer",
+    "confirmDelete": "Delete this transfer? Both wallet balances are recalculated automatically.",
+    "archived": "(archived)",
+    "row": "{from} → {to}",
+    "received": "received {amount}",
+    "start": "Transfer from {name}",
+    "sheet": "Transfer",
+    "validation": {
+      "walletRequired": "Choose a wallet",
+      "sameWallet": "Choose a different wallet",
+      "amountRequired": "How much are you moving?",
+      "amountInvalid": "Enter a positive amount, e.g. 250.50",
+      "amountPositive": "The amount must be more than zero",
+      "amountTooLarge": "That’s too much even for us — check the amount",
+      "noteTooLong": "500 characters at most",
+      "dateInvalid": "Enter a date and time",
+      "dateInFuture": "That date hasn't come yet — pick today or earlier"
     }
   }
 }

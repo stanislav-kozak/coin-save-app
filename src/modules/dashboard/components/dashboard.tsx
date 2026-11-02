@@ -24,7 +24,8 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const isDesktop = useIsDesktop();
   const wallets = useWallets(spaceId);
   const categories = useCategories(spaceId);
-  const { openExpense, openAddWallet, openIncome, pendingSpends } = useExpenseLauncher();
+  const { openExpense, openAddWallet, openIncome, openTransfer, pendingSpends } =
+    useExpenseLauncher();
 
   const dropped = useDroppedOrder(spaceId);
   const order = dropped.order;
@@ -33,14 +34,18 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
   const walletById = (id: string) => wallets.data?.find((w) => w.id === id);
   const nameOf = (dndId: string) => {
     const [kind, id] = dndId.split(':');
-    const source = kind === 'wallet' ? wallets.data : categories.data;
+    const source = kind === 'category' ? categories.data : wallets.data; // wallet / walletTarget
     return source?.find((x) => x.id === id)?.name ?? '';
   };
 
   return (
     <DndProvider
       nameOf={nameOf}
-      onDrop={openExpense}
+      onDrop={(drop) =>
+        drop.kind === 'transfer'
+          ? openTransfer({ fromWalletId: drop.fromWalletId, toWalletId: drop.toWalletId })
+          : openExpense({ walletId: drop.walletId, categoryId: drop.categoryId })
+      }
       onReorder={(activeId, overId) => {
         const next = resolveReorder(activeId, overId, categoryIds);
         if (next) dropped.apply(next);
@@ -87,6 +92,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
             spaceId={spaceId}
             onAdd={openAddWallet}
             onAddIncome={openIncome}
+            onTransfer={(walletId) => openTransfer({ fromWalletId: walletId })}
             // Only the visible variant (card on desktop, circle on mobile) registers with dnd-kit.
             wrap={(id, node, isCard, onActivate) =>
               isCard === isDesktop ? (

@@ -1,16 +1,17 @@
 'use client';
 
-import { useDraggable } from '@dnd-kit/core';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { DragHandleProps } from '@/modules/categories';
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { categoryDndId, walletDndId } from '../lib/resolve-drop';
+import { categoryDndId, walletDndId, walletTargetDndId } from '../lib/resolve-drop';
 
 /**
- * Wallet card/circle you can pick up (design system §5 "Wallet card — drag state"). `onClick` fires on a
- * tap/click that never became a drag (the sensors need 4px / a 150ms press first).
+ * Wallet card/circle you can pick up (design system §5 "Wallet card — drag state") and drop another
+ * wallet on (a transfer). `onClick` fires on a tap/click that never became a drag (the sensors need
+ * 4px / a 150ms press first).
  */
 export function DraggableWallet({
   id,
@@ -21,17 +22,28 @@ export function DraggableWallet({
   onClick?: () => void;
   children: ReactNode;
 }) {
-  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({ id: walletDndId(id) });
+  const drag = useDraggable({ id: walletDndId(id) });
+  const drop = useDroppable({ id: walletTargetDndId(id) });
+  const { listeners, attributes, isDragging } = drag;
+  const otherWalletOver =
+    drop.isOver &&
+    String(drop.active?.id).startsWith('wallet:') &&
+    drop.active?.id !== walletDndId(id);
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        drag.setNodeRef(node);
+        drop.setNodeRef(node);
+      }}
       {...listeners}
       {...attributes}
       onClick={onClick}
-      // touch-none: a long-press must start a drag, not scroll the page (spec §6.6 TouchSensor)
+      // touch-none: a long-press must start a drag, not scroll the page (spec §6.6 TouchSensor).
+      // no-callout + select-none: a press or a drag never selects text or opens the iOS menu.
       className={cn(
-        'cursor-grab touch-none rounded-card outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        'no-callout cursor-grab touch-none rounded-card outline-none select-none focus-visible:ring-2 focus-visible:ring-ring/50 motion-safe:transition-transform',
         isDragging && 'opacity-40',
+        otherWalletOver && 'scale-105 shadow-card-raised ring-2 ring-primary',
       )}
     >
       {children}
@@ -70,7 +82,7 @@ export function SortableCategory({
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
         // Desktop cards and mobile tiles are both rounded-card; the highlight follows their shape.
-        'rounded-card transition-transform',
+        'no-callout rounded-card transition-transform select-none',
         walletOver && 'scale-105 shadow-card-raised ring-2 ring-primary',
         // Lifted while it moves in place (design system: raised shadow for drag).
         isDragging && 'relative z-10 shadow-card-raised',

@@ -1,6 +1,6 @@
 'use client';
 
-import { MoreHorizontal, Pencil, Plus } from 'lucide-react';
+import { ArrowLeftRight, MoreHorizontal, Pencil, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/shared/ui/button';
@@ -20,6 +20,8 @@ type Props = {
   onAdd: () => void;
   /** "+" on a desktop card / "+ Income" in a mobile circle's sheet: add income to that wallet (spec §6.3). */
   onAddIncome?: (walletId: string) => void;
+  /** ⇄ on a desktop card / «Переказ» in a mobile circle's sheet: a transfer from that wallet. */
+  onTransfer?: (walletId: string) => void;
   /**
    * Lets the dashboard make each wallet draggable without this module knowing about drag-and-drop.
    * `onActivate` is the circle's tap action (open its sheet), for the wrapper to attach when it owns the element.
@@ -27,11 +29,12 @@ type Props = {
   wrap?: (walletId: string, node: ReactNode, isCard: boolean, onActivate?: () => void) => ReactNode;
 };
 
-export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
+export function WalletsPanel({ spaceId, onAdd, onAddIncome, onTransfer, wrap }: Props) {
   const t = useTranslations('wallets');
   const ti = useTranslations('expenses.income');
   const tc = useTranslations('common');
   const tw = useTranslations('wallets.edit');
+  const tt = useTranslations('transfers');
   const [editing, setEditing] = useState<EditableWallet | null>(null);
   // The mobile circle whose actions sheet is open.
   const [acting, setActing] = useState<EditableWallet | null>(null);
@@ -67,6 +70,10 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
       </section>
     );
   }
+
+  // A transfer needs somewhere to go: at least two wallets.
+  const transfer = wallets.data.length >= 2 ? onTransfer : undefined;
+  const actions = 1 + (onAddIncome ? 1 : 0) + (transfer ? 1 : 0);
 
   const addButton = (
     <Button variant="secondary" size="s" className="w-full" onClick={onAdd}>
@@ -127,9 +134,9 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
             {wallets.data.map((w) => (
               <li key={w.id} className="relative">
                 {wrap ? (
-                  wrap(w.id, <WalletCard wallet={w} withAction />, true)
+                  wrap(w.id, <WalletCard wallet={w} actions={actions} />, true)
                 ) : (
-                  <WalletCard wallet={w} withAction />
+                  <WalletCard wallet={w} actions={actions} />
                 )}
                 {/* Siblings of the (draggable) card, not inside it: no nested interactive elements. */}
                 <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center">
@@ -141,6 +148,16 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
                   >
                     <Pencil aria-hidden className="size-4" />
                   </button>
+                  {transfer ? (
+                    <button
+                      type="button"
+                      aria-label={tt('start', { name: w.name })}
+                      onClick={() => transfer(w.id)}
+                      className={ACTION}
+                    >
+                      <ArrowLeftRight aria-hidden className="size-4" />
+                    </button>
+                  ) : null}
                   {onAddIncome ? (
                     <button
                       type="button"
@@ -176,6 +193,14 @@ export function WalletsPanel({ spaceId, onAdd, onAddIncome, wrap }: Props) {
               ? () => {
                   setActing(null);
                   onAddIncome(acting.id);
+                }
+              : undefined
+          }
+          onTransfer={
+            transfer
+              ? () => {
+                  setActing(null);
+                  transfer(acting.id);
                 }
               : undefined
           }

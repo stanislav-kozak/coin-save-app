@@ -147,4 +147,39 @@ describe('WalletsPanel', () => {
     const cards = container.querySelector('ul.hidden')!;
     expect(cards).toHaveClass('md:grid', 'md:grid-cols-2', 'lg:flex', 'lg:flex-col');
   });
+
+  it('offers a transfer from a wallet when there is another one to send to', async () => {
+    get.mockResolvedValue({
+      data: [
+        { id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', icon: null, color: null },
+        { id: 'w2', name: 'Cash', currency: 'UAH', balance: '1', icon: null, color: null },
+      ],
+    });
+    const onTransfer = vi.fn();
+    renderWithProviders(
+      <WalletsPanel spaceId="sp1" onAdd={vi.fn()} onAddIncome={vi.fn()} onTransfer={onTransfer} />,
+    );
+    const user = userEvent.setup();
+    // Desktop card: ⇄
+    await user.click(await screen.findByRole('button', { name: 'Переказ з Mono' }));
+    // Mobile: the circle's sheet
+    await user.click(screen.getByRole('button', { name: 'Гаманець Cash' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Cash' });
+    await user.click(within(sheet).getByRole('button', { name: 'Переказ' }));
+    expect(onTransfer.mock.calls).toEqual([['w1'], ['w2']]);
+  });
+
+  it('has no transfer with a single wallet', async () => {
+    get.mockResolvedValue({
+      data: [{ id: 'w1', name: 'Mono', currency: 'UAH', balance: '1', icon: null, color: null }],
+    });
+    renderWithProviders(
+      <WalletsPanel spaceId="sp1" onAdd={vi.fn()} onAddIncome={vi.fn()} onTransfer={vi.fn()} />,
+    );
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Гаманець Mono' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Mono' });
+    expect(within(sheet).queryByRole('button', { name: 'Переказ' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Переказ з Mono' })).toBeNull();
+  });
 });

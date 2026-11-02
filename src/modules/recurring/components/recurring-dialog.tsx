@@ -89,7 +89,8 @@ export function RecurringDialog({ spaceId, rule, open, onOpenChange, onDelete }:
   } = useForm<RecurringFormInput, unknown, RecurringFormValues>({
     resolver: zodResolver(recurringFormSchema),
     defaultValues: {
-      type: rule?.type ?? 'EXPENSE',
+      // A rule is only ever an expense or an income (EntryType); TRANSFER can't come back here.
+      type: rule?.type === 'INCOME' ? 'INCOME' : 'EXPENSE',
       name: rule?.name ?? '',
       amount: rule?.amount ?? '',
       walletId: rule?.walletId ?? '',

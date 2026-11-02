@@ -1,3 +1,4 @@
+import { ArrowLeftRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/shared/lib/money';
 import { cn } from '@/shared/lib/utils';
@@ -6,46 +7,77 @@ import { EntityIcon } from '@/shared/ui/entity-icon';
 type Props = {
   expense: {
     id: string;
-    type: 'EXPENSE' | 'INCOME';
+    type: 'EXPENSE' | 'INCOME' | 'TRANSFER';
     amount: string;
     walletCurrency: string;
+    /** Transfers: the received amount, in the target wallet's currency. */
+    toAmount?: string | null;
+    toWalletCurrency?: string | null;
     note?: string | null;
     occurredAt: string;
   };
   category?: { id: string; name: string; icon?: string | null; color?: string | null };
   /** The wallet's name (analytics list, Figma 16:505): a column on desktop, a caption on phones. */
   wallet?: string;
+  /** Transfers: the two wallets' names, shown as «from → to». */
+  transfer?: { from: string; to: string };
   /** Makes the row a button that opens the record for editing. */
   onOpen?: () => void;
   /** Just arrived: slides in (motion allowed only). */
   isNew?: boolean;
 };
 
-/** Figma 8:161. Amount in the wallet's currency; incomes in green with "+". */
-export function ExpenseRow({ expense, category, wallet, onOpen, isNew }: Props) {
+/**
+ * Figma 8:161. Amount in the wallet's currency; incomes in green with "+". A transfer is neutral (no
+ * sign): «from → to», with the received amount when the currencies differ.
+ */
+export function ExpenseRow({ expense, category, wallet, transfer, onOpen, isNew }: Props) {
   const te = useTranslations('expenses.edit');
   const t = useTranslations('categories');
+  const tt = useTranslations('transfers');
   const locale = useLocale();
   const isIncome = expense.type === 'INCOME';
-  const signed = isIncome ? expense.amount : `-${expense.amount}`;
+  const isTransfer = expense.type === 'TRANSFER';
+  const signed = isIncome || isTransfer ? expense.amount : `-${expense.amount}`;
+  const received =
+    isTransfer &&
+    expense.toAmount &&
+    expense.toWalletCurrency &&
+    expense.toWalletCurrency !== expense.walletCurrency
+      ? tt('received', {
+          amount: formatMoney(expense.toAmount, expense.toWalletCurrency, locale),
+        })
+      : null;
+  const caption = [received, expense.note].filter(Boolean).join(' · ');
   const content = (
     <>
-      <EntityIcon
-        id={category?.id ?? expense.id}
-        color={category?.color}
-        icon={category?.icon}
-        size="s"
-      />
+      {isTransfer ? (
+        <span
+          aria-hidden
+          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+        >
+          <ArrowLeftRight className="size-4" />
+        </span>
+      ) : (
+        <EntityIcon
+          id={category?.id ?? expense.id}
+          color={category?.color}
+          icon={category?.icon}
+          size="s"
+        />
+      )}
       <span className="block min-w-0 flex-1">
         <span className="block truncate text-body font-medium">
-          {category?.name ?? (isIncome ? t('income') : t('uncategorized'))}
+          {isTransfer && transfer
+            ? tt('row', transfer)
+            : (category?.name ?? (isIncome ? t('income') : t('uncategorized')))}
         </span>
-        {expense.note || wallet ? (
+        {caption || wallet ? (
           <span className="block truncate text-caption text-muted-foreground">
-            {expense.note}
+            {caption}
             {wallet ? (
               <span className="md:hidden">
-                {expense.note ? ' · ' : ''}
+                {caption ? ' · ' : ''}
                 {wallet}
               </span>
             ) : null}
@@ -64,7 +96,9 @@ export function ExpenseRow({ expense, category, wallet, onOpen, isNew }: Props) 
             isIncome ? 'text-success' : 'text-foreground',
           )}
         >
-          {formatMoney(signed, expense.walletCurrency, locale, { sign: 'always' })}
+          {formatMoney(signed, expense.walletCurrency, locale, {
+            sign: isTransfer ? 'auto' : 'always',
+          })}
         </span>
         <span className="block text-caption text-muted-foreground">
           {new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(
