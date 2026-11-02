@@ -39,9 +39,11 @@ describe('CategoryCard', () => {
     expect(badge).toHaveClass('absolute');
   });
 
-  it('shows spent of limit with percentage', () => {
+  it("shows what's spent, what's left and the limit with its percentage", () => {
     renderWithProviders(<CategoryCard category={groceries} spent="1200" pct={60} currency="UAH" />);
-    expect(screen.getByText(/1\s200,00\s₴ \/ 2\s000,00\s₴ · 60%/)).toBeInTheDocument();
+    expect(screen.getByText('Витрачено').nextSibling).toHaveTextContent(/^1\s200,00\s₴$/);
+    expect(screen.getByText('Залишилось').nextSibling).toHaveTextContent(/^800,00\s₴$/);
+    expect(screen.getByText(/^Ліміт 2\s000,00\s₴ · 60%$/)).toBeInTheDocument();
     expect(screen.getByRole('progressbar', { name: 'Продукти' })).toHaveAttribute(
       'aria-valuenow',
       '60',
@@ -54,6 +56,10 @@ describe('CategoryCard', () => {
     );
     expect(screen.getByText(/\+400,10\s₴/)).toBeInTheDocument();
     expect(screen.getByText('понад ліміт')).toBeInTheDocument();
+    // The second figure turns into the excess, in red.
+    const over = screen.getByText('Понад ліміт').nextSibling;
+    expect(over).toHaveTextContent(/^400,10\s₴$/);
+    expect(over).toHaveClass('text-destructive');
   });
 
   it('never shows a negative excess when the rounded pct says 100', () => {
@@ -80,7 +86,9 @@ describe('CategoryCard', () => {
         currency="UAH"
       />,
     );
-    expect(screen.getByText(/450,00\s₴ витрачено/)).toBeInTheDocument();
+    expect(screen.getByText('Витрачено').nextSibling).toHaveTextContent(/^450,00\s₴$/);
+    expect(screen.queryByText('Залишилось')).toBeNull();
+    expect(screen.getByText('Ліміт не задано')).toBeInTheDocument();
   });
 });
 
@@ -118,7 +126,10 @@ describe('CategoriesGrid', () => {
           },
     );
     renderWithProviders(<CategoriesGrid spaceId="sp1" />);
-    expect(await screen.findByText(/0,00\s₴ витрачено/)).toBeInTheDocument();
+    // The card's «Витрачено» shows zero for a category with no expenses yet.
+    expect((await screen.findAllByText('Витрачено'))[1]!.nextSibling).toHaveTextContent(
+      /^0,00\s₴$/,
+    );
     expect(screen.getAllByText('Розваги').length).toBeGreaterThan(0);
   });
 
@@ -142,13 +153,13 @@ describe('CategoriesGrid', () => {
 });
 
 describe('CategoryTile (mobile)', () => {
-  it('shows the name and the spent amount under the icon, filled by the share of the limit', () => {
+  it("shows what's left of the limit and «spent of limit», filled by the share of the limit", () => {
     renderWithProviders(
       <CategoryTile category={groceries} spent="1200" pct={60} currency="UAH" onEdit={() => {}} />,
     );
     const tile = screen.getByRole('button', { name: 'Редагувати: Продукти' });
     expect(tile).toHaveTextContent('Продукти');
-    expect(tile).toHaveTextContent(/1\s200,00\s₴/);
+    expect(tile).toHaveTextContent(/800\s₴залишилось1\s200\s₴ з 2\s000\s₴/);
     const fill = tile.querySelector<HTMLElement>('[data-fill]')!;
     expect(fill.style.height).toBe('60%');
   });
@@ -168,7 +179,12 @@ describe('CategoryTile (mobile)', () => {
     const fills = document.querySelectorAll<HTMLElement>('[data-fill]');
     expect(fills).toHaveLength(1);
     expect(fills[0]!.style.height).toBe('100%');
-    expect(amount(/2\s400,00\s₴/)).toHaveClass('text-destructive');
+    const over = screen.getByText(/^−400\s₴$/);
+    expect(over).toHaveClass('text-destructive');
+    expect(screen.getByText('понад ліміт')).toBeInTheDocument();
+    // Without a limit: the spent amount, labelled so.
+    expect(amount(/10,00\s₴/)).not.toHaveClass('text-destructive');
+    expect(screen.getByText('без ліміту')).toBeInTheDocument();
   });
 });
 

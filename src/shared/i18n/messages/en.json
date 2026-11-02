@@ -217,7 +217,8 @@
       "currency": "Currency",
       "initialBalance": "Starting balance",
       "submit": "Add",
-      "color": "Color"
+      "color": "Color",
+      "icon": "Icon"
     },
     "validation": {
       "nameRequired": "Give the wallet a name",
@@ -288,6 +289,20 @@
       "limitInvalid": "Enter an amount, e.g. 1500",
       "limitPositive": "The limit must be above zero — or leave it empty",
       "limitTooLarge": "That’s too much even for us — check the amount"
+    },
+    "tile": {
+      "left": "left",
+      "overShort": "over limit",
+      "spentLabel": "spent",
+      "ofLimit": "{spent} of {limit}",
+      "noLimit": "no limit",
+      "stats": {
+        "spent": "Spent",
+        "left": "Left",
+        "over": "Over limit",
+        "limit": "Limit {limit} · {pct}%",
+        "noLimit": "No limit set"
+      }
     }
   },
   "expenses": {
@@ -745,5 +760,30 @@
       "dateInvalid": "Enter a date and time",
       "dateInFuture": "That date hasn't come yet — pick today or earlier"
     }
+  },
+  "walletIcons": {
+    "none": "No icon",
+    "names": {
+      "wallet": "Wallet",
+      "card": "Card",
+      "bank": "Bank",
+      "cash": "Cash",
+      "coins": "Coins",
+      "savings": "Piggy bank",
+      "safe": "Safe",
+      "debt": "Debt",
+      "invest": "Investments",
+      "crypto": "Crypto",
+      "gem": "Valuables",
+      "work": "Work",
+      "home": "Home",
+      "car": "Car",
+      "travel": "Travel",
+      "gifts": "Gifts",
+      "study": "Study",
+      "kids": "Kids",
+      "health": "Health"
+    },
+    "dark": "Dark icon"
   }
 }

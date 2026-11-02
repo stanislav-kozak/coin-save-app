@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test-utils/render';
@@ -183,10 +183,76 @@ describe('WalletDialog', () => {
       <WalletDialog spaceId="sp1" wallet={{ ...mono, color: null }} open onOpenChange={vi.fn()} />,
     );
     const user = userEvent.setup();
-    for (const radio of screen.getAllByRole('radio')) expect(radio).not.toBeChecked();
+    const colors = screen.getByRole('radiogroup', { name: 'Колір' });
+    for (const radio of within(colors).getAllByRole('radio')) expect(radio).not.toBeChecked();
     await user.type(screen.getByLabelText('Назва'), ' 2');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     await vi.waitFor(() => expect(patch).toHaveBeenCalled());
     expect(patch.mock.calls[0][1].body).toEqual({ name: 'Mono 2' });
+  });
+
+  it('changes the icon to a currency symbol, and resets it with «Без іконки»', async () => {
+    patch.mockResolvedValue({ data: mono });
+    const { unmount } = renderWithProviders(
+      <WalletDialog
+        spaceId="sp1"
+        wallet={{ ...mono, icon: 'i:bank' }}
+        open
+        onOpenChange={vi.fn()}
+      />,
+    );
+    let user = userEvent.setup();
+    let icons = screen.getByRole('radiogroup', { name: 'Іконка' });
+    expect(within(icons).getByRole('radio', { name: 'Банк' })).toBeChecked();
+    await user.click(within(icons).getByRole('radio', { name: 'USD' }));
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ icon: 'c:USD' });
+    unmount();
+
+    patch.mockClear();
+    renderWithProviders(
+      <WalletDialog
+        spaceId="sp1"
+        wallet={{ ...mono, icon: 'i:bank' }}
+        open
+        onOpenChange={vi.fn()}
+      />,
+    );
+    user = userEvent.setup();
+    icons = screen.getByRole('radiogroup', { name: 'Іконка' });
+    await user.click(within(icons).getByRole('radio', { name: 'Без іконки' }));
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ icon: null });
+  });
+
+  it('draws the icon dark with the switch, keeping it when another icon is picked', async () => {
+    patch.mockResolvedValue({ data: mono });
+    renderWithProviders(
+      <WalletDialog
+        spaceId="sp1"
+        wallet={{ ...mono, icon: 'i:bank' }}
+        open
+        onOpenChange={vi.fn()}
+      />,
+    );
+    const user = userEvent.setup();
+    const dark = screen.getByRole('switch', { name: 'Темна іконка' });
+    expect(dark).not.toBeChecked();
+    await user.click(dark);
+    await user.click(
+      within(screen.getByRole('radiogroup', { name: 'Іконка' })).getByRole('radio', {
+        name: 'EUR',
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await vi.waitFor(() => expect(patch).toHaveBeenCalled());
+    expect(patch.mock.calls[0][1].body).toEqual({ icon: 'c:EUR|dark' });
+  });
+
+  it('has nothing to darken on a color-only circle', () => {
+    renderWithProviders(<WalletDialog spaceId="sp1" wallet={mono} open onOpenChange={vi.fn()} />);
+    expect(screen.getByRole('switch', { name: 'Темна іконка' })).toBeDisabled();
   });
 });

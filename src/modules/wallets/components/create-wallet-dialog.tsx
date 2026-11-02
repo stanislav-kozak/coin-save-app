@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useWatch, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import {
   DEFAULT_CURRENCY,
@@ -14,6 +14,7 @@ import { firstUnusedColor } from '@/shared/constants/entity-colors';
 import { getErrorCode } from '@/shared/lib/api-error';
 import { Button } from '@/shared/ui/button';
 import { ColorPicker } from '@/shared/ui/color-picker';
+import { WalletIconPicker } from './wallet-icon-picker';
 import { Dialog, DialogContent } from '@/shared/ui/dialog';
 import { FormField } from '@/shared/ui/form-field';
 import { Input } from '@/shared/ui/input';
@@ -43,13 +44,20 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
       currency: DEFAULT_CURRENCY,
       initialBalance: '',
       color: defaultColor,
+      icon: '',
     },
   });
 
   // Each opening starts clean…
   useEffect(() => {
     if (open)
-      reset({ name: '', currency: DEFAULT_CURRENCY, initialBalance: '', color: defaultColor });
+      reset({
+        name: '',
+        currency: DEFAULT_CURRENCY,
+        initialBalance: '',
+        color: defaultColor,
+        icon: '',
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on (re)open, not on every refetch
   }, [open]);
   // …and follows the wallets list (loaded late, or changed by a family member) only while the user
@@ -58,6 +66,8 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
     if (open && !getFieldState('color').isDirty) setValue('color', defaultColor);
   }, [open, defaultColor, getFieldState, setValue]);
   const errors = formState.errors;
+  // Icon options preview the color being picked.
+  const color = useWatch({ control, name: 'color' });
   const vm = (key?: string) => (key ? t(`validation.${key as ValidationKey}`) : undefined);
 
   const onSubmit = handleSubmit(async (values) => {
@@ -108,6 +118,19 @@ export function CreateWalletDialog({ spaceId, open, onOpenChange }: Props) {
                 id="wallet-color"
                 label={t('create.color')}
                 value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="icon"
+            render={({ field }) => (
+              <WalletIconPicker
+                id="wallet-icon"
+                label={t('create.icon')}
+                value={field.value ?? ''}
+                color={color}
                 onChange={field.onChange}
               />
             )}

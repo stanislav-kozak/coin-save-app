@@ -87,7 +87,8 @@ export function formatMoney(
   amount: string,
   currency: string,
   locale: string,
-  opts: { sign?: 'auto' | 'always' } = {},
+  /** `whole`: rounded to whole units, for tight spots (a phone's category tile). */
+  opts: { sign?: 'auto' | 'always'; whole?: boolean } = {},
 ): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
@@ -95,5 +96,6 @@ export function formatMoney(
     // Symbols as in the design (₴, €, $) rather than "грн"/"EUR"; wallets also show the ISO badge.
     currencyDisplay: 'narrowSymbol',
     signDisplay: opts.sign === 'always' ? 'exceptZero' : 'auto',
+    ...(opts.whole ? { minimumFractionDigits: 0, maximumFractionDigits: 0 } : {}),
   }).format(amount as Intl.StringNumericLiteral);
 }
