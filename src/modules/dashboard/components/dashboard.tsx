@@ -96,7 +96,7 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
             // Only the visible variant (card on desktop, circle on mobile) registers with dnd-kit.
             wrap={(id, node, isCard, onActivate) =>
               isCard === isDesktop ? (
-                <DraggableWallet id={id} onClick={onActivate}>
+                <DraggableWallet id={id} color={walletById(id)?.color} onClick={onActivate}>
                   {node}
                 </DraggableWallet>
               ) : (
@@ -114,7 +114,12 @@ export function Dashboard({ spaceId }: { spaceId: string }) {
               notice={dropped.error ? te(getErrorCode(dropped.error)) : undefined}
               wrap={(id, render, isCard) =>
                 isCard === isDesktop ? (
-                  <SortableCategory id={id}>{render}</SortableCategory>
+                  <SortableCategory
+                    id={id}
+                    color={categories.data?.find((c) => c.id === id)?.color}
+                  >
+                    {render}
+                  </SortableCategory>
                 ) : (
                   render()
                 )
