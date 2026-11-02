@@ -3,8 +3,9 @@
 import { useEffect, useRef } from 'react';
 
 const GAP = 22; // dot grid step, px
-const REACH = 130; // how far around the pointer the dots lift, px
-const PUSH = 16; // how far the nearest dots move aside, px
+// Kept subtle on purpose (user feedback): a hint of depth, never a distraction.
+const REACH = 110; // how far around the pointer the dots lift, px
+const PUSH = 5; // how far the nearest dots move aside, px
 const DOT = 1.2; // dot radius at rest, px
 
 type Rgb = [number, number, number];
@@ -79,8 +80,8 @@ export function AnimatedBackground() {
 
       // The light under the cursor/finger.
       if (eased.power > 0.01) {
-        const glow = ctx.createRadialGradient(eased.x, eased.y, 0, eased.x, eased.y, 190);
-        glow.addColorStop(0, `rgba(${hot.join(',')},${(dark ? 0.2 : 0.16) * eased.power})`);
+        const glow = ctx.createRadialGradient(eased.x, eased.y, 0, eased.x, eased.y, 160);
+        glow.addColorStop(0, `rgba(${hot.join(',')},${(dark ? 0.07 : 0.05) * eased.power})`);
         glow.addColorStop(1, `rgba(${hot.join(',')},0)`);
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, width, height);
@@ -101,8 +102,8 @@ export function AnimatedBackground() {
           x += (dx / d) * PUSH * lift;
           y += (dy / d) * PUSH * lift;
           ctx.beginPath();
-          ctx.arc(x, y, DOT + lift * 1.8, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${(lift > 0.02 ? hot : dot).join(',')},${0.1 + lift * 0.45})`;
+          ctx.arc(x, y, DOT + lift * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${(lift > 0.02 ? hot : dot).join(',')},${0.1 + lift * 0.15})`;
           ctx.fill();
         }
       }
@@ -162,8 +163,8 @@ export function AnimatedBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       <div ref={lightsRef} className="absolute -inset-24">
-        <div className="absolute top-10 left-[15%] size-105 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--primary)_18%,transparent)_0%,transparent_70%)] motion-safe:animate-glow-drift" />
-        <div className="absolute top-[70%] left-[45%] size-95 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--palette-amber)_14%,transparent)_0%,transparent_70%)] motion-safe:animate-glow-drift-alt" />
+        <div className="absolute top-10 left-[15%] size-105 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--primary)_10%,transparent)_0%,transparent_70%)] motion-safe:animate-glow-drift" />
+        <div className="absolute top-[70%] left-[45%] size-95 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--palette-amber)_8%,transparent)_0%,transparent_70%)] motion-safe:animate-glow-drift-alt" />
       </div>
       <canvas ref={canvasRef} className="absolute inset-0 size-full" />
     </div>
