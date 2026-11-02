@@ -856,6 +856,16 @@ export interface components {
         };
         CreateWalletDto: {
             /**
+             * @description Emoji or icon id
+             * @example 💳
+             */
+            icon?: string;
+            /**
+             * @description Hex color
+             * @example #F97350
+             */
+            color?: string;
+            /**
              * @description Up to 4 decimal places; may be negative (e.g. a credit card)
              * @example 1250.5
              */
@@ -863,8 +873,6 @@ export interface components {
             name: string;
             /** @enum {string} */
             currency: "USD" | "EUR" | "GBP" | "PLN" | "CZK" | "CHF" | "CAD" | "AUD" | "JPY" | "TRY" | "RON" | "UAH" | "RUB";
-            icon?: string;
-            color?: string;
         };
         WalletResponseDto: {
             id: string;
@@ -893,6 +901,16 @@ export interface components {
         };
         UpdateWalletDto: {
             /**
+             * @description Emoji or icon id; omit to keep, null resets to the default
+             * @example 💳
+             */
+            icon?: string | null;
+            /**
+             * @description Hex color; omit to keep, null resets to the default
+             * @example #F97350
+             */
+            color?: string | null;
+            /**
              * @description Up to 4 decimal places; may be negative (e.g. a credit card)
              * @example 1250.5
              */
@@ -900,17 +918,23 @@ export interface components {
             /** @description Converts initialBalance, every transaction's amount and every recurring rule's amount at today's rate (4 dp); amounts in the space currency stay. Cannot be combined with initialBalance. */
             currency?: components["schemas"]["Currency"];
             name?: string;
-            icon?: string;
-            color?: string;
         };
         CreateCategoryDto: {
+            /**
+             * @description Emoji or icon id
+             * @example 💳
+             */
+            icon?: string;
+            /**
+             * @description Hex color
+             * @example #F97350
+             */
+            color?: string;
             /** @example 12.5 */
             monthlyLimit?: number;
             /** @description Currency of this category's budget; null follows the space. Changing it converts monthlyLimit at today's rate (whole units) unless monthlyLimit is sent too, taken as given in the new currency. */
             currency?: components["schemas"]["Currency"] | null;
             name: string;
-            icon?: string;
-            color?: string;
         };
         CategoryResponseDto: {
             id: string;
@@ -938,6 +962,16 @@ export interface components {
         };
         UpdateCategoryDto: {
             /**
+             * @description Emoji or icon id; omit to keep, null resets to the default
+             * @example 💳
+             */
+            icon?: string | null;
+            /**
+             * @description Hex color; omit to keep, null resets to the default
+             * @example #F97350
+             */
+            color?: string | null;
+            /**
              * @description Omit to keep the current limit; null removes it
              * @example 12.5
              */
@@ -945,8 +979,6 @@ export interface components {
             /** @description Currency of this category's budget; null follows the space. Changing it converts monthlyLimit at today's rate (whole units) unless monthlyLimit is sent too, taken as given in the new currency. */
             currency?: components["schemas"]["Currency"] | null;
             name?: string;
-            icon?: string;
-            color?: string;
         };
         /** @enum {string} */
         EntryType: "EXPENSE" | "INCOME";
