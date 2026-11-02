@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useCategories } from '@/modules/categories';
+import { useWallets } from '@/modules/wallets';
 import { useNewIds } from '@/shared/hooks/use-new-ids';
 import { EmptyScene } from '@/shared/ui/empty-scene';
 import { SectionError } from '@/shared/ui/section-error';
@@ -11,6 +12,7 @@ import { useRecentExpenses } from '../api/expenses-queries';
 import { groupByDay } from '../lib/group-by-day';
 import { ExpenseEditDialog, type EditableExpense } from './expense-edit-dialog';
 import { ExpenseRow } from './expense-row';
+import { TransferDialog, type EditableTransfer } from './transfer-dialog';
 
 export function RecentExpenses({ spaceId }: { spaceId: string }) {
   const t = useTranslations('expenses');
@@ -19,6 +21,9 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
   const locale = useLocale();
   const expenses = useRecentExpenses(spaceId);
   const [editing, setEditing] = useState<EditableExpense | null>(null);
+  const [editingTransfer, setEditingTransfer] = useState<EditableTransfer | null>(null);
+  // A transfer's source name (the list carries only the target's); archived ones included.
+  const wallets = useWallets(spaceId, { includeArchived: true });
   // An optimistic row (`optimistic-…`) is replaced by the saved one: it slides in once, not twice.
   const fresh = useNewIds(
     expenses.data?.map((e) => e.id),
@@ -76,18 +81,40 @@ export function RecentExpenses({ spaceId }: { spaceId: string }) {
               : t(g.label)}
           </h3>
           <ul>
-            {g.items.map((e) => (
-              <ExpenseRow
-                key={e.id}
-                expense={e}
-                category={e.categoryId ? byId.get(e.categoryId) : undefined}
-                onOpen={() => setEditing(e)}
-                isNew={fresh.has(e.id)}
-              />
-            ))}
+            {g.items.map((e) =>
+              e.type === 'TRANSFER' ? (
+                <ExpenseRow
+                  key={e.id}
+                  expense={e}
+                  transfer={{
+                    from: wallets.data?.find((w) => w.id === e.walletId)?.name ?? '',
+                    to: e.toWalletName ?? '',
+                  }}
+                  onOpen={() => setEditingTransfer(e)}
+                  isNew={fresh.has(e.id)}
+                />
+              ) : (
+                <ExpenseRow
+                  key={e.id}
+                  expense={e}
+                  category={e.categoryId ? byId.get(e.categoryId) : undefined}
+                  onOpen={() => setEditing(e)}
+                  isNew={fresh.has(e.id)}
+                />
+              ),
+            )}
           </ul>
         </div>
       ))}
+      {editingTransfer ? (
+        <TransferDialog
+          key={editingTransfer.id}
+          spaceId={spaceId}
+          transfer={editingTransfer}
+          open
+          onOpenChange={(open) => !open && setEditingTransfer(null)}
+        />
+      ) : null}
       {editing ? (
         <ExpenseEditDialog
           key={editing.id}

@@ -259,6 +259,13 @@
     /* Nothing may be scrollable sideways on a phone. */
     overflow-x: clip;
   }
+  /* While a wallet or category is dragged (set by the dashboard's DndProvider), the pointer crossing
+     text must not select it. */
+  html[data-dragging] {
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grabbing;
+  }
 }
 
 /* iPhone notch / home indicator (viewport-fit=cover). */
@@ -267,6 +274,11 @@
 }
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
+}
+/* Drag sources: no iOS long-press menu (copy/share/lookup) and no grey tap flash. */
+@utility no-callout {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 /* A bottom sheet's own padding plus the home indicator. */
 @utility pb-sheet {

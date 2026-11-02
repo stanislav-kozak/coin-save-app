@@ -11,3 +11,4 @@ export { ExpenseRow } from './components/expense-row';
 export { groupByDay } from './lib/group-by-day';
 export { ExpenseEditDialog, type EditableExpense } from './components/expense-edit-dialog';
 export { useDeleteExpense, useUpdateExpense } from './api/expenses-mutations';
+export { TransferDialog, type EditableTransfer } from './components/transfer-dialog';

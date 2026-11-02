@@ -111,7 +111,7 @@ export function useCreateExpense(spaceId: string) {
 type UpdateExpense = components['schemas']['UpdateExpenseDto'];
 
 /** Editing or deleting a record moves the wallet balance, the lists and the analytics. */
-function useInvalidateMoney(spaceId: string) {
+export function useInvalidateMoney(spaceId: string) {
   const queryClient = useQueryClient();
   return () =>
     Promise.all([

@@ -527,6 +527,38 @@ export interface paths {
         patch: operations["ExpensesController_update"];
         trace?: never;
     };
+    "/api/spaces/{spaceId}/transfers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["TransfersController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/spaces/{spaceId}/transfers/{transferId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["TransfersController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["TransfersController_update"];
+        trace?: never;
+    };
     "/api/spaces/{spaceId}/recurring": {
         parameters: {
             query?: never;
@@ -647,7 +679,7 @@ export interface components {
          * @description Stable machine-readable code; localize on the client
          * @enum {string}
          */
-        ErrorCode: "EMAIL_ALREADY_EXISTS" | "EMAIL_DELIVERY_FAILED" | "INVALID_CREDENTIALS" | "EMAIL_NOT_VERIFIED" | "INVALID_VERIFICATION_TOKEN" | "INVALID_REFRESH_TOKEN" | "REFRESH_TOKEN_REUSE_DETECTED" | "INVALID_RESET_TOKEN" | "FORBIDDEN_NOT_MEMBER" | "FORBIDDEN_NOT_OWNER" | "SPACE_NOT_FOUND" | "MEMBER_NOT_FOUND" | "ALREADY_MEMBER" | "INVALID_INVITATION_TOKEN" | "INVITATION_EMAIL_MISMATCH" | "INVITATION_NOT_FOUND" | "CANNOT_REMOVE_LAST_OWNER" | "WALLET_NOT_FOUND" | "CATEGORY_NOT_FOUND" | "CATEGORY_NAME_TAKEN" | "INVALID_REORDER" | "CURRENCY_API_UNAVAILABLE" | "CURRENCY_NOT_SUPPORTED" | "EXPENSE_NOT_FOUND" | "INVALID_OCCURRED_AT" | "INVALID_RECURRING_DATE_RANGE" | "WALLET_ARCHIVED" | "CATEGORY_ARCHIVED" | "INVALID_PERIOD" | "RECURRING_NOT_FOUND" | "NEXT_PAYMENT_DATE_IN_PAST" | "VALIDATION_ERROR" | "HTTP_ERROR" | "INTERNAL_ERROR";
+        ErrorCode: "EMAIL_ALREADY_EXISTS" | "EMAIL_DELIVERY_FAILED" | "INVALID_CREDENTIALS" | "EMAIL_NOT_VERIFIED" | "INVALID_VERIFICATION_TOKEN" | "INVALID_REFRESH_TOKEN" | "REFRESH_TOKEN_REUSE_DETECTED" | "INVALID_RESET_TOKEN" | "FORBIDDEN_NOT_MEMBER" | "FORBIDDEN_NOT_OWNER" | "SPACE_NOT_FOUND" | "MEMBER_NOT_FOUND" | "ALREADY_MEMBER" | "INVALID_INVITATION_TOKEN" | "INVITATION_EMAIL_MISMATCH" | "INVITATION_NOT_FOUND" | "CANNOT_REMOVE_LAST_OWNER" | "WALLET_NOT_FOUND" | "CATEGORY_NOT_FOUND" | "CATEGORY_NAME_TAKEN" | "INVALID_REORDER" | "CURRENCY_API_UNAVAILABLE" | "CURRENCY_NOT_SUPPORTED" | "EXPENSE_NOT_FOUND" | "INVALID_OCCURRED_AT" | "INVALID_RECURRING_DATE_RANGE" | "WALLET_ARCHIVED" | "CATEGORY_ARCHIVED" | "INVALID_PERIOD" | "RECURRING_NOT_FOUND" | "NEXT_PAYMENT_DATE_IN_PAST" | "TRANSFER_NOT_FOUND" | "TRANSFER_SAME_WALLET" | "TRANSFER_AMOUNT_MISMATCH" | "EXPENSE_IS_TRANSFER" | "VALIDATION_ERROR" | "HTTP_ERROR" | "INTERNAL_ERROR";
         ErrorResponseDto: {
             /** @example 404 */
             statusCode: number;
@@ -916,23 +948,28 @@ export interface components {
             icon?: string;
             color?: string;
         };
+        /** @enum {string} */
+        EntryType: "EXPENSE" | "INCOME";
         CreateExpenseDto: {
+            type: components["schemas"]["EntryType"];
             /** @example 12.5 */
             amount: number;
             walletId: string;
             categoryId?: string;
-            /** @enum {string} */
-            type: "EXPENSE" | "INCOME";
             occurredAt: string;
             note?: string;
         };
-        /** @enum {string} */
-        TransactionType: "EXPENSE" | "INCOME";
+        /**
+         * @description TRANSFER moves money between two wallets: not an expense or income, excluded from totals, categories and budgets
+         * @enum {string}
+         */
+        TransactionType: "EXPENSE" | "INCOME" | "TRANSFER";
         ExpenseResponseDto: {
             id: string;
             spaceId: string;
             walletId: string;
             categoryId: string | null;
+            /** @description TRANSFER moves money between two wallets: not an expense or income, excluded from totals, categories and budgets */
             type: components["schemas"]["TransactionType"];
             /**
              * Format: decimal
@@ -953,6 +990,18 @@ export interface components {
              * @example 1250.5
              */
             fxRate: string;
+            /** @description TRANSFER only: destination wallet (walletId is the source); null otherwise */
+            toWalletId: string | null;
+            /** @description TRANSFER only: destination wallet name (even if archived) */
+            toWalletName: string | null;
+            /**
+             * Format: decimal
+             * @description TRANSFER only: amount received, in toWalletCurrency
+             * @example 1250.5
+             */
+            toAmount: string | null;
+            /** @description TRANSFER only: destination wallet currency (snapshot) */
+            toWalletCurrency: string | null;
             note: string | null;
             /** Format: date-time */
             occurredAt: string;
@@ -973,13 +1022,42 @@ export interface components {
             walletId?: string;
             occurredAt?: string;
         };
+        CreateTransferDto: {
+            /**
+             * @description Amount sent, in the source wallet currency
+             * @example 12.5
+             */
+            amount: number;
+            /**
+             * @description Amount received, in the destination wallet currency. Omitted: converted at occurredAt's rate. Wallets in the same currency: must equal amount (else TRANSFER_AMOUNT_MISMATCH) or be omitted.
+             * @example 12.5
+             */
+            toAmount?: number;
+            note?: string;
+            fromWalletId: string;
+            toWalletId: string;
+            occurredAt: string;
+        };
+        UpdateTransferDto: {
+            /** @example 12.5 */
+            amount?: number;
+            /**
+             * @description Amount received, in the destination wallet currency. Omitted while amount or a wallet changes: converted again at the rate of the transfer date (equals amount for wallets in the same currency).
+             * @example 12.5
+             */
+            toAmount?: number;
+            /** @description Omit to keep; null removes the note */
+            note?: string | null;
+            fromWalletId?: string;
+            toWalletId?: string;
+            occurredAt?: string;
+        };
         CreateRecurringTransactionDto: {
+            type: components["schemas"]["EntryType"];
             /** @example 12.5 */
             amount: number;
             walletId: string;
             categoryId?: string;
-            /** @enum {string} */
-            type: "EXPENSE" | "INCOME";
             name: string;
             note?: string;
             frequency: string;
@@ -1107,7 +1185,20 @@ export interface components {
             occurredAt: string;
             walletId: string;
             walletName: string;
+            /** @description TRANSFER only: destination wallet; null otherwise */
+            toWalletId: string | null;
+            /** @description TRANSFER only: destination wallet name */
+            toWalletName: string | null;
+            /**
+             * Format: decimal
+             * @description TRANSFER only: amount received, in toWalletCurrency
+             * @example 1250.5
+             */
+            toAmount: string | null;
+            /** @description TRANSFER only: destination wallet currency */
+            toWalletCurrency: string | null;
             categoryId: string | null;
+            /** @description Empty for a TRANSFER */
             categoryName: string;
             createdById: string;
             createdByName: string;
@@ -1519,7 +1610,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Sets auth cookies and redirects to the frontend */
+            /** @description Sets auth cookies and redirects to the frontend; on failure redirects to /login?error=GOOGLE_AUTH_FAILED (or / when a session already exists) */
             302: {
                 headers: {
                     [name: string]: unknown;
@@ -3007,7 +3098,7 @@ export interface operations {
                 tz?: string;
                 walletId?: string;
                 categoryId?: string;
-                type?: "EXPENSE" | "INCOME";
+                type?: "EXPENSE" | "INCOME" | "TRANSFER";
                 from?: string;
                 to?: string;
             };
@@ -3285,7 +3376,207 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponseDto"];
                 };
             };
-            /** @description Codes: WALLET_ARCHIVED, CATEGORY_ARCHIVED */
+            /** @description Codes: WALLET_ARCHIVED, CATEGORY_ARCHIVED, EXPENSE_IS_TRANSFER */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: CURRENCY_API_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TransfersController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spaceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTransferDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpenseResponseDto"];
+                };
+            };
+            /** @description Codes: VALIDATION_ERROR, INVALID_OCCURRED_AT, TRANSFER_SAME_WALLET, TRANSFER_AMOUNT_MISMATCH */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: HTTP_ERROR */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: FORBIDDEN_NOT_MEMBER */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: WALLET_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: WALLET_ARCHIVED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: CURRENCY_API_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TransfersController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spaceId: string;
+                transferId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Codes: HTTP_ERROR */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: FORBIDDEN_NOT_MEMBER */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: TRANSFER_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TransfersController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spaceId: string;
+                transferId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTransferDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpenseResponseDto"];
+                };
+            };
+            /** @description Codes: VALIDATION_ERROR, INVALID_OCCURRED_AT, TRANSFER_SAME_WALLET, TRANSFER_AMOUNT_MISMATCH */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: HTTP_ERROR */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: FORBIDDEN_NOT_MEMBER */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: TRANSFER_NOT_FOUND, WALLET_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+            /** @description Codes: WALLET_ARCHIVED */
             409: {
                 headers: {
                     [name: string]: unknown;

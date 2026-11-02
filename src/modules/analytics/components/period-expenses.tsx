@@ -8,7 +8,9 @@ import {
   ExpenseEditDialog,
   ExpenseRow,
   groupByDay,
+  TransferDialog,
   type EditableExpense,
+  type EditableTransfer,
 } from '@/modules/expenses';
 
 type Item = components['schemas']['AnalyticsExpenseItemDto'];
@@ -24,6 +26,7 @@ export function PeriodExpenses({ spaceId, items }: { spaceId: string; items: Ite
   const byId = new Map(categories.data?.map((c) => [c.id, c]));
   const groups = groupByDay(items, now);
   const [editing, setEditing] = useState<EditableExpense | null>(null);
+  const [editingTransfer, setEditingTransfer] = useState<EditableTransfer | null>(null);
 
   return (
     <section aria-labelledby="period-list-title" className="flex flex-col gap-3">
@@ -41,19 +44,37 @@ export function PeriodExpenses({ spaceId, items }: { spaceId: string; items: Ite
                 : te(g.label)}
             </h3>
             <ul>
-              {g.items.map((e) => (
-                <ExpenseRow
-                  key={e.id}
-                  expense={e}
-                  category={e.categoryId ? byId.get(e.categoryId) : undefined}
-                  wallet={e.walletName}
-                  onOpen={() => setEditing(e)}
-                />
-              ))}
+              {g.items.map((e) =>
+                e.type === 'TRANSFER' ? (
+                  <ExpenseRow
+                    key={e.id}
+                    expense={e}
+                    transfer={{ from: e.walletName, to: e.toWalletName ?? '' }}
+                    onOpen={() => setEditingTransfer(e)}
+                  />
+                ) : (
+                  <ExpenseRow
+                    key={e.id}
+                    expense={e}
+                    category={e.categoryId ? byId.get(e.categoryId) : undefined}
+                    wallet={e.walletName}
+                    onOpen={() => setEditing(e)}
+                  />
+                ),
+              )}
             </ul>
           </div>
         ))
       )}
+      {editingTransfer ? (
+        <TransferDialog
+          key={editingTransfer.id}
+          spaceId={spaceId}
+          transfer={editingTransfer}
+          open
+          onOpenChange={(open) => !open && setEditingTransfer(null)}
+        />
+      ) : null}
       {editing ? (
         <ExpenseEditDialog
           key={editing.id}

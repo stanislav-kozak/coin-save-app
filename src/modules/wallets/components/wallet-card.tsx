@@ -15,14 +15,22 @@ export type WalletView = {
 };
 
 /** Desktop wallet card (Figma 8:144). Negative balances in red (spec §6.8). */
-export function WalletCard({ wallet, withAction }: { wallet: WalletView; withAction?: boolean }) {
+export function WalletCard({
+  wallet,
+  actions = 0,
+}: {
+  wallet: WalletView;
+  /** How many of the panel's buttons sit over the card's right edge (edit, + income, ⇄ transfer). */
+  actions?: number;
+}) {
   return (
     <article
       style={entityStyle(wallet.color)}
       className={cn(
         'flex items-center gap-3 rounded-card border border-border bg-card p-4 shadow-card transition-shadow hover:shadow-card-raised motion-safe:transition-[translate,box-shadow] motion-safe:hover:-translate-y-0.5',
-        // Room for the panel's buttons (edit, + income) laid over the card's right edge.
-        withAction && 'pr-20',
+        // Room for the panel's buttons laid over the card's right edge.
+        actions === 2 && 'pr-20',
+        actions >= 3 && 'pr-28',
         entityStyle(wallet.color) && 'border-l-4 border-l-[color:var(--entity)]',
       )}
     >
@@ -33,7 +41,8 @@ export function WalletCard({ wallet, withAction }: { wallet: WalletView; withAct
           <CountUpMoney value={wallet.balance} currency={wallet.currency} />
         </p>
       </div>
-      <Badge tone="neutral">{wallet.currency}</Badge>
+      {/* With three buttons there's no room for both: the balance's own symbol (₴, $) names it. */}
+      {actions >= 3 ? null : <Badge tone="neutral">{wallet.currency}</Badge>}
     </article>
   );
 }
