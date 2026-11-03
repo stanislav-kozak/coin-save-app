@@ -20,6 +20,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+  // Android: the on-screen keyboard shrinks the layout instead of covering it (iOS ignores this;
+  // dialogs follow the visual viewport there, see use-sheet-keyboard).
+  interactiveWidget: 'resizes-content',
   // Browser and installed-app chrome: the design system's `bg` per colour scheme.
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#fdfbf9' },

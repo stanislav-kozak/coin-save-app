@@ -75,7 +75,8 @@ export function AnimatedBackground() {
       eased.y += (target.y - eased.y) * 0.12;
       eased.power += ((target.on ? 1 : 0) - eased.power) * 0.06;
       const { dot, hot, dark } = colors;
-      const scroll = window.scrollY;
+      // An open dialog pins the page (use-sheet-keyboard): its offset is then in body's `top`.
+      const scroll = window.scrollY || -parseFloat(document.body.style.top || '0');
       ctx.clearRect(0, 0, width, height);
 
       // The light under the cursor/finger.

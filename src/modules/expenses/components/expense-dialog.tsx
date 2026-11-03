@@ -15,6 +15,7 @@ import { Input } from '@/shared/ui/input';
 import { useCreateExpense } from '../api/expenses-mutations';
 import { createExpenseSchema, type ExpenseDraft, type ExpenseFormInput } from '../schemas';
 import { notify } from '@/shared/ui/toaster';
+import { focusWithoutScroll } from '@/shared/hooks/use-sheet-keyboard';
 
 type ValidationKey =
   | 'walletRequired'
@@ -52,10 +53,13 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingS
     isOpen.current = open;
   }, [open]);
 
-  const { register, handleSubmit, formState, reset, control, setFocus, setValue, getValues } =
-    useForm<ExpenseFormInput, unknown, ExpenseDraft>({
-      resolver: zodResolver(createExpenseSchema),
-    });
+  const { register, handleSubmit, formState, reset, control, setValue, getValues } = useForm<
+    ExpenseFormInput,
+    unknown,
+    ExpenseDraft
+  >({
+    resolver: zodResolver(createExpenseSchema),
+  });
 
   // A fresh open (new drop / FAB) starts clean; reopening after a failure keeps what was typed.
   useEffect(() => {
@@ -76,8 +80,8 @@ export function ExpenseDialog({ spaceId, open, onOpenChange, prefill, onPendingS
   }, [open, prefill?.walletId, prefill?.categoryId]);
 
   useEffect(() => {
-    if (open) setTimeout(() => setFocus('amount'), 0); // after Radix moves focus into the dialog
-  }, [open, setFocus]);
+    if (open) setTimeout(() => focusWithoutScroll('expense-amount'), 0); // after Radix moves focus into the dialog
+  }, [open]);
 
   // Opened before wallets loaded (e.g. the FAB right after navigation): preselect the first one then.
   const firstWalletId = wallets.data?.[0]?.id;
