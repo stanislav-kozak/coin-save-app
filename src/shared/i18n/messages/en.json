@@ -291,10 +291,7 @@
       "limitTooLarge": "That’s too much even for us — check the amount"
     },
     "tile": {
-      "left": "left",
-      "overShort": "over limit",
       "spentLabel": "spent",
-      "ofLimit": "{spent} of {limit}",
       "noLimit": "no limit",
       "stats": {
         "spent": "Spent",
@@ -302,7 +299,8 @@
         "over": "Over limit",
         "limit": "Limit {limit} · {pct}%",
         "noLimit": "No limit set"
-      }
+      },
+      "of": "of {limit}"
     }
   },
   "expenses": {

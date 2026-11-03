@@ -176,7 +176,7 @@ export function CategoryTile(props: Props) {
   const { category, spent, currency, onEdit, handle } = props;
   const t = useTranslations('categories');
   const tt = useTranslations('categories.tile');
-  const { status, caption, whole, shownSpent, left, excess } = useCategoryCaption(props);
+  const { status, caption, whole } = useCategoryCaption(props);
   const fill = limitFill(spent, category.monthlyLimit);
   const pulse = usePulseOnIncrease(spent, currency);
   const content = (
@@ -201,7 +201,7 @@ export function CategoryTile(props: Props) {
       <span className="relative mt-1 w-full truncate text-caption font-medium text-foreground">
         {category.name}
       </span>
-      {/* Variant C: the headline is what's left of the limit (or how much over), else the spent. */}
+      {/* The headline is what's spent (red over the limit); under it the limit, or that there's none. */}
       <span
         className={cn(
           // Tighter than the body line: the tile stays short with four lines under the icon.
@@ -209,25 +209,13 @@ export function CategoryTile(props: Props) {
           status === 'over' ? 'text-destructive' : 'text-foreground',
         )}
       >
-        {!category.monthlyLimit ? (
-          <CountUpMoney value={spent} currency={currency} />
-        ) : status === 'over' && excess ? (
-          `−${whole(excess)}`
-        ) : (
-          whole(left)
-        )}
+        <CountUpMoney value={spent} currency={currency} />
       </span>
       <span className="relative w-full truncate text-micro text-muted-foreground">
-        {!category.monthlyLimit
-          ? tt('spentLabel')
-          : status === 'over'
-            ? tt('overShort')
-            : tt('left')}
+        {tt('spentLabel')}
       </span>
       <span className="relative w-full truncate text-micro text-muted-foreground tabular-nums">
-        {category.monthlyLimit
-          ? tt('ofLimit', { spent: whole(shownSpent), limit: whole(category.monthlyLimit) })
-          : tt('noLimit')}
+        {category.monthlyLimit ? tt('of', { limit: whole(category.monthlyLimit) }) : tt('noLimit')}
       </span>
     </>
   );
