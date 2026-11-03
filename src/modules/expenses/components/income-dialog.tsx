@@ -16,6 +16,7 @@ import { Input } from '@/shared/ui/input';
 import { useCreateExpense } from '../api/expenses-mutations';
 import { incomeSchema, type IncomeDraft, type IncomeFormInput } from '../income-schema';
 import { notify } from '@/shared/ui/toaster';
+import { focusWithoutScroll } from '@/shared/hooks/use-sheet-keyboard';
 
 type CreateRecurring = components['schemas']['CreateRecurringTransactionDto'];
 type ValidationKey =
@@ -63,7 +64,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
     isOpen.current = open;
   }, [open]);
 
-  const { register, handleSubmit, formState, reset, control, setFocus, getValues } = useForm<
+  const { register, handleSubmit, formState, reset, control, getValues } = useForm<
     IncomeFormInput,
     unknown,
     IncomeDraft
@@ -82,7 +83,7 @@ export function IncomeDialog({ spaceId, walletId, open, onOpenChange }: Props) {
     setStage('form');
     pendingRule.current = null;
     reset(EMPTY);
-    setTimeout(() => setFocus('amount'), 0); // after Radix moves focus into the dialog
+    setTimeout(() => focusWithoutScroll('income-amount'), 0); // after Radix moves focus into the dialog
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset only when the dialog (re)opens
   }, [open, walletId]);
 

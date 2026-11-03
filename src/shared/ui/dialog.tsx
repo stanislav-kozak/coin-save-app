@@ -3,6 +3,7 @@
 import { X } from 'lucide-react';
 import { Dialog as Primitive } from 'radix-ui';
 import type { ReactNode } from 'react';
+import { useSheetKeyboard } from '@/shared/hooks/use-sheet-keyboard';
 import { cn } from '@/shared/lib/utils';
 
 export const Dialog = Primitive.Root;
@@ -29,8 +30,9 @@ export function DialogContent({ title, closeLabel, wide, children }: ContentProp
         aria-describedby={undefined}
         className={cn(
           'fixed z-50 overflow-y-auto bg-card p-6 text-card-foreground shadow-modal',
-          // Mobile: a sheet from the bottom edge, above the home indicator.
-          'inset-x-0 bottom-0 max-h-[90dvh] rounded-t-card pb-sheet',
+          // Mobile: a sheet from the bottom edge, above the home indicator — and above the on-screen
+          // keyboard while it's up (--keyboard-inset, use-sheet-keyboard), so nothing scrolls.
+          'inset-x-0 bottom-[var(--keyboard-inset,0px)] max-h-[min(90dvh,calc(var(--viewport-height,100dvh)-1rem))] rounded-t-card pb-sheet',
           'motion-safe:data-[state=open]:animate-in motion-safe:data-[state=open]:slide-in-from-bottom motion-safe:data-[state=open]:duration-300',
           'motion-safe:data-[state=closed]:animate-out motion-safe:data-[state=closed]:slide-out-to-bottom motion-safe:data-[state=closed]:duration-200',
           // Desktop: centred, fading in with a slight zoom.
@@ -40,6 +42,7 @@ export function DialogContent({ title, closeLabel, wide, children }: ContentProp
           'md:motion-safe:data-[state=closed]:fade-out-0 md:motion-safe:data-[state=closed]:zoom-out-95 md:motion-safe:data-[state=closed]:slide-out-to-bottom-0 md:motion-safe:data-[state=closed]:duration-150',
         )}
       >
+        <SheetKeyboard />
         <div className="mb-4 flex items-center justify-between gap-4">
           <Primitive.Title className="text-h2">{title}</Primitive.Title>
           <Primitive.Close
@@ -53,4 +56,10 @@ export function DialogContent({ title, closeLabel, wide, children }: ContentProp
       </Primitive.Content>
     </Primitive.Portal>
   );
+}
+
+/** Lives inside the content, so it runs only while the dialog is open (and closing). */
+function SheetKeyboard() {
+  useSheetKeyboard();
+  return null;
 }
