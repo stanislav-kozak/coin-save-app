@@ -291,10 +291,7 @@
       "limitTooLarge": "Це забагато навіть для нас — перевірте суму"
     },
     "tile": {
-      "left": "залишилось",
-      "overShort": "понад ліміт",
       "spentLabel": "витрачено",
-      "ofLimit": "{spent} з {limit}",
       "noLimit": "без ліміту",
       "stats": {
         "spent": "Витрачено",
@@ -302,7 +299,8 @@
         "over": "Понад ліміт",
         "limit": "Ліміт {limit} · {pct}%",
         "noLimit": "Ліміт не задано"
-      }
+      },
+      "of": "з {limit}"
     }
   },
   "expenses": {

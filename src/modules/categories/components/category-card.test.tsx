@@ -153,13 +153,14 @@ describe('CategoriesGrid', () => {
 });
 
 describe('CategoryTile (mobile)', () => {
-  it("shows what's left of the limit and «spent of limit», filled by the share of the limit", () => {
+  it('shows the spent amount, «витрачено» and «з <limit>», filled by the share of the limit', () => {
     renderWithProviders(
       <CategoryTile category={groceries} spent="1200" pct={60} currency="UAH" onEdit={() => {}} />,
     );
     const tile = screen.getByRole('button', { name: 'Редагувати: Продукти' });
     expect(tile).toHaveTextContent('Продукти');
-    expect(tile).toHaveTextContent(/800\s₴залишилось1\s200\s₴ з 2\s000\s₴/);
+    expect(amount(/1\s200,00\s₴/)).not.toHaveClass('text-destructive');
+    expect(tile).toHaveTextContent(/витрачено\s*з 2\s000\s₴$/);
     const fill = tile.querySelector<HTMLElement>('[data-fill]')!;
     expect(fill.style.height).toBe('60%');
   });
@@ -179,10 +180,10 @@ describe('CategoryTile (mobile)', () => {
     const fills = document.querySelectorAll<HTMLElement>('[data-fill]');
     expect(fills).toHaveLength(1);
     expect(fills[0]!.style.height).toBe('100%');
-    const over = screen.getByText(/^−400\s₴$/);
-    expect(over).toHaveClass('text-destructive');
-    expect(screen.getByText('понад ліміт')).toBeInTheDocument();
-    // Without a limit: the spent amount, labelled so.
+    // Over the limit: the spent amount turns red.
+    expect(amount(/2\s400,00\s₴/)).toHaveClass('text-destructive');
+    expect(screen.getByText(/^з 2\s000\s₴$/)).toBeInTheDocument();
+    // Without a limit: the spent amount, «без ліміту» under it.
     expect(amount(/10,00\s₴/)).not.toHaveClass('text-destructive');
     expect(screen.getByText('без ліміту')).toBeInTheDocument();
   });
